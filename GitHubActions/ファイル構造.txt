@@ -1,0 +1,7 @@
+GithubActions   
+    |-- ファイル構造.txt
+    |-- fetch_commit_log.py
+    |-- resources
+            |-- fetch_commit_log.sh
+            |-- workflows.csv
+            |-- commit_log.csv
