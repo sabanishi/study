@@ -26,7 +26,7 @@ vectorizer = TfidfVectorizer(
     analyzer='word',
     )
 
-# KMEansクラスタリングの実行
+# KMeansクラスタリングの実行
 tf_idfs = vectorizer.fit_transform(logs)
 num_clusters = 5
 kmeans = KMeans(n_clusters=num_clusters,random_state=999)
@@ -55,7 +55,6 @@ output_df = pd.DataFrame(output_lines, columns=["commit_hash","url","log"])
 output_df.to_csv(output_file_path, index=False)
 
 # 特徴量を出力する
-
 tf_pd = pd.DataFrame(tf_idfs.toarray())
 tf_pd.columns = vectorizer.get_feature_names_out()
 print(tf_pd.columns.to_list())

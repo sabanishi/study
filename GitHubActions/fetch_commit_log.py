@@ -18,7 +18,7 @@ def get_commit_title(commit_url,token):
     
         # レスポンスのJSONデータを取得
         data = response.json()
-        # コミットメッセージ（タイトル）を取得
+        # コミットメッセージを取得
         commit_title = data['commit']['message']
         is_success = True
     except Exception as e:
@@ -26,8 +26,6 @@ def get_commit_title(commit_url,token):
     
     return is_success, commit_title
 
-
-#tokenを環境変数から取得
 args = sys.argv
 if len(args) != 4:
     print("Usage: python fetch_commit_log.py <token> <input_file_path> <output_file_path>")
