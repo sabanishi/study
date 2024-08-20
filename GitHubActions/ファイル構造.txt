@@ -2,10 +2,18 @@ GitHubActions
     |-- ファイル構造.txt
     |-- fetch_commit_log.py
     |-- clustering.py
+    |-- browse_cluster.py
+    |-- search_vocab.py
+    |-- remove_merge_commit.py
+    |-- count_merge.py
     |-- resources
         |-- workflows.csv
         |-- commit_log.csv
         |-- commit_log_clustered.csv
+        |-- commit_log_no_merge.csv (commit_log.csvからマージコミットを除いた物)
+        |-- commit_log_clustered_no_merge.csv
     |-- sh
         |-- fetch_commit_log.sh
         |-- clustering.sh 
+        |-- browse_cluster.sh
+        |-- search_vocab.sh
