@@ -1,13 +1,8 @@
 # TF-IDF特徴量によってCommitLogをベクトル化するスクリプト
 
-import matplotlib.pyplot as plt
 import sys
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 
 args = sys.argv
 if len(args) != 3:

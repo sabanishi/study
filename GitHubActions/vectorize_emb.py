@@ -1,13 +1,7 @@
 # OpenAIのEmbeddingによってCommitLogをベクトル化するスクリプト
 
-import matplotlib.pyplot as plt
 import sys
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 from openai import OpenAI
 
 args = sys.argv
@@ -28,18 +22,27 @@ client = OpenAI(api_key=api_token)
 vectors = []
 i = 0
 for log in logs:
-    response = client.embeddings.create(
-        input = log,
-        model="text-embedding-3-small"
-    )
-    embedding = response.data[0].embedding
-    #配列を文字列に変換
-    embedding = ",".join(map(str, embedding))
-    vectors.append(embedding)
-    i += 1
-    print(f"{i}/{len(logs)}終了")
+    try:
+        response = client.embeddings.create(
+            input = log,
+            model="text-embedding-3-small"
+        )
+        embedding = response.data[0].embedding
+        #配列を文字列に変換
+        embedding = ",".join(map(str, embedding))
+        vectors.append(embedding)
+        i += 1
+        print(f"{i}/{len(logs)}終了")
+    except Exception as e:
+        print(f"{i}/{len(logs)}失敗")
+        print(e)
+        vectors.append("")
 
 #結果をdfに追記
 df["vector"] = vectors
+
+# vector列が空の行を削除
+df = df[df["vector"] != ""]
+
 # csvファイルに保存
 df.to_csv(output_file_path, index=False)

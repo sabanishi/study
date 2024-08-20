@@ -1,10 +1,7 @@
 # 階層的クラスタリングを行うスクリプト
 
-import matplotlib.pyplot as plt
 import sys
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
