@@ -11,7 +11,7 @@ if len(args) != 2:
     sys.exit()
 
 input_file_path = args[1]
-output_file_path = "browse_memo.txt"
+output_file_path = "browse_memo_3.txt"
 
 df = pd.read_csv(input_file_path)
 
