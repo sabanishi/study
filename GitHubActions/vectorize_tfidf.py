@@ -27,7 +27,8 @@ vectorizer = TfidfVectorizer(
         'fix','fixes','if','it','not','only','this','use',
         'off','that','ci','github','action','actions','add','added','change','changes','create','yml',
         'bot','new','so','some','try','workflow','workflows','also','now','signed','com','will','which','build',
-        'test','tests','release','version','run','make'],
+        'test','tests','release','version','run','make','yaml',
+        'reverts','revert','commit'],
     analyzer='word',
     )
 tf_idfs = vectorizer.fit_transform(logs)
