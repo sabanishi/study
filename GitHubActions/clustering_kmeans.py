@@ -17,13 +17,16 @@ num_clusters = int(args[3])
 
 df = pd.read_csv(input_file_path)
 
+# vectorのラベルを読み込み
+vector_labels = pd.read_csv("feature_names.csv")
+
 # vector列を抽出
 vectors = df["vector"].values.astype('U')
 #カンマ区切りを配列に変換
 vectors = [list(map(float, vector.split(','))) for vector in vectors]
 
 # KMeansクラスタリングの実行
-kmeans = KMeans(n_clusters=num_clusters,random_state=999)
+kmeans = KMeans(n_clusters=num_clusters,random_state=999, verbose=1)
 kmeans.fit(vectors)
 clusters = kmeans.predict(vectors)
 # クラスターの重心を取得
@@ -40,7 +43,12 @@ output_lines = []
 for cluster_num in similarity_order:
     # クラスタラベル行を追加
     cluster_similarity = average_similarity[cluster_num]
-    output_lines.append([f'Cluster {cluster_num} (Avg Similarity: {cluster_similarity:.4f})', '', ''])
+    # 特徴的な単語を取得
+    cluster_vector = centroids[cluster_num]
+    #ベクトル内の値が大きい要素5個のインデックスを取得
+    top_indices = np.argsort(-cluster_vector)[:5]
+    top_words = vector_labels.iloc[top_indices].values
+    output_lines.append([f"Cluster {cluster_num} (Similarity: {cluster_similarity:.2f})", top_words])
     
     # このクラスタに属する行を抽出
     cluster_data = sorted_data[sorted_data['Cluster'] == cluster_num]

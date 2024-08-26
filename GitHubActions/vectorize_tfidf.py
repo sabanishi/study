@@ -20,13 +20,14 @@ logs = df["log"].values.astype('U')
 vectorizer = TfidfVectorizer(
     # テキストデータをTF-IDF特徴量に変換
     min_df=5,
-    max_features=100,
+    max_features=1000,
     stop_words=[
         'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'am', 'are', 'is',
         'all','and','as','by','chore','feat','for','from','in','more','of','on','to','update','updated','we','when','with',
         'fix','fixes','if','it','not','only','this','use',
         'off','that','ci','github','action','actions','add','added','change','changes','create','yml',
-        'bot','new','so','some','try','workflow','workflows','also','now','signed','com','will','which','build'],
+        'bot','new','so','some','try','workflow','workflows','also','now','signed','com','will','which','build',
+        'test','release','version'],
     analyzer='word',
     )
 tf_idfs = vectorizer.fit_transform(logs)
@@ -39,3 +40,9 @@ vectors = [','.join(map(str, vector)) for vector in vectors]
 df["vector"] = vectors
 # csvファイルに保存
 df.to_csv(output_file_path, index=False)
+
+#各ベクトルに対応する単語を取得
+feature_names = vectorizer.get_feature_names_out()
+
+#それをcsvファイルに出力
+pd.DataFrame(feature_names).to_csv("feature_names.csv", index=False)
