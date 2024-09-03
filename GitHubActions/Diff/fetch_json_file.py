@@ -32,7 +32,7 @@ output_folder_path = args[3]
 first_commit = args[4]
 
 #取ってくるコミットの数
-fetch_amount = 10
+fetch_amount = 10000
 shuffle_seed = 9999
 
 print("読み込み開始")
