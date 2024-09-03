@@ -3,6 +3,7 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import silhouette_score
 import numpy as np
 import sys
 
@@ -26,11 +27,17 @@ vectors = df["vector"].values.astype('U')
 vectors = [list(map(float, vector.split(','))) for vector in vectors]
 
 # KMeansクラスタリングの実行
+print("Clustering...")
 kmeans = KMeans(n_clusters=num_clusters,random_state=999, verbose=1)
 kmeans.fit(vectors)
 clusters = kmeans.predict(vectors)
 # クラスターの重心を取得
 centroids = kmeans.cluster_centers_
+print("Clustering finished")
+
+#シルエット係数を計算する
+silhouette_avg = silhouette_score(vectors, clusters)
+print(f"Silhouette Score: {silhouette_avg}")
 
 df['Cluster'] = clusters
 sorted_data = df.sort_values(by="Cluster")
