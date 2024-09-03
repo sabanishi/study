@@ -25,8 +25,6 @@ def create_vector(patch):
             words.remove(words[0])
         negative_words.extend(words)
 
-    print("")
-    print("")
     #positive_wordsとnegative_wordsの両方に含まれる単語を両方から削除
     i = 0
     while True:
@@ -34,7 +32,6 @@ def create_vector(patch):
             break
         word = positive_words[i]
         if word in negative_words:
-            print("delete pos:"+word)
             positive_words.remove(word)
             negative_words.remove(word)
         else:
@@ -70,6 +67,7 @@ output_dict = {
 
 i = 0
 is_skip = False
+length = len(df)
 while(True):
     try:
         #全てのコミットログを取得したら終了
@@ -108,6 +106,7 @@ while(True):
                     "filename" : filename,
                     "vector" : vector
                 })
+            print(f"Success({i}/{length}): {commit_hash}")
             buffer_dict["data"].append(json_data)
             if len(buffer_dict["data"]) >= batch_size:
                 output_dict["data"].extend(buffer_dict["data"])
