@@ -22,14 +22,15 @@ def get_commit_json(commit_url,token) -> (str, str):
     return (data, log)
 
 args = sys.argv
-if len(args) != 5:
-    print("Usage: python fetch_json_log.py <token> <input_file_path> <output_folder_path> <skip_to>")
+if len(args) != 6:
+    print("Usage: python fetch_json_log.py <token> <input_file_path> <output_file_path> <output_folder_path> <skip_to>")
     sys.exit()
 
 token = args[1]
 input_file_path = args[2]
-output_folder_path = args[3]
-first_commit = args[4]
+output_file_path = args[3]
+output_folder_path = args[4]
+first_commit = args[5]
 
 #取ってくるコミットの数
 fetch_amount = 10000
@@ -41,10 +42,13 @@ print("読み込み完了")
 
 #ファイルをシャッフル
 df = df.sample(frac=1,random_state=shuffle_seed)
+output_df = pd.DataFrame(columns=["commit_hash","url","log"])
+buffer = []
 
 i = 0
 success_count = 0
 is_skip = False
+batch_size = 100
 while(True):
     #一定数のコミットログを取得したら終了
     if success_count >= fetch_amount or i >= len(df):
@@ -76,9 +80,20 @@ while(True):
                 break
 
             #jsonファイルを保存
-            output_file_path = output_folder_path +"/"+ commit_hash + ".json"
-            with open(output_file_path, mode='w') as f:
+            json_path = output_folder_path +"/"+ commit_hash + ".json"
+            with open(json_path, mode='w') as f:
                 json.dump(data, f, indent=4)
+            
+            buffer.append({
+                "commit_hash": commit_hash,
+                "url": url,
+                "log": log
+            })
+
+            if len(buffer) >= batch_size:
+                output_df = pd.concat([output_df, pd.DataFrame(buffer)],ignore_index=True)
+                output_df.to_csv(output_file_path,index=False)
+                buffer.clear()
             
             success_count += 1
             print(f"Success({success_count}件目): {commit_hash}")
@@ -93,3 +108,7 @@ while(True):
                 print(f"Error: {e}")
                 time.sleep(60)
                 break
+
+if buffer:
+    output_df = pd.concat([output_df, pd.DataFrame(buffer)],ignore_index=True)
+    output_df.to_csv(output_file_path,index=False)
