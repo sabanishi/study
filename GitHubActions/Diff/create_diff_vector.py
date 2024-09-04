@@ -1,6 +1,9 @@
 import pandas as pd
 import json
 import sys
+import os
+import traceback
+from RawPatchCommit import RawPatchCommit, RawPatchData
 
 def create_vector(patch):
     #patchを行ごとに分割
@@ -50,16 +53,14 @@ if len(args) != 5:
     sys.exit()
 
 input_file_path = args[1]
-json_folder = args[2]
+json_folder = os.path.abspath(args[2])
 output_file_path = args[3]
 first_commit = args[4]
 
 df = pd.read_csv(input_file_path)
 
 batch_size = 100
-buffer_dict = {
-    "data" : []
-}
+buffer_list = []
 
 output_dict = {
     "data" : []
@@ -77,23 +78,21 @@ while(True):
         commit = df.iloc[i]
         i+=1
         commit_hash = commit["commit_hash"]
-        if first_commit == "none" or commit_hash == first_commit:
-            is_skip=True
-        else:
-            print(f"First Skip:({i}件目); {commit_hash}")
-            continue
+        if is_skip == False:
+            if first_commit == "none" or commit_hash == first_commit:
+                is_skip=True
+            else:
+                print(f"First Skip:({i}件目); {commit_hash}")
+                continue
 
         url = commit["url"]
         #jsonファイルを取得
-        with open(f"{json_folder}/{commit_hash}.json") as f:
+        file_path = os.path.join(json_folder, f"{commit_hash}.json")
+        with open(file_path,mode='r') as f:
             data = json.load(f)
             #全ての変更ファイルの情報を取得
             all_file_info = data["files"]
-            json_data = {
-                "commit_hash" : commit_hash,
-                "url" : url,
-                "patch" : []
-            }
+            commit_data = RawPatchCommit(commit_hash,url)
             for file_info in all_file_info:
                 #ファイルの拡張子がymlまたはyamlでない場合はスキップ
                 filename = file_info["filename"]
@@ -102,23 +101,20 @@ while(True):
                 #変更情報を取得
                 patch = file_info["patch"]
                 vector = create_vector(patch)
-                json_data["patch"].append({
-                    "filename" : filename,
-                    "vector" : vector
-                })
+                commit_data.add_patch(RawPatchData(filename, vector))
             print(f"Success({i}/{length}): {commit_hash}")
-            buffer_dict["data"].append(json_data)
-            if len(buffer_dict["data"]) >= batch_size:
-                output_dict["data"].extend(buffer_dict["data"])
+            buffer_list.append(commit_data.to_json())
+            if len(buffer_list) >= batch_size:
+                output_dict["data"].extend(buffer_list)
                 with open(output_file_path, mode='w') as f:
                     json.dump(output_dict, f, indent=4)
-                buffer_dict["data"] = []
+                buffer_list = []
 
     except Exception as e:
-        print(f"Error: {commit_hash}, {e}")
+        print(traceback.format_exc())
         continue
 
-if len(buffer_dict["data"]) > 0:
-    output_dict["data"].extend(buffer_dict["data"])
+if len(buffer_list) > 0:
+    output_dict["data"].extend(buffer_list)
     with open(output_file_path, mode='w') as f:
         json.dump(output_dict, f, indent=4)

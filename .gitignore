@@ -2,3 +2,4 @@
 *resources/
 *sh/
 *log/
+*__pycache__/
