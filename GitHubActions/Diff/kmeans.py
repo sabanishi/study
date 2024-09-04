@@ -52,17 +52,17 @@ for cluster_num in similarity_order:
     #ベクトル内の値が大きい要素5個のインデックスを取得
     top_indices = np.argsort(-cluster_vector)[:5]
     top_words = vector_labels.iloc[top_indices].values
-    output_lines.append([f"Cluster {cluster_num} (Similarity: {cluster_similarity:.2f})", top_words])
+    output_lines.append([f"Cluster {cluster_num} (Similarity: {cluster_similarity:.2f})","",top_words,""])
     
     # このクラスタに属する行を抽出
     cluster_data = sorted_data[sorted_data['Cluster'] == cluster_num]
     
     # 各行のデータを追加
     for _, row in cluster_data.iterrows():
-        output_lines.append([row['commit_hash'], row['url'], row['raw_vector']])
+        output_lines.append([row['commit_hash'], row['url'],"",row['raw_vector']])
 
 #行リストをDataFrameに変換
-output_df = pd.DataFrame(output_lines, columns=["commit_hash","url","log"])
+output_df = pd.DataFrame(output_lines, columns=["commit_hash","url","features","raw_vector"])
 
 #出力する
 output_df.to_csv(output_file_path, index=False)
