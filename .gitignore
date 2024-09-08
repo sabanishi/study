@@ -1,5 +1,5 @@
 .DS_Store
 *resources/
-*sh/
+*secrets/
 *log/
 *__pycache__/

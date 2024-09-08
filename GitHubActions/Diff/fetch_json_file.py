@@ -22,19 +22,17 @@ def get_commit_json(commit_url,token) -> (str, str):
     return (data, log)
 
 args = sys.argv
-if len(args) != 6:
-    print("Usage: python fetch_json_log.py <token> <input_file_path> <output_file_path> <output_folder_path> <skip_to>")
+if len(args) != 8:
+    print("Usage: python fetch_json_log.py <token> <input_file_path> <output_file_path> <output_folder_path> <fetch_amount> <shuffle_seed> <skip_to>")
     sys.exit()
 
 token = args[1]
 input_file_path = args[2]
 output_file_path = args[3]
 output_folder_path = args[4]
-first_commit = args[5]
-
-#取ってくるコミットの数
-fetch_amount = 100000
-shuffle_seed = 9999
+fetch_amount = int(args[5])
+shuffle_seed = int(args[6])
+first_commit = args[7]
 
 print("読み込み開始")
 df = pd.read_csv(input_file_path)

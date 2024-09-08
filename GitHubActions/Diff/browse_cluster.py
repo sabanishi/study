@@ -7,7 +7,7 @@ import pyperclip
 
 args = sys.argv
 if len(args) != 3:
-    print("Usage: python search_vocab.py <input_file_path> <output_file_path>")
+    print("Usage: python browse_cluster.py <input_file_path> <output_file_path>")
     sys.exit()
 
 input_file_path = args[1]
