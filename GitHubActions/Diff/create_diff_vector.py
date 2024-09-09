@@ -9,6 +9,7 @@ from RawPatchCommit import RawPatchCommit, RawPatchData, ChunkData
 def create_chunk_data(chunk,is_debug) -> ChunkData:
     positive_lines = [line for line in chunk if line.startswith("+")]
     negative_lines = [line for line in chunk if line.startswith("-")]
+
     #「\s」がある場所で分割
     positive_words = []
     for line in positive_lines:
@@ -16,6 +17,9 @@ def create_chunk_data(chunk,is_debug) -> ChunkData:
         #文頭の「+」の文字を削除
         if len(words) > 0:
             words.remove(words[0])
+        #文頭が「#」で始まる場合はコメントアウトと判断して無視する
+        if len(words) > 0 and words[0].startswith("#"):
+            continue
         positive_words.extend(words)
     negative_words = []
     for line in negative_lines:
@@ -23,7 +27,13 @@ def create_chunk_data(chunk,is_debug) -> ChunkData:
         #文頭の「-」を削除
         if len(words) > 0:
             words.remove(words[0])
+        #文頭が「#」で始まる場合はコメントアウトと判断して無視する
+        if len(words) > 0 and words[0].startswith("#"):
+            continue
         negative_words.extend(words)
+
+    #positive_word,negative_wordのいずれかが空の場合は無効なデータとする
+    is_valid = len(positive_words) > 0 and len(negative_words) > 0
 
     #positive_wordsとnegative_wordsの両方に含まれる単語を両方から削除
     i = 0
@@ -44,9 +54,6 @@ def create_chunk_data(chunk,is_debug) -> ChunkData:
         returu_vector.append(f"+{word}")
     for word in negative_words:
         returu_vector.append(f"-{word}")
-
-    #positive_word,negative_wordのいずれかが空の場合は無効なデータとする
-    is_valid = len(positive_words) > 0 and len(negative_words) > 0
     
     if is_debug:
         print("Chunk:")

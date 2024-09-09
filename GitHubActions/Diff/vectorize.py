@@ -38,20 +38,23 @@ with open(input_file_path, "r") as f:
 
                 #positive_wordsとnegative_wordsの両方が存在するもののみを抽出する
                 if is_valid:
-                    data_list.append({
-                        "commit_hash":commit.commit_hash,
-                        "url":commit.url,
-                        "file_name":file_name,
-                        "chunk_name":chunk_name,
-                        "raw_vector":chunk_data
-                    })
 
-df = pd.DataFrame(data_list,columns=["commit_hash","url","file_name","chunk_name","raw_vector"])
+                    #ベクトルの要素数が10以下のものに限定する
+                    if len(chunk_data) <= 10:
+                        data_list.append({
+                            "commit_hash":commit.commit_hash,
+                            "url":commit.url,
+                            "file_name":file_name,
+                            "chunk_name":chunk_name,
+                            "raw_vector":chunk_data
+                        })
+
+df = pd.DataFrame(data_list,columns=["commit_hash","url","file_name","chunk_name","raw_vector","vector"])
 #TF-IDFのパッケージをsetupする
 vectorizer = TfidfVectorizer(
     # テキストデータをTF-IDF特徴量に変換
     min_df=1,
-    max_features=1000,
+    max_features=100,
     analyzer='word',
     token_pattern=r"(?u)\s[\+\-]\w+\s",
     stop_words=convert_to_stop_words([
@@ -61,7 +64,7 @@ vectorizer = TfidfVectorizer(
         'off','that','ci','github','action','actions','add','added','change','changes','create','yml',
         'bot','new','so','some','try','workflow','workflows','also','now','signed','com','will','which','build',
         'test','tests','release','version','run','make','yaml',
-        'reverts','revert','commit'])
+        'reverts','revert','commit','true','false'])
 )
 
 #単語ベクトルを空白文字で結合
@@ -73,6 +76,8 @@ vectors = [','.join(map(str, vector)) for vector in vectors]
 
 #結果をdfに追記
 df["vector"] = vectors
+
+print("Success: Vectorize")
 
 # csvファイルに保存
 df.to_csv(output_file_path, index=False)
