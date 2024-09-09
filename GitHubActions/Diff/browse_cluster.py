@@ -4,6 +4,24 @@ import pandas as pd
 import webbrowser
 import sys
 import pyperclip
+from enum import Enum
+from typing import Tuple
+
+class InputResult(Enum):
+    NONE = 0
+    SKIP = 1
+    GO_TO_SPEC_CLUSTER = 2
+    SHOW_DETAIL = 3
+
+def wait_input() -> Tuple[InputResult,str]:
+    tmp = input()
+    if tmp == "s":
+        return (InputResult.SKIP,tmp)
+    elif tmp.isdecimal():
+        return (InputResult.GO_TO_SPEC_CLUSTER,tmp)
+    elif tmp == "d":
+        return (InputResult.SHOW_DETAIL,tmp)
+    return (InputResult.NONE,tmp)
 
 args = sys.argv
 if len(args) != 3:
@@ -63,12 +81,26 @@ for i in range(len(urls)):
     print(f"GoTo: {name}:{url}")
 
     #何かしらの入力があるまで待つ
-    tmp = input()
-    if tmp == "s":
-        # sが入力された時、次のクラスターまでスキップする
-        is_skip_to_cluster = True
-    elif tmp.isdecimal():
-        # 数字が入力された時、そのクラスターまでスキップする
-        next_cluster_num = int(tmp)
-        is_skip_to_cluster = True
-        skip_next_cluster = True
+    #dが入力された時は、もう一度入力を待つ
+    while True:
+        (result,input_text) = wait_input()
+        if result == InputResult.SKIP:
+            # sが入力された時、次のクラスターまでスキップする
+            is_skip_to_cluster = True
+            break
+        elif result == InputResult.GO_TO_SPEC_CLUSTER:
+            # 数字が入力された時、そのクラスターまでスキップする
+            next_cluster_num = int(input_text)
+            is_skip_to_cluster = True
+            skip_next_cluster = True
+            break
+        elif result == InputResult.SHOW_DETAIL:
+            # dが入力された時、詳細を表示する
+            #文字列vectorを表示
+            raw_vector = df["raw_vector"].values[i]
+            print("Raw Vector:")
+            for word in raw_vector.split(","):
+                print(word)
+        else:
+            break
+        
