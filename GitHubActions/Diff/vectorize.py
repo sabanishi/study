@@ -29,21 +29,25 @@ with open(input_file_path, "r") as f:
     raw_data = json.load(f)["data"]
     for data in raw_data:
         commit = RawPatchCommit.from_json(data)
-        raw_vector = set()
         for patch in commit.patch:
-            raw_vector.update(patch.vector)
+            file_name = patch.file_name
+            for chunk in patch.chunks:
+                chunk_name = chunk.name
+                chunk_data = chunk.data
         
-        data_list.append({
-            "commit_hash":commit.commit_hash,
-             "url":commit.url,
-             "raw_vector":list(raw_vector)
-        })
+                data_list.append({
+                    "commit_hash":commit.commit_hash,
+                    "url":commit.url,
+                    "file_name":file_name,
+                    "chunk_name":chunk_name,
+                    "raw_vector":chunk_data
+                })
 
-df = pd.DataFrame(data_list,columns=["commit_hash","url","raw_vector"])
+df = pd.DataFrame(data_list,columns=["commit_hash","url","file_name","chunk_name","raw_vector"])
 #TF-IDFのパッケージをsetupする
 vectorizer = TfidfVectorizer(
     # テキストデータをTF-IDF特徴量に変換
-    min_df=5,
+    min_df=1,
     max_features=1000,
     analyzer='word',
     token_pattern=r"(?u)\s[\+\-]\w+\s",

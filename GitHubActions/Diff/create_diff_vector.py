@@ -3,15 +3,12 @@ import json
 import sys
 import os
 import traceback
-from RawPatchCommit import RawPatchCommit, RawPatchData
+from RawPatchCommit import RawPatchCommit, RawPatchData, ChunkData
 
-def create_vector(patch):
-    #patchを行ごとに分割
-    lines = patch.split("\n")
-    #変更された行のみを取得
-    positive_lines = [line for line in lines if line.startswith("+")]
-    negative_lines = [line for line in lines if line.startswith("-")]
-
+#チャンク毎の変更情報をベクトル化したものを作成する
+def create_chunk_data(chunk,is_debug) -> ChunkData:
+    positive_lines = [line for line in chunk if line.startswith("+")]
+    negative_lines = [line for line in chunk if line.startswith("-")]
     #「\s」がある場所で分割
     positive_words = []
     for line in positive_lines:
@@ -40,15 +37,43 @@ def create_vector(patch):
         else:
             i+=1
 
-    return_lines = []
+    #ベクトルを作成
+    #positive_wordには「+」を、negative_wordには「-」を付与する
+    returu_vector = []
     for word in positive_words:
-        return_lines.append(f"+{word}")
+        returu_vector.append(f"+{word}")
     for word in negative_words:
-        return_lines.append(f"-{word}")
-    return return_lines
+        returu_vector.append(f"-{word}")
+
+    if is_debug:
+        print("Chunk:")
+        for line in chunk:
+            print(line)
+    name = chunk[0]
+    chunk_data = ChunkData(name,returu_vector)
+    return chunk_data
+
+#ファイルのパッチ情報から、チャンク毎の変更情報をベクトル化したものを作成する
+def create_chunk_list(patch,is_debug=False) ->list[list[str]]:
+    #patchを行ごとに分割
+    returu_vector = patch.split("\n")
+    #チャンク毎に分割
+    chunks = []
+    for line in returu_vector:
+        if line.startswith("@@"):
+            chunks.append([])
+        chunks[-1].append(line)
+
+    #各チャンクに対して、変更された部分のみを取り出したベクトルを作成する
+    result = []
+    for chunk in chunks:
+        chuk_data = create_chunk_data(chunk,is_debug)
+        result.append(chuk_data)
+    
+    return result
 
 args = sys.argv
-if len(args) != 5:
+if len(args) != 5 and len(args) != 6:
     print("Usage: python create_diff_vector.py <input_file_path> <json_folder> <output_file_path> <skip_to>")
     sys.exit()
 
@@ -56,6 +81,10 @@ input_file_path = args[1]
 json_folder = os.path.abspath(args[2])
 output_file_path = args[3]
 first_commit = args[4]
+
+is_debug = False
+if len(args) == 6:
+    is_debug = True
 
 df = pd.read_csv(input_file_path)
 
@@ -100,8 +129,8 @@ while(True):
                     continue
                 #変更情報を取得
                 patch = file_info["patch"]
-                vector = create_vector(patch)
-                commit_data.add_patch(RawPatchData(filename, vector))
+                chunks = create_chunk_list(patch,is_debug)
+                commit_data.add_patch(RawPatchData(filename, chunks))
             print(f"Success({i}/{length}): {commit_hash}")
             buffer_list.append(commit_data.to_json())
             if len(buffer_list) >= batch_size:

@@ -1,17 +1,36 @@
+class ChunkData:
+    def __init__(self,name:str,data:list[str]):
+        self.name = name
+        self.data = data
+
+    def from_json(json_data:dict):
+        name = json_data["name"]
+        data = json_data["data"]
+        return ChunkData(name,data)
+    
+    def to_json(self):
+        return {
+            "name" : self.name,
+            "data" : self.data
+        }
+
 class RawPatchData:
-    def __init__(self,file_name:str,vector:list[str]):
+    def __init__(self,file_name:str,chunks:list[ChunkData]):
         self.file_name = file_name
-        self.vector = vector
+        self.chunks = chunks
     
     def from_json(json_data:dict):
         file_name = json_data["file_name"]
-        vector = json_data["vector"]
-        return RawPatchData(file_name,vector)
+        raw_chunks = json_data["chunks"]
+        chunks = []
+        for c in raw_chunks:
+            chunks.append(ChunkData.from_json(c))
+        return RawPatchData(file_name,chunks)
 
     def to_json(self):
         return {
             "file_name" : self.file_name,
-            "vector" : self.vector
+            "chunks" : [c.to_json() for c in self.chunks]
         }
 
 class RawPatchCommit:
