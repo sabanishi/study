@@ -59,10 +59,10 @@ for cluster_num in similarity_order:
     
     # 各行のデータを追加
     for _, row in cluster_data.iterrows():
-        output_lines.append([row['commit_hash'], row['url'],"",row['raw_vector']])
+        output_lines.append([row['file_name']+row['chunk_name'], row['url'],"",row['raw_vector']])
 
 #行リストをDataFrameに変換
-output_df = pd.DataFrame(output_lines, columns=["commit_hash","url","features","raw_vector"])
+output_df = pd.DataFrame(output_lines, columns=["name","url","features","raw_vector"])
 
 #出力する
 output_df.to_csv(output_file_path, index=False)

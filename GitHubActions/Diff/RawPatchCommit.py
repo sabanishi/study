@@ -1,16 +1,19 @@
 class ChunkData:
-    def __init__(self,name:str,data:list[str]):
+    def __init__(self,name:str,is_valid:bool,data:list[str]):
         self.name = name
+        self.is_valid = is_valid
         self.data = data
 
     def from_json(json_data:dict):
         name = json_data["name"]
+        is_valid = json_data["is_valid"]
         data = json_data["data"]
-        return ChunkData(name,data)
+        return ChunkData(name,is_valid,data)
     
     def to_json(self):
         return {
             "name" : self.name,
+            "is_valid" : self.is_valid,
             "data" : self.data
         }
 

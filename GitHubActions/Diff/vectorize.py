@@ -33,15 +33,18 @@ with open(input_file_path, "r") as f:
             file_name = patch.file_name
             for chunk in patch.chunks:
                 chunk_name = chunk.name
+                is_valid = chunk.is_valid
                 chunk_data = chunk.data
-        
-                data_list.append({
-                    "commit_hash":commit.commit_hash,
-                    "url":commit.url,
-                    "file_name":file_name,
-                    "chunk_name":chunk_name,
-                    "raw_vector":chunk_data
-                })
+
+                #positive_wordsとnegative_wordsの両方が存在するもののみを抽出する
+                if is_valid:
+                    data_list.append({
+                        "commit_hash":commit.commit_hash,
+                        "url":commit.url,
+                        "file_name":file_name,
+                        "chunk_name":chunk_name,
+                        "raw_vector":chunk_data
+                    })
 
 df = pd.DataFrame(data_list,columns=["commit_hash","url","file_name","chunk_name","raw_vector"])
 #TF-IDFのパッケージをsetupする

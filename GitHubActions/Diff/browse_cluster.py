@@ -16,7 +16,7 @@ output_file_path = args[2]
 df = pd.read_csv(input_file_path)
 
 # url列を抽出
-commit_hashs = df["commit_hash"].values.astype('U')
+commit_hashs = df["name"].values.astype('U')
 urls = df["url"].values.astype('U')
 
 is_skip_to_cluster = False
@@ -25,10 +25,10 @@ next_cluster_num = 0
 # 上から順に開く
 for i in range(len(urls)):
     url = urls[i].rstrip()
-    if "Cluster" in commit_hashs[i]:
-        cluster_name = df["commit_hash"].values[i]
+    name = commit_hashs[i]
+    if "Cluster" in name:
         if skip_next_cluster:
-            if next_cluster_num == int(cluster_name.split(" ")[1]):
+            if next_cluster_num == int(name.split(" ")[1]):
                 skip_next_cluster = False
             else:
                 continue
@@ -36,7 +36,7 @@ for i in range(len(urls)):
         #featuresがfloatでない時
         if type(features) is not float:
             features = features.replace("\n", "")
-        print(f"GoTo: {cluster_name},\n{features}")
+        print(f"GoTo: {name},\n{features}")
         #クラスターに含まれる要素の数を表示
         cluster_size = 0
         for j in range(i+1,len(commit_hashs)):
@@ -48,8 +48,7 @@ for i in range(len(urls)):
 
         #メモに書き込む
         with open(output_file_path, mode='a') as f:
-            print(f"Write to {output_file_path}")
-            f.write(f"{cluster_name}\n")
+            f.write(f"{name}\n")
             f.write(f"Cluster size: {cluster_size}\n")
             f.write(f"{features}\n")
             f.write("\n")
@@ -61,7 +60,7 @@ for i in range(len(urls)):
         continue
     webbrowser.open(url,0)
     pyperclip.copy(url)
-    print(url)
+    print(f"GoTo: {name}:{url}")
 
     #何かしらの入力があるまで待つ
     tmp = input()

@@ -45,12 +45,15 @@ def create_chunk_data(chunk,is_debug) -> ChunkData:
     for word in negative_words:
         returu_vector.append(f"-{word}")
 
+    #positive_word,negative_wordのいずれかが空の場合は無効なデータとする
+    is_valid = len(positive_words) > 0 and len(negative_words) > 0
+    
     if is_debug:
         print("Chunk:")
         for line in chunk:
             print(line)
     name = chunk[0]
-    chunk_data = ChunkData(name,returu_vector)
+    chunk_data = ChunkData(name,is_valid,returu_vector)
     return chunk_data
 
 #ファイルのパッチ情報から、チャンク毎の変更情報をベクトル化したものを作成する
