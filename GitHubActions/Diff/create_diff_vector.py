@@ -5,6 +5,8 @@ import os
 import traceback
 from RawPatchCommit import RawPatchCommit, RawPatchData, ChunkData
 
+INVALID_CHAR = [".",";","-","==","->>","&&","|","||",">","}}","${{","!="]
+
 #チャンク毎の変更情報をベクトル化したものを作成する
 def create_chunk_data(chunk,is_debug) -> ChunkData:
     positive_lines = [line for line in chunk if line.startswith("+")]
@@ -31,6 +33,10 @@ def create_chunk_data(chunk,is_debug) -> ChunkData:
         if len(words) > 0 and words[0].startswith("#"):
             continue
         negative_words.extend(words)
+
+    #記号は無視する
+    positive_words = [word for word in positive_words if word not in INVALID_CHAR]
+    negative_words = [word for word in negative_words if word not in INVALID_CHAR]
 
     #positive_word,negative_wordのいずれかが空の場合は無効なデータとする
     is_valid = len(positive_words) > 0 and len(negative_words) > 0

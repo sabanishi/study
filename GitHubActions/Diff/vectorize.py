@@ -10,8 +10,8 @@ def convert_to_stop_words(words):
     result = []
     #「 +hoge 」と「 -hoge 」の形にして返す
     for word in words:
-        result.append(f' [+{word}] ')
-        result.append(f' [-{word}] ')
+        result.append(f' +{word} ')
+        result.append(f' -{word} ')
     return result
 
 args = sys.argv
