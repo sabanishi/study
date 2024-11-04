@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import normalize
 import numpy as np
 import sys
 
@@ -39,12 +40,22 @@ print(f"Silhouette Score: {silhouette_avg}")
 df['Cluster'] = clusters
 sorted_data = df.sort_values(by="Cluster")
 
-similarity_matrix = cosine_similarity(centroids, vectors)
+print("Centroids shape:", centroids.shape)
+print("Vectors shape:", np.array(vectors).shape)
+
+# クラスタの重心を正規化
+centroids_normalized = normalize(centroids)
+# ベクトルも正規化
+vectors_normalized = normalize(vectors)
+
+# 正規化したベクトルでコサイン類似度を計算
+similarity_matrix = cosine_similarity(centroids_normalized, vectors_normalized)
+
 average_similarity = similarity_matrix.mean(axis=1)
-similarity_order = np.argsort(-average_similarity)
+#similarity_order = np.argsort(-average_similarity)
 
 output_lines = []
-for cluster_num in similarity_order:
+for cluster_num in range(num_clusters):
     # クラスタラベル行を追加
     cluster_similarity = average_similarity[cluster_num]
     # 特徴的な単語を取得
