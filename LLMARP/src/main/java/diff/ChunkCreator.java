@@ -1,10 +1,12 @@
 package diff;
 
+import com.github.gumtreediff.tree.Tree;
 import model.Chunk;
 import model.Statement;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.revwalk.RevCommit;
 import utils.RepositoryAccess;
+import utils.TreeUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +24,7 @@ public class ChunkCreator {
     /**
      * コミットに含まれるChunkをリストにして返す
      */
-    public List<Chunk> extract(final RevCommit commit,final RepositoryAccess repositoryAccess){
+    public List<Chunk> calculate(final RevCommit commit, final RepositoryAccess repositoryAccess){
         final List<DiffEntry> entries = repositoryAccess.getChanges(commit);
         return entries.stream().filter(this::isSupportedFileChange)
                 .flatMap(e->extractChunks(e,repositoryAccess))
@@ -42,8 +44,11 @@ public class ChunkCreator {
         List<Statement> oldStatements = splitter.split(oldSource);
         List<Statement> newStatements = splitter.split(newSource);
 
+        Tree oldAllTree = TreeUtils.createTree(oldSource);
+        Tree newAllTree = TreeUtils.createTree(newSource);
+
         return differencer.compute(oldStatements,newStatements)
                 .stream()
-                .map(e->Chunk.of(entry.getNewPath(),oldStatements,newStatements,e));
+                .map(e->Chunk.of(entry.getNewPath(),oldStatements,oldAllTree,newStatements,newAllTree,e));
     }
 }
