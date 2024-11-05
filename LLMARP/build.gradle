@@ -23,6 +23,9 @@ dependencies {
     implementation 'com.github.gumtreediff:client:3.0.0'
     implementation 'com.github.gumtreediff:gen.jdt:3.0.0'
 
+    //Java-Diff-Utils
+    implementation "io.github.java-diff-utils:java-diff-utils:4.12"
+
     //JGit
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r'
 
@@ -31,6 +34,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    //Hash作成
+    implementation 'com.google.guava:guava:32.1.1-jre'
+    implementation 'commons-codec:commons-codec:1.16.0'
+
 }
 
 test {
