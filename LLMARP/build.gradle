@@ -22,6 +22,15 @@ dependencies {
     implementation 'com.github.gumtreediff:core:3.0.0'
     implementation 'com.github.gumtreediff:client:3.0.0'
     implementation 'com.github.gumtreediff:gen.jdt:3.0.0'
+
+    //JGit
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r'
+
+    //Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 }
 
 test {

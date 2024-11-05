@@ -8,7 +8,7 @@ import java.io.IOException;
 public class SandboxTest {
 
     @Test
-    void sandboxTest(){
+    void test(){
         String oldSource="",newSource="";
         try {
             oldSource = TestUtils.read("Before.java");
