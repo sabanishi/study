@@ -45,6 +45,8 @@ dependencies {
     implementation 'org.jdbi:jdbi3-core:3.42.0'
     implementation 'org.jdbi:jdbi3-sqlobject:3.42.0'
 
+    //Logging
+    implementation 'ch.qos.logback:logback-classic:1.4.12'
 }
 
 test {
