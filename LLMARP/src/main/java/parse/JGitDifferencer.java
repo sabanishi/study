@@ -1,4 +1,4 @@
-package diff;
+package parse;
 
 import lombok.Getter;
 import org.eclipse.jgit.diff.*;

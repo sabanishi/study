@@ -1,4 +1,4 @@
-package diff;
+package parse;
 
 import model.Statement;
 

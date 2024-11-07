@@ -1,9 +1,5 @@
-package diff;
+package parse;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.ChangeDelta;
-import com.github.difflib.patch.Patch;
 import com.github.gumtreediff.tree.Tree;
 import model.Chunk;
 import model.Statement;

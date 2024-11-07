@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    //JUnit
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
@@ -35,9 +36,14 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 
-    //Hash作成
+    //Create Hash
     implementation 'com.google.guava:guava:32.1.1-jre'
     implementation 'commons-codec:commons-codec:1.16.0'
+
+    //DB(JDBI)
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'org.jdbi:jdbi3-core:3.42.0'
+    implementation 'org.jdbi:jdbi3-sqlobject:3.42.0'
 
 }
 
