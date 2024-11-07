@@ -1,12 +1,14 @@
 package model;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Value
+@EqualsAndHashCode(of = {"raw"})
 @AllArgsConstructor(staticName="of")
 public class Statement {
     String raw;

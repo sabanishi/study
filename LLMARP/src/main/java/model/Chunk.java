@@ -78,13 +78,13 @@ public class Chunk {
         return new Chunk(fileName, oldStatement,oldAllTree, newStatement,newAllTree);
     }
 
-    private Tree extractSubTree(Tree allTree,Statement statement){
+    private Tree extractSubTree(Tree root,Statement statement){
         Range range = statement.getChars();
         final int begin = range.getBegin();
         final int end = range.getEnd();
 
         Stack<Tree> stack = new Stack<>();
-        stack.push(allTree);
+        stack.push(root);
 
         while(!stack.empty()){
             Tree node = stack.pop();
@@ -92,10 +92,8 @@ public class Chunk {
                 return node.deepCopy();
             }
 
-            if(node.getPos() <= begin && end <= node.getEndPos()){
-                for(Tree child: node.getChildren()){
-                    stack.push(child);
-                }
+            for(Tree child: node.getChildren()){
+                stack.push(child);
             }
         }
 

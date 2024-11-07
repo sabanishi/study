@@ -29,4 +29,8 @@ public class Range {
 
         return String.format("%d-%d", begin, end - 1);
     }
+
+    public Range joint(Range other){
+        return new Range(Math.min(this.begin, other.begin), Math.max(this.end, other.end));
+    }
 }

@@ -1,9 +1,14 @@
 package diff;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.ChangeDelta;
+import com.github.difflib.patch.Patch;
 import com.github.gumtreediff.tree.Tree;
 import model.Chunk;
 import model.Statement;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.revwalk.RevCommit;
 import utils.RepositoryAccess;
 import utils.TreeUtils;
@@ -49,6 +54,7 @@ public class ChunkCreator {
 
         return differencer.compute(oldStatements,newStatements)
                 .stream()
+                .filter(e->e.getType()== Edit.Type.REPLACE)//単純な追加、削除は除外する
                 .map(e->Chunk.of(entry.getNewPath(),oldStatements,oldAllTree,newStatements,newAllTree,e));
     }
 }
