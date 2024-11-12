@@ -1,23 +1,28 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 @Getter
 public class HalTreeNode extends HalNode {
-    private String type;
-    private String label;
-    private Tree original;
+    protected String type;
+    @Setter(AccessLevel.PUBLIC)
+    protected String label;
+    protected Tree original;
+
+    protected HalTreeNode(String type, String label, Tree original,int pos,int length) {
+        this.type = type;
+        this.label = label;
+        this.original = original;
+        this.pos = pos;
+        this.length = length;
+    }
 
     public static HalTreeNode of(Tree tree) {
-        HalTreeNode node = new HalTreeNode();
-        node.type = tree.getType().toString();
-        node.label = tree.getLabel();
-        node.original = tree;
-        node.pos = tree.getPos();
-        node.length = tree.getLength();
-
+        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree,tree.getPos(),tree.getLength());
         for (Tree child : tree.getChildren()) {
             node.addChild(HalTreeNode.of(child));
         }
@@ -26,7 +31,7 @@ public class HalTreeNode extends HalNode {
     }
 
     public static HalTreeNode of(HalTreeNode tree) {
-        HalTreeNode node = of(tree.original);
+        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original,tree.getPos(),tree.getLength());
         node.id = tree.id;
         return node;
     }
@@ -55,8 +60,28 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
-    public boolean equals(HalNode tree) {
-        return false;
+    public boolean equals(HalNode node) {
+        if (!(node instanceof HalTreeNode treeNode)) {
+            return false;
+        }
+
+        return this.getLabel().equals(treeNode.getLabel())
+                && this.getType().equals(treeNode.getType())
+                && this.getPos() == treeNode.getPos()
+                && this.getLength() == treeNode.getLength();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = calcMyHashCode();
+        for (HalNode child : children) {
+            hash += child.hashCode();
+        }
+        return hash;
+    }
+
+    private int calcMyHashCode(){
+        return this.label.hashCode() + this.type.hashCode() + this.pos + this.length;
     }
 
     @Override

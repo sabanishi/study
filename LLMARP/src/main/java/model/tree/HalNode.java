@@ -31,17 +31,44 @@ public abstract class HalNode {
         return list;
     }
 
-    public HalNode searchFromGumTree(Tree target) {
+    public HalNode searchByGumTree(Tree target) {
         if (isSameTree(target)) {
             return this;
         }
         for (HalNode child : children) {
-            HalNode result = child.searchFromGumTree(target);
+            HalNode result = child.searchByGumTree(target);
             if (result != null) {
                 return result;
             }
         }
         return null;
+    }
+
+    public HalNode searchById(int id){
+        if(this.id == id){
+            return this;
+        }
+        for(HalNode child:children){
+            HalNode result = child.searchById(id);
+            if(result != null){
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public boolean replace(HalNode oldNode,HalNode newNode){
+        for(int i=0;i<children.size();i++){
+            HalNode child = children.get(i);
+            if(child.equals(oldNode)){
+                children.set(i,newNode);
+                return true;
+            }
+            if(child.replace(oldNode,newNode)){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -54,6 +81,8 @@ public abstract class HalNode {
     public abstract HalNode deepCopy();
 
     public abstract boolean equals(HalNode tree);
+
+    public abstract int hashCode();
 
     protected abstract boolean isSameTree(Tree tree);
 }

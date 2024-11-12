@@ -32,6 +32,7 @@ dependencies {
 
     //JGit
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r'
+    testImplementation 'org.jetbrains:annotations:24.0.0'
 
     //Lombok
     compileOnly 'org.projectlombok:lombok:1.18.28'

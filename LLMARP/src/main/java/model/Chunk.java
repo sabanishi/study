@@ -8,11 +8,10 @@ import lombok.ToString;
 import lombok.Value;
 import model.tree.HalNode;
 import model.tree.HalTreeNode;
+import model.tree.NormalizationInfo;
 import org.eclipse.jgit.diff.Edit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 @ToString(of = {"fileName", "oldStatement", "newStatement"})
 @RequiredArgsConstructor
@@ -50,7 +49,7 @@ public class Chunk {
         HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree);
         HalTreeNode newTreeRoot = HalTreeNode.of(newTree);
 
-        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot);
+        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot,new ArrayList<NormalizationInfo>());
 
         //originalPatternのNodeにIDを付与する
         int id = 0;
@@ -59,7 +58,7 @@ public class Chunk {
             if (oldNode instanceof HalTreeNode oldTreeNode) {
                 Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
                 if (newOriginalTree != null) {
-                    HalNode newNode = newTreeRoot.searchFromGumTree(newOriginalTree);
+                    HalNode newNode = newTreeRoot.searchByGumTree(newOriginalTree);
                     newNode.setId(id);
                 }
             }
@@ -106,5 +105,8 @@ public class Chunk {
 
     private void normalize() {
         //徐々に正規化則を適用していく
+        Set<Pattern> normalized = new HashSet<Pattern>();
+        originalPattern.normalize(normalized);
+        normalizedPatterns.addAll(normalized);
     }
 }
