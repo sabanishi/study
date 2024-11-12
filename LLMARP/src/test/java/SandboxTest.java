@@ -1,19 +1,19 @@
 import com.github.gumtreediff.client.Run;
 import com.github.gumtreediff.gen.jdt.JdtTreeGenerator;
-import org.junit.jupiter.api.Test;
 import com.github.gumtreediff.tree.Tree;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 public class SandboxTest {
 
     @Test
-    void test(){
-        String oldSource="",newSource="";
+    void test() {
+        String oldSource = "", newSource = "";
         try {
             oldSource = TestUtils.read("Before.java");
             newSource = TestUtils.read("After.java");
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             return;
         }
@@ -27,10 +27,10 @@ public class SandboxTest {
         Run.initGenerators();
         Tree beforeTree;
         Tree afterTree;
-        try{
+        try {
             beforeTree = createTree(oldSource);
             afterTree = createTree(newSource);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }
@@ -42,7 +42,7 @@ public class SandboxTest {
         System.out.println(afterTree.toTreeString());
     }
 
-    private Tree createTree(String source) throws Exception{
+    private Tree createTree(String source) throws Exception {
         return new JdtTreeGenerator().generateFrom().string(source).getRoot();
     }
 }

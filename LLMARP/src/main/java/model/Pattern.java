@@ -5,7 +5,7 @@ import lombok.Value;
 import model.tree.HalNode;
 
 @Value
-@AllArgsConstructor(staticName="of")
+@AllArgsConstructor(staticName = "of")
 public class Pattern {
     HalNode oldTreeRoot;
     HalNode newTreeRoot;

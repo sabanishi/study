@@ -1,6 +1,5 @@
 package model;
 
-import com.github.gumtreediff.matchers.Mapping;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.Tree;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-@ToString(of = {"fileName","oldStatement","newStatement"})
+@ToString(of = {"fileName", "oldStatement", "newStatement"})
 @RequiredArgsConstructor
 @Value
 public class Chunk {
@@ -28,7 +27,7 @@ public class Chunk {
 
     List<Pattern> normalizedPatterns;
 
-    public static Chunk of(final String fileName, final List<Statement> oldStatements, Tree oldAllTree,final List<Statement> newStatements, Tree newAllTree,Edit e){
+    public static Chunk of(final String fileName, final List<Statement> oldStatements, Tree oldAllTree, final List<Statement> newStatements, Tree newAllTree, Edit e) {
         final List<Statement> oldSlice = oldStatements.subList(e.getBeginA(), e.getEndA());
         final List<Statement> newSlice = newStatements.subList(e.getBeginB(), e.getEndB());
 
@@ -42,24 +41,24 @@ public class Chunk {
         int newCharBegin = newSlice.get(0).getChars().getBegin();
         int newCharEnd = newSlice.get(newSlice.size() - 1).getChars().getEnd();
 
-        Statement oldStatement = Statement.joint(oldSlice, Range.of(oldLineBegin, oldLineEnd),Range.of(oldCharBegin,oldCharEnd));
-        Statement newStatement = Statement.joint(newSlice, Range.of(newLineBegin, newLineEnd),Range.of(newCharBegin,newCharEnd));
+        Statement oldStatement = Statement.joint(oldSlice, Range.of(oldLineBegin, oldLineEnd), Range.of(oldCharBegin, oldCharEnd));
+        Statement newStatement = Statement.joint(newSlice, Range.of(newLineBegin, newLineEnd), Range.of(newCharBegin, newCharEnd));
 
-        Tree oldTree = extractSubTree(oldAllTree,oldStatement);
-        Tree newTree = extractSubTree(newAllTree,newStatement);
+        Tree oldTree = extractSubTree(oldAllTree, oldStatement);
+        Tree newTree = extractSubTree(newAllTree, newStatement);
 
         HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree);
         HalTreeNode newTreeRoot = HalTreeNode.of(newTree);
 
-        Pattern originalPattern = Pattern.of(oldTreeRoot,newTreeRoot);
+        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot);
 
         //originalPatternのNodeにIDを付与する
         int id = 0;
-        MappingStore mapping = Matchers.getInstance().getMatcher().match(oldTree,newTree);
-        for(HalNode oldNode : oldTreeRoot.preOrder()){
-            if(oldNode instanceof HalTreeNode oldTreeNode){
+        MappingStore mapping = Matchers.getInstance().getMatcher().match(oldTree, newTree);
+        for (HalNode oldNode : oldTreeRoot.preOrder()) {
+            if (oldNode instanceof HalTreeNode oldTreeNode) {
                 Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
-                if(newOriginalTree != null){
+                if (newOriginalTree != null) {
                     HalNode newNode = newTreeRoot.searchFromGumTree(newOriginalTree);
                     newNode.setId(id);
                 }
@@ -69,8 +68,8 @@ public class Chunk {
             id++;
         }
 
-        for(HalNode newNode : newTreeRoot.preOrder()){
-            if(newNode.getId() >= 0) continue;
+        for (HalNode newNode : newTreeRoot.preOrder()) {
+            if (newNode.getId() >= 0) continue;
             newNode.setId(id);
             id++;
         }
@@ -78,12 +77,12 @@ public class Chunk {
         List<Pattern> normalizedPatterns = new ArrayList<>();
         normalizedPatterns.add(originalPattern);
 
-        Chunk chunk = new Chunk(fileName, oldStatement, newStatement,originalPattern,normalizedPatterns);
+        Chunk chunk = new Chunk(fileName, oldStatement, newStatement, originalPattern, normalizedPatterns);
         chunk.normalize();
         return chunk;
     }
 
-    private static Tree extractSubTree(Tree root,Statement statement){
+    private static Tree extractSubTree(Tree root, Statement statement) {
         Range range = statement.getChars();
         final int begin = range.getBegin();
         final int end = range.getEnd();
@@ -91,13 +90,13 @@ public class Chunk {
         Stack<Tree> stack = new Stack<>();
         stack.push(root);
 
-        while(!stack.empty()){
+        while (!stack.empty()) {
             Tree node = stack.pop();
-            if(begin <= node.getPos() && node.getEndPos() <= end){
+            if (begin <= node.getPos() && node.getEndPos() <= end) {
                 return node.deepCopy();
             }
 
-            for(Tree child: node.getChildren()){
+            for (Tree child : node.getChildren()) {
                 stack.push(child);
             }
         }
@@ -105,7 +104,7 @@ public class Chunk {
         return null;
     }
 
-    private void normalize(){
+    private void normalize() {
         //徐々に正規化則を適用していく
     }
 }

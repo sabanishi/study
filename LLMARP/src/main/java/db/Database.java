@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 @Slf4j
 public class Database {
-    public static Jdbi open(Path path){
+    public static Jdbi open(Path path) {
         String uri = "jdbc:sqlite:" + path.toString();
         Jdbi jdbi = Jdbi.create(uri);
         jdbi.installPlugin(new SqlObjectPlugin());
@@ -17,7 +17,7 @@ public class Database {
         return jdbi;
     }
 
-    public static void initialize(Handle handle){
+    public static void initialize(Handle handle) {
         handle.execute("CREATE TABLE repositories (id INTEGER PRIMARY KEY AUTOINCREMENT,url TEXT UNIQUE)");
         log.info("Table created");
     }

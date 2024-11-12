@@ -6,7 +6,7 @@ import model.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Splitter implements ISplitter{
+public class Splitter implements ISplitter {
 
     @Override
     public List<Statement> split(String source) {
@@ -19,7 +19,7 @@ public class Splitter implements ISplitter{
             String line = lines.get(i);
             Range lineRange = Range.of(i, i + 1);
             Range charRange = Range.of(charStart, charStart + line.length());
-            result.add(Statement.of(line,lineRange,charRange));
+            result.add(Statement.of(line, lineRange, charRange));
             //改行も文字数に含める
             charStart += line.length() + lfLength;
         }

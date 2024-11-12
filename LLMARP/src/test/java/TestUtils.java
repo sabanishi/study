@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 public class TestUtils {
 
     /**
-     *  引数のファイルをresourcesフォルダから読み込み、その内容を返す
+     * 引数のファイルをresourcesフォルダから読み込み、その内容を返す
+     *
      * @param filePath
      * @return
      */

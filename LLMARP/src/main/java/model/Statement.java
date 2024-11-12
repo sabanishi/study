@@ -9,18 +9,18 @@ import java.util.stream.Collectors;
 
 @Value
 @EqualsAndHashCode(of = {"raw"})
-@AllArgsConstructor(staticName="of")
+@AllArgsConstructor(staticName = "of")
 public class Statement {
     String raw;
     Range lines;
     Range chars;
 
     @Override
-    public String toString(){
+    public String toString() {
         return raw;
     }
 
-    public static Statement joint(List<Statement> statements, Range lines, Range chars){
-        return new Statement(statements.stream().map(Statement::getRaw).collect(Collectors.joining("\n")), lines,chars);
+    public static Statement joint(List<Statement> statements, Range lines, Range chars) {
+        return new Statement(statements.stream().map(Statement::getRaw).collect(Collectors.joining("\n")), lines, chars);
     }
 }

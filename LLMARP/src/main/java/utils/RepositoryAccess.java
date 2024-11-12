@@ -20,30 +20,30 @@ import java.util.List;
 /**
  * Gitリポジトリを操作するためのクラス
  */
-public class RepositoryAccess implements AutoCloseable{
+public class RepositoryAccess implements AutoCloseable {
     @Getter
     private final Repository repository;
     private RevWalk cachedWalk;
     private ObjectReader cachedReader;
 
-    public RepositoryAccess(Path path){
+    public RepositoryAccess(Path path) {
         this.repository = createRepository(path);
     }
 
     /**
      * PathからJGitのRepositoryを生成する
      */
-    private Repository createRepository(final Path path){
-        try{
+    private Repository createRepository(final Path path) {
+        try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
             return builder.setGitDir(path.toFile()).readEnvironment().findGitDir().build();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private DiffFormatter createFormatter(final Repository repo){
+    private DiffFormatter createFormatter(final Repository repo) {
         DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
         formatter.setRepository(repo);
         formatter.setDiffComparator(RawTextComparator.DEFAULT);
@@ -51,15 +51,15 @@ public class RepositoryAccess implements AutoCloseable{
         return formatter;
     }
 
-    private RevWalk getWalk(){
-        if(cachedWalk == null){
+    private RevWalk getWalk() {
+        if (cachedWalk == null) {
             cachedWalk = new RevWalk(repository);
         }
         return cachedWalk;
     }
 
-    private ObjectReader getReader(){
-        if(cachedReader == null){
+    private ObjectReader getReader() {
+        if (cachedReader == null) {
             cachedReader = repository.newObjectReader();
         }
         return cachedReader;
@@ -68,18 +68,18 @@ public class RepositoryAccess implements AutoCloseable{
     /**
      * 全コミットを回す
      */
-    public Iterable<RevCommit> walk(){
+    public Iterable<RevCommit> walk() {
         RevWalk walk = getWalk();
-        try{
+        try {
             Ref head = repository.findRef("HEAD");
-            if(head == null){
+            if (head == null) {
                 throw new RuntimeException("HEAD not found");
             }
 
             RevCommit commit = walk.parseCommit(head.getObjectId());
             walk.markStart(commit);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -90,11 +90,11 @@ public class RepositoryAccess implements AutoCloseable{
     /**
      * 指定したコミットと、その1つ前のコミットとの変更差分を取得する
      */
-    public List<DiffEntry> getChanges(final RevCommit commit){
-        try(DiffFormatter formatter = createFormatter(repository)){
-            ObjectId parentId = commit.getParentCount() == 1 ?  commit.getParent(0).getId() : null;
+    public List<DiffEntry> getChanges(final RevCommit commit) {
+        try (DiffFormatter formatter = createFormatter(repository)) {
+            ObjectId parentId = commit.getParentCount() == 1 ? commit.getParent(0).getId() : null;
             return formatter.scan(parentId, commit.getId());
-        }catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -103,9 +103,9 @@ public class RepositoryAccess implements AutoCloseable{
     /**
      * 指定したコミットの変更差分を取得する
      */
-    public String readBlob(final ObjectId blobId){
+    public String readBlob(final ObjectId blobId) {
         try {
-            ObjectLoader loader = getReader().open(blobId,Constants.OBJ_BLOB);
+            ObjectLoader loader = getReader().open(blobId, Constants.OBJ_BLOB);
             final RawText text = new RawText(loader.getCachedBytes());
 
             return text.getString(0, text.size(), false);
@@ -116,12 +116,12 @@ public class RepositoryAccess implements AutoCloseable{
     }
 
     @Override
-    public void close(){
-        if(cachedWalk != null){
+    public void close() {
+        if (cachedWalk != null) {
             cachedWalk.close();
         }
 
-        if(cachedReader != null){
+        if (cachedReader != null) {
             cachedReader.close();
         }
 

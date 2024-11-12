@@ -13,7 +13,7 @@ public class JGitDifferencer<T> implements IDifferencer<T> {
         this.algorithm = DiffAlgorithm.getAlgorithm(alg);
     }
 
-    public JGitDifferencer(){
+    public JGitDifferencer() {
         this(DiffAlgorithm.SupportedAlgorithm.HISTOGRAM);
     }
 
@@ -28,17 +28,17 @@ public class JGitDifferencer<T> implements IDifferencer<T> {
      * 隣接するEditをマージする<br />
      * 引数のEditListの内容を書き換えるので注意
      */
-    private static void mergeAdjacentEdits(final EditList edits){
+    private static void mergeAdjacentEdits(final EditList edits) {
         int i = 0;
-        while(i < edits.size()-1){
+        while (i < edits.size() - 1) {
             Edit e1 = edits.get(i);
-            Edit e2 = edits.get(i+1);
-            if(e1.getEndA() == e2.getBeginA() && e1.getEndB() == e2.getBeginB()) {
+            Edit e2 = edits.get(i + 1);
+            if (e1.getEndA() == e2.getBeginA() && e1.getEndB() == e2.getBeginB()) {
                 //e1、e2を削除し、両者を統合した新しいEditを追加
                 edits.remove(i);
                 edits.remove(i);
                 edits.add(i, new Edit(e1.getBeginA(), e2.getEndA(), e1.getBeginB(), e2.getEndB()));
-            }else{
+            } else {
                 i++;
             }
         }

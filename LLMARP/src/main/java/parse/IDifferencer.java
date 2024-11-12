@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 2つの文の差分を計算するインターフェース
  */
-public interface IDifferencer<T>{
+public interface IDifferencer<T> {
     /**
      * 二つのT型のリストの差分を計算する
      */

@@ -17,7 +17,7 @@ public class ChunkCreator {
     private final ISplitter splitter;
     private final IDifferencer<Statement> differencer;
 
-    public ChunkCreator(final ISplitter splitter,final IDifferencer<Statement> differencer){
+    public ChunkCreator(final ISplitter splitter, final IDifferencer<Statement> differencer) {
         this.splitter = splitter;
         this.differencer = differencer;
     }
@@ -25,14 +25,14 @@ public class ChunkCreator {
     /**
      * コミットに含まれるChunkをリストにして返す
      */
-    public List<Chunk> calculate(final RevCommit commit, final RepositoryAccess repositoryAccess){
+    public List<Chunk> calculate(final RevCommit commit, final RepositoryAccess repositoryAccess) {
         final List<DiffEntry> entries = repositoryAccess.getChanges(commit);
         return entries.stream().filter(this::isSupportedFileChange)
-                .flatMap(e->extractChunks(e,repositoryAccess))
+                .flatMap(e -> extractChunks(e, repositoryAccess))
                 .collect(Collectors.toList());
     }
 
-    private boolean isSupportedFileChange(final DiffEntry entry){
+    private boolean isSupportedFileChange(final DiffEntry entry) {
         return entry.getChangeType() == DiffEntry.ChangeType.MODIFY
                 && entry.getOldPath().endsWith(".java")
                 && entry.getNewPath().endsWith(".java");
@@ -48,9 +48,9 @@ public class ChunkCreator {
         Tree oldAllTree = TreeUtils.createTree(oldSource);
         Tree newAllTree = TreeUtils.createTree(newSource);
 
-        return differencer.compute(oldStatements,newStatements)
+        return differencer.compute(oldStatements, newStatements)
                 .stream()
-                .filter(e->e.getType()== Edit.Type.REPLACE)//単純な追加、削除は除外する
-                .map(e->Chunk.of(entry.getNewPath(),oldStatements,oldAllTree,newStatements,newAllTree,e));
+                .filter(e -> e.getType() == Edit.Type.REPLACE)//単純な追加、削除は除外する
+                .map(e -> Chunk.of(entry.getNewPath(), oldStatements, oldAllTree, newStatements, newAllTree, e));
     }
 }
