@@ -6,8 +6,8 @@ import model.Statement;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.revwalk.RevCommit;
-import utils.RepositoryAccess;
-import utils.TreeUtils;
+import util.RepositoryAccess;
+import util.TreeUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +45,8 @@ public class ChunkCreator {
         List<Statement> oldStatements = splitter.split(oldSource);
         List<Statement> newStatements = splitter.split(newSource);
 
-        Tree oldAllTree = TreeUtils.createTree(oldSource);
-        Tree newAllTree = TreeUtils.createTree(newSource);
+        Tree oldAllTree = TreeUtil.createTree(oldSource);
+        Tree newAllTree = TreeUtil.createTree(newSource);
 
         return differencer.compute(oldStatements, newStatements)
                 .stream()

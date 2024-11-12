@@ -44,6 +44,11 @@ public abstract class HalNode {
         return null;
     }
 
+    @Override
+    public String toString(){
+        return toString(0);
+    }
+
     public abstract String toString(int depth);
 
     public abstract HalNode deepCopy();

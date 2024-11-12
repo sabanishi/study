@@ -1,11 +1,11 @@
-package utils;
+package util;
 
 import com.github.gumtreediff.gen.jdt.JdtTreeGenerator;
 import com.github.gumtreediff.tree.Tree;
 
 import java.io.IOException;
 
-public class TreeUtils {
+public class TreeUtil {
     public static Tree createTree(String source) {
         try {
             return new JdtTreeGenerator().generateFrom().string(source).getRoot();

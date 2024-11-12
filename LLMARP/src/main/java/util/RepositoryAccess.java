@@ -1,4 +1,4 @@
-package utils;
+package util;
 
 import lombok.Getter;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -28,6 +28,10 @@ public class RepositoryAccess implements AutoCloseable {
 
     public RepositoryAccess(Path path) {
         this.repository = createRepository(path);
+    }
+
+    public RepositoryAccess(Repository repository) {
+        this.repository = repository;
     }
 
     /**

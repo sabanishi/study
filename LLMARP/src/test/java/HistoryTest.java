@@ -1,7 +1,7 @@
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.Test;
-import utils.RepositoryAccess;
+import util.RepositoryAccess;
 
 import java.nio.file.Path;
 
