@@ -1,9 +1,14 @@
 package model;
 
+import com.github.gumtreediff.matchers.Mapping;
+import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.Tree;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
+import model.tree.HalNode;
+import model.tree.HalTreeNode;
 import org.eclipse.jgit.diff.Edit;
 
 import java.util.ArrayList;
@@ -40,12 +45,42 @@ public class Chunk {
         Statement oldStatement = Statement.joint(oldSlice, Range.of(oldLineBegin, oldLineEnd),Range.of(oldCharBegin,oldCharEnd));
         Statement newStatement = Statement.joint(newSlice, Range.of(newLineBegin, newLineEnd),Range.of(newCharBegin,newCharEnd));
 
-        Pattern originalPattern = Pattern.of(extractSubTree(oldAllTree,oldStatement),extractSubTree(newAllTree,newStatement));
+        Tree oldTree = extractSubTree(oldAllTree,oldStatement);
+        Tree newTree = extractSubTree(newAllTree,newStatement);
+
+        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree);
+        HalTreeNode newTreeRoot = HalTreeNode.of(newTree);
+
+        Pattern originalPattern = Pattern.of(oldTreeRoot,newTreeRoot);
+
+        //originalPatternのNodeにIDを付与する
+        int id = 0;
+        MappingStore mapping = Matchers.getInstance().getMatcher().match(oldTree,newTree);
+        for(HalNode oldNode : oldTreeRoot.preOrder()){
+            if(oldNode instanceof HalTreeNode oldTreeNode){
+                Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
+                if(newOriginalTree != null){
+                    HalNode newNode = newTreeRoot.searchFromGumTree(newOriginalTree);
+                    newNode.setId(id);
+                }
+            }
+
+            oldNode.setId(id);
+            id++;
+        }
+
+        for(HalNode newNode : newTreeRoot.preOrder()){
+            if(newNode.getId() >= 0) continue;
+            newNode.setId(id);
+            id++;
+        }
 
         List<Pattern> normalizedPatterns = new ArrayList<>();
         normalizedPatterns.add(originalPattern);
 
-        return new Chunk(fileName, oldStatement, newStatement,originalPattern,normalizedPatterns);
+        Chunk chunk = new Chunk(fileName, oldStatement, newStatement,originalPattern,normalizedPatterns);
+        chunk.normalize();
+        return chunk;
     }
 
     private static Tree extractSubTree(Tree root,Statement statement){
@@ -68,5 +103,9 @@ public class Chunk {
         }
 
         return null;
+    }
+
+    private void normalize(){
+        //徐々に正規化則を適用していく
     }
 }
