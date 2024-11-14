@@ -74,7 +74,6 @@ public class Chunk {
         }
 
         List<Pattern> normalizedPatterns = new ArrayList<>();
-        normalizedPatterns.add(originalPattern);
 
         Chunk chunk = new Chunk(fileName, oldStatement, newStatement, originalPattern, normalizedPatterns);
         chunk.normalize();

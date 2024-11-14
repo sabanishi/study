@@ -1,11 +1,20 @@
 package model.tree;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
+import model.Hash;
 
 @Value
-@AllArgsConstructor(staticName = "of")
 public class NormalizationInfo {
     NormalizationType type;
     int targetId;
+    Hash hash;
+
+    public static NormalizationInfo of(NormalizationType type, int targetId, Hash hash){
+        return new NormalizationInfo(type, targetId, hash);
+    }
+
+    public static NormalizationInfo of(NormalizationType type,int targetId){
+        Hash hash = Hash.of(type.toString() + targetId);
+        return new NormalizationInfo(type, targetId, hash);
+    }
 }

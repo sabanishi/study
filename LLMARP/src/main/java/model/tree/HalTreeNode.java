@@ -1,6 +1,8 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -87,5 +89,11 @@ public class HalTreeNode extends HalNode {
     @Override
     protected boolean isSameTree(Tree tree) {
         return this.original.equals(tree);
+    }
+
+    @Override
+    protected void makeJsonInternal(JsonObject jsonObject, JsonSerializationContext context) {
+        jsonObject.addProperty("type", type);
+        jsonObject.addProperty("label", label);
     }
 }

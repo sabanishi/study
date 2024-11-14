@@ -1,17 +1,14 @@
 package model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import model.tree.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-@RequiredArgsConstructor(staticName = "of")
+import java.util.stream.Stream;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Pattern {
     @Getter
     private final HalNode oldTreeRoot;
@@ -19,6 +16,8 @@ public class Pattern {
     private final HalNode newTreeRoot;
     @Getter
     private final List<NormalizationInfo> appliedNormalizations;
+    @Getter
+    private final Hash hash;
 
     private boolean isNormalized = false;
 
@@ -52,12 +51,19 @@ public class Pattern {
         }
     }
 
-    public Pattern deepCopy(){
-        return Pattern.of(oldTreeRoot.deepCopy(), newTreeRoot.deepCopy(), new ArrayList<NormalizationInfo>(appliedNormalizations));
-    }
-
     private Set<Pattern> normalizeInternal(){
         return normalizeName();
+    }
+
+    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations){
+        Hash hash = Hash.of(Stream.concat(
+                Stream.of(oldTreeRoot.getHash(), newTreeRoot.getHash()),
+                appliedNormalizations.stream().map(NormalizationInfo::getHash)));
+        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations,hash);
+    }
+
+    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations, Hash hash){
+        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash);
     }
 
     /**
@@ -70,19 +76,22 @@ public class Pattern {
             if(oldNode instanceof HalTreeNode oldTargetNode && !(oldNode instanceof HalNormalizeNode)){
                 if(oldTargetNode.getType().equals("SimpleName") || oldTargetNode.getType().equals("StringLiteral")){
                     HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
-                    Pattern copy = deepCopy();
+                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
+                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
                     //oldTreeの該当箇所を置換する
-                    copy.getOldTreeRoot().replace(oldTargetNode, normalizedNode);
+                    copyOldRoot.replace(oldTargetNode, normalizedNode);
 
                     //newTreeに同じIDのノードがあれば置換する
-                    HalNode newTargetNode = copy.getNewTreeRoot().searchById(normalizedNode.getId());
+                    HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
                     if(newTargetNode instanceof HalTreeNode){
                         HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode)newTargetNode);
-                        copy.getNewTreeRoot().replace(newTargetNode, normalizeNode2);
+                        copyNewRoot.replace(newTargetNode, normalizeNode2);
                     }
 
                     //正規化情報を追加
-                    copy.appliedNormalizations.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId()));
+                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId()));
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
                     result.add(copy);
                 }
             }

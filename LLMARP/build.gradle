@@ -51,6 +51,9 @@ dependencies {
 
     //Logging
     implementation 'ch.qos.logback:logback-classic:1.4.12'
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 test {
