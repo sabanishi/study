@@ -54,8 +54,57 @@ public class Pattern {
     private Set<Pattern> normalizeInternal(){
         Set<Pattern> result = new HashSet<>();
         normalizeName(result);
+        normalizeArg(result);
 
         return result;
+    }
+
+    private void normalizeArg(Set<Pattern> result){
+        for(HalNode oldNode: getOldTreeRoot().preOrder()){
+            if(oldNode instanceof HalTreeNode oldTargetNode){
+                if(oldTargetNode.getType().equals("METHOD_INVOCATION_ARGUMENTS")){
+                    //子要素が全て正規化されている時、正規化を行う
+                    boolean canNormalize = true;
+                    for(HalNode child : oldTargetNode.getChildren()){
+                        if(!(child instanceof HalNormalizeNode)){
+                            canNormalize = false;
+                            break;
+                        }
+                    }
+
+                    if(canNormalize){
+                        HalNormalizeInvocationNode normalizedNode = HalNormalizeInvocationNode.of(oldTargetNode);
+                        HalNode copyOldRoot = getOldTreeRoot().deepCopy();
+                        HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                        List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
+                        //oldTreeの該当箇所を置換する
+                        copyOldRoot.replace(oldTargetNode, normalizedNode);
+
+                        //newTreeに同じIDのノードがあれば置換する
+                        HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
+                        if(newTargetNode instanceof HalTreeNode){
+                            //子要素が全て正規化されている時、正規化を行う
+                            boolean canNormalize2 = true;
+                            for(HalNode child : newTargetNode.getChildren()){
+                                if(!(child instanceof HalNormalizeNode)){
+                                    canNormalize2 = false;
+                                    break;
+                                }
+                            }
+                            if(canNormalize2){
+                                HalNormalizeInvocationNode normalizeNode2 = HalNormalizeInvocationNode.of((HalTreeNode)newTargetNode);
+                                copyNewRoot.replace(newTargetNode, normalizeNode2);
+                            }
+                        }
+
+                        //正規化情報を追加
+                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Argument,normalizedNode.getId()));
+                        Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                        result.add(copy);
+                    }
+                }
+            }
+        }
     }
 
     /**

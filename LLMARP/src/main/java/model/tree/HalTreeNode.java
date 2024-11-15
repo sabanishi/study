@@ -57,7 +57,7 @@ public class HalTreeNode extends HalNode {
 
     @Override
     public HalNode deepCopy() {
-        HalTreeNode node = of(this);
+        HalTreeNode node = copyMe();
         for (HalNode child : children) {
             node.addChild(child.deepCopy());
         }
@@ -104,5 +104,9 @@ public class HalTreeNode extends HalNode {
     protected void makeFromJsonInternal(JsonObject jsonObject){
         type = jsonObject.get("type").getAsString();
         label = jsonObject.get("label").getAsString();
+    }
+
+    protected HalTreeNode copyMe(){
+        return of(this);
     }
 }
