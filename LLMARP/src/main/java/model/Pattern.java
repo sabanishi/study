@@ -52,7 +52,55 @@ public class Pattern {
     }
 
     private Set<Pattern> normalizeInternal(){
-        return normalizeName();
+        Set<Pattern> result = new HashSet<>();
+        normalizeName(result);
+
+        return result;
+    }
+
+    /**
+     * 自身に対して、変数名正規化を一箇所だけ適用したSetを返す
+     */
+    private void normalizeName(Set<Pattern> result){
+        for(HalNode oldNode :getOldTreeRoot().preOrder()){
+            if(oldNode instanceof HalTreeNode oldTargetNode && !(oldNode instanceof HalNormalizeNode)){
+                switch(oldTargetNode.getType()){
+                    case "SimpleName":
+                        if(oldNode.getParent()!=null){
+                            String parentType = oldNode.getParent().getType();
+                            //親がメソッドかクラスの時、正規化を行わない
+                            if(parentType.equals("MethodInvocation") || parentType.equals("TypeDeclaration")){
+                                break;
+                            }
+                        }
+                    case "StringLiteral":
+                    case "CharacterLiteral":
+                    case "NumberLiteral":
+                    case "BooleanLiteral":
+                        HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
+                        HalNode copyOldRoot = getOldTreeRoot().deepCopy();
+                        HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                        List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
+                        //oldTreeの該当箇所を置換する
+                        copyOldRoot.replace(oldTargetNode, normalizedNode);
+
+                        //newTreeに同じIDのノードがあれば置換する
+                        HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
+                        if(newTargetNode instanceof HalTreeNode){
+                            HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode)newTargetNode);
+                            copyNewRoot.replace(newTargetNode, normalizeNode2);
+                        }
+
+                        //正規化情報を追加
+                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId()));
+                        Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                        result.add(copy);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations){
@@ -64,39 +112,5 @@ public class Pattern {
 
     public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations, Hash hash){
         return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash);
-    }
-
-    /**
-     * 自身に対して、変数名正規化を一箇所だけ適用したSetを返す
-     */
-    private Set<Pattern> normalizeName(){
-        Set<Pattern> result = new HashSet<Pattern>();
-
-        for(HalNode oldNode :getOldTreeRoot().preOrder()){
-            if(oldNode instanceof HalTreeNode oldTargetNode && !(oldNode instanceof HalNormalizeNode)){
-                if(oldTargetNode.getType().equals("SimpleName") || oldTargetNode.getType().equals("StringLiteral")){
-                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
-                    List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
-                    //oldTreeの該当箇所を置換する
-                    copyOldRoot.replace(oldTargetNode, normalizedNode);
-
-                    //newTreeに同じIDのノードがあれば置換する
-                    HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
-                    if(newTargetNode instanceof HalTreeNode){
-                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode)newTargetNode);
-                        copyNewRoot.replace(newTargetNode, normalizeNode2);
-                    }
-
-                    //正規化情報を追加
-                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
-                    result.add(copy);
-                }
-            }
-        }
-
-        return result;
     }
 }
