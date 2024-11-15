@@ -2,27 +2,29 @@ package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import model.Hash;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Getter
 public abstract class HalNode {
     @Setter(AccessLevel.PUBLIC)
     protected int id = -1;
     protected int pos;
     protected int length;
+    protected List<HalNode> children = new ArrayList<>();
+    protected HalTreeNode parent;
     @Getter(lazy = true)
     private final Hash hash = Hash.of(toString());
-    @Setter(AccessLevel.PROTECTED)
-    private HalTreeNode parent;
-    protected List<HalNode> children = new ArrayList<>();
 
     public List<HalNode> preOrder() {
         List<HalNode> list = new ArrayList<>();
@@ -82,8 +84,8 @@ public abstract class HalNode {
         return toString(0);
     }
 
-    public void makeJsonObject(JsonObject jsonObject, JsonSerializationContext context){
-        jsonObject.addProperty("class",getClass().toString());
+    public void makeToJson(JsonObject jsonObject, JsonSerializationContext context){
+        jsonObject.addProperty("class",getClass().getSimpleName());
         jsonObject.addProperty("id",id);
         jsonObject.addProperty("pos",pos);
         jsonObject.addProperty("length",length);
@@ -98,7 +100,42 @@ public abstract class HalNode {
             childList.add(context.serialize(child));
         }
         jsonObject.add("children",childList);
-        makeJsonInternal(jsonObject,context);
+        makeToJsonInternal(jsonObject,context);
+    }
+
+    public static HalNode makeFromJson(JsonObject jsonObject){
+        String className = jsonObject.get("class").getAsString();
+        HalNode node;
+        switch(className){
+            case "HalTreeNode":
+                node = new HalTreeNode();
+                break;
+            case "HalNormalizeNode":
+                node = new HalNormalizeNode();
+                break;
+            default:
+                log.error("Unknown class: {}",className);
+                return null;
+        }
+
+        node.id = jsonObject.get("id").getAsInt();
+        node.pos = jsonObject.get("pos").getAsInt();
+        node.length = jsonObject.get("length").getAsInt();
+
+        List<JsonElement> childElements = jsonObject.getAsJsonArray("children").asList();
+
+        HalTreeNode halNode = (HalTreeNode)node;
+        for (JsonElement element : childElements) {
+            JsonObject childObject = element.getAsJsonObject();
+            HalNode child = makeFromJson(childObject);
+            if (child == null) continue;
+            child.parent = halNode;
+            node.children.add(child);
+        }
+
+        node.makeFromJsonInternal(jsonObject);
+
+        return node;
     }
 
     public abstract String toString(int depth);
@@ -111,5 +148,7 @@ public abstract class HalNode {
 
     protected abstract boolean isSameTree(Tree tree);
 
-    protected abstract void makeJsonInternal(JsonObject jsonObject,JsonSerializationContext context);
+    protected abstract void makeToJsonInternal(JsonObject jsonObject, JsonSerializationContext context);
+
+    protected abstract void makeFromJsonInternal(JsonObject jsonObject);
 }

@@ -8,6 +8,10 @@ public class HalNormalizeNode extends HalTreeNode{
         super(type, label, original, pos, length);
     }
 
+    protected HalNormalizeNode(){
+        super();
+    }
+
     public static HalNormalizeNode of(HalTreeNode node){
         String label = "$V" + node.getId();
         HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength());

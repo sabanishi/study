@@ -12,7 +12,7 @@ public class HalNodeSerializer implements JsonSerializer<HalNode>{
     @Override
     public JsonElement serialize(HalNode src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
-        src.makeJsonObject(jsonObject, context);
+        src.makeToJson(jsonObject, context);
         return jsonObject;
     }
 }

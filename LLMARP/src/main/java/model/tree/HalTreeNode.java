@@ -15,6 +15,9 @@ public class HalTreeNode extends HalNode {
     protected String label;
     protected Tree original;
 
+    protected HalTreeNode() {
+    }
+
     protected HalTreeNode(String type, String label, Tree original,int pos,int length) {
         this.type = type;
         this.label = label;
@@ -40,7 +43,7 @@ public class HalTreeNode extends HalNode {
 
     public void addChild(HalNode child) {
         children.add(child);
-        child.setParent(this);
+        child.parent = this;
     }
 
     @Override
@@ -92,8 +95,14 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
-    protected void makeJsonInternal(JsonObject jsonObject, JsonSerializationContext context) {
+    protected void makeToJsonInternal(JsonObject jsonObject, JsonSerializationContext context) {
         jsonObject.addProperty("type", type);
         jsonObject.addProperty("label", label);
+    }
+
+    @Override
+    protected void makeFromJsonInternal(JsonObject jsonObject){
+        type = jsonObject.get("type").getAsString();
+        label = jsonObject.get("label").getAsString();
     }
 }

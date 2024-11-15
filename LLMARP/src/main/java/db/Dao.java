@@ -1,13 +1,21 @@
 package db;
 
+import gson.GsonLocator;
 import model.Chunk;
 import model.Pattern;
 import model.tree.HalNode;
 import model.tree.NormalizationInfo;
+import org.jdbi.v3.core.result.ResultIterable;
+import org.jdbi.v3.core.statement.StatementContext;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.core.mapper.RowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public interface Dao {
     @SqlQuery("INSERT INTO repositories (url) VALUES (?) RETURNING id")
@@ -34,4 +42,15 @@ public interface Dao {
     @SqlQuery("INSERT OR IGNORE INTO pattern_normalization_info (pattern_hash, info_hash) VALUES (:p.hash.name, :i.hash.name) RETURNING id")
     long insertPatternInfoRelationship(@BindBean("p")Pattern pattern, @BindBean("i")NormalizationInfo info);
 
+    @SqlQuery("SELECT * FROM trees WHERE hash = :hash")
+    @RegisterRowMapper(TreeJsonRawMapper.class)
+    ResultIterable<HalNode> searchTree(@Bind("hash")final String hash);
+
+    class TreeJsonRawMapper implements RowMapper<HalNode> {
+        @Override
+        public HalNode map(ResultSet rs, StatementContext ctx) throws SQLException {
+            String structure = rs.getString("structure");
+            return GsonLocator.getGson().fromJson(structure, HalNode.class);
+        }
+    }
 }
