@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Getter
 public class HalTreeNode extends HalNode {
+    @Setter(AccessLevel.PUBLIC)
     protected String type;
     @Setter(AccessLevel.PUBLIC)
     protected String label;

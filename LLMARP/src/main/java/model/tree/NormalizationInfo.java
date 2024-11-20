@@ -17,4 +17,9 @@ public class NormalizationInfo {
         Hash hash = Hash.of(type.toString() + targetId);
         return new NormalizationInfo(type, targetId, hash);
     }
+
+    @Override
+    public String toString(){
+        return type + ":" + targetId;
+    }
 }
