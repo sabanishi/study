@@ -2,6 +2,7 @@ package db;
 
 import gson.GsonLocator;
 import model.Chunk;
+import model.Hash;
 import model.Pattern;
 import model.tree.HalNode;
 import model.tree.NormalizationInfo;
@@ -30,7 +31,7 @@ public interface Dao {
     @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_normalized) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:isNormalized)")
     void insertPattern(@Bind("isNormalized")boolean isNormalized,@BindBean("p")final Pattern pattern);
 
-    @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure) VALUES (:t.hash.name,:structure)")
+    @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.text)")
     void insertTree(@BindBean("t")final HalNode tree,@Bind("structure")String structure);
 
     @SqlUpdate("INSERT OR IGNORE INTO normalization_info (hash, type, target_id) VALUES (:i.hash.name, :i.type,:i.targetId)")
@@ -53,4 +54,8 @@ public interface Dao {
             return GsonLocator.getGson().fromJson(structure, HalNode.class);
         }
     }
+
+    @SqlQuery("SELECT chunk_hash FROM chunk_patterns WHERE pattern_hash = :hash")
+    ResultIterable<String> searchChunkHashByPatternHash(@Bind("hash")String hash);
+
 }

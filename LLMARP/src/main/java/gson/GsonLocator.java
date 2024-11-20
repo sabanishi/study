@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import gson.tree.HalNodeDeserializer;
 import gson.tree.HalNodeSerializer;
 import model.tree.HalNode;
+import model.tree.HalNormalizeInvocationNode;
 import model.tree.HalNormalizeNode;
 import model.tree.HalTreeNode;
 
@@ -31,6 +32,8 @@ public class GsonLocator {
         builder.registerTypeAdapter(HalTreeNode.class, new HalNodeDeserializer());
         builder.registerTypeAdapter(HalNormalizeNode.class, new HalNodeSerializer());
         builder.registerTypeAdapter(HalNormalizeNode.class, new HalNodeDeserializer());
+        builder.registerTypeAdapter(HalNormalizeInvocationNode.class, new HalNodeSerializer());
+        builder.registerTypeAdapter(HalNormalizeInvocationNode.class, new HalNodeDeserializer());
 
         return builder.create();
     }

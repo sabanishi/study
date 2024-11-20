@@ -57,6 +57,15 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
+    public String toHashString(int depth){
+        String text = String.format("%s%d %s \"%s\"\n",StringUtils.repeat("  ",depth),id,type,label);
+        for(HalNode child:children){
+            text = text.concat(child.toHashString(depth+1));
+        }
+        return text;
+    }
+
+    @Override
     public HalNode deepCopy() {
         HalTreeNode node = copyMe();
         for (HalNode child : children) {

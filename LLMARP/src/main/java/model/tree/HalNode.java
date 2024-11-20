@@ -24,7 +24,10 @@ public abstract class HalNode {
     protected List<HalNode> children = new ArrayList<>();
     protected HalTreeNode parent;
     @Getter(lazy = true)
-    private final Hash hash = Hash.of(toString());
+    private final Hash hash = Hash.of(toHashString(0));
+
+    @Getter(lazy = true)
+    private final String text = toHashString(0);
 
     public List<HalNode> preOrder() {
         List<HalNode> list = new ArrayList<>();
@@ -113,6 +116,9 @@ public abstract class HalNode {
             case "HalNormalizeNode":
                 node = new HalNormalizeNode();
                 break;
+            case "HalNormalizeInvocationNode":
+                node = new HalNormalizeInvocationNode();
+                break;
             default:
                 log.error("Unknown class: {}",className);
                 return null;
@@ -139,6 +145,7 @@ public abstract class HalNode {
     }
 
     public abstract String toString(int depth);
+    public abstract String toHashString(int depth);
 
     public abstract HalNode deepCopy();
 

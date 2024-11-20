@@ -38,4 +38,9 @@ public class HalNormalizeNode extends HalTreeNode{
     protected HalTreeNode copyMe(){
         return of(this);
     }
+
+    @Override
+    public String toHashString(int depth){
+        return "NORMALIZED_NODE"+super.toHashString(depth);
+    }
 }
