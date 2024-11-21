@@ -20,7 +20,7 @@ public class Database {
     public static void initialize(Handle handle) {
         handle.execute("CREATE TABLE repositories (id INTEGER PRIMARY KEY AUTOINCREMENT,url TEXT UNIQUE)");
         handle.execute("CREATE TABLE commits (id INTEGER PRIMARY KEY AUTOINCREMENT,repository_id INTEGER,hash TEXT,message TEXT)");
-        handle.execute("CREATE TABLE chunks (id INTEGER PRIMARY KEY AUTOINCREMENT,commit_id INTEGER,file TEXT,old_begin INTEGER,old_end INTEGER,new_begin INTEGER,new_end INTEGER)");
+        handle.execute("CREATE TABLE chunks (id INTEGER PRIMARY KEY AUTOINCREMENT,commit_id INTEGER,file TEXT,old_begin INTEGER,old_end INTEGER,new_begin INTEGER,new_end INTEGER,old_raw TEXT,new_raw TEXT)");
         handle.execute("CREATE TABLE patterns (hash TEXT PRIMARY KEY,old_tree_hash TEXT,new_tree_hash TEXT,is_normalized INTEGER)");
         handle.execute("CREATE TABLE normalization_info (hash TEXT PRIMARY KEY, type INTEGER,target_id INTEGER,order_index INTEGER)");
         handle.execute("CREATE TABLE trees (hash TEXT PRIMARY KEY,structure TEXT, text TEXT)");
