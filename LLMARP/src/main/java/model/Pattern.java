@@ -130,7 +130,7 @@ public class Pattern {
                     canNormalize = false;
                     break;
                 }
-                //子要素がRecevierであり、かつそれが変数でない時、正規化しない
+                //子要素がReceiverであり、かつそれが変数でない時、正規化しない
                 if (childNode.getType().equals("METHOD_INVOCATION_RECEIVER")) {
                     if (!childNode.getChildren().isEmpty()) {
                         if (childNode.getChildren().get(0) instanceof HalTreeNode receiverNode) {
@@ -201,9 +201,6 @@ public class Pattern {
         return canNormalize;
     }
 
-    /**
-     * 自身に対して、変数名正規化を一箇所だけ適用したSetを返す
-     */
     private void normalizeName(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
             if (oldNode instanceof HalTreeNode oldTargetNode && !(oldNode instanceof HalNormalizeNode)) {

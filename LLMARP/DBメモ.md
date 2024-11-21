@@ -10,10 +10,10 @@ commits |o--|{ chunks:""
 chunks ||--|{ chunk_patterns: ""
 patterns ||--|{ chunk_patterns:""
 
-patterns ||--|{ trees :""
+normalization_info ||--|{ chunk_normalization_info:""
+chunk_patterns ||--|{ chunk_normalization_info:""
 
-patterns ||--|{ pattern_normalization_info:""
-normalization_info ||--|{ pattern_normalization_info:""
+patterns ||--|{ trees :""
 
 
 repositories{
@@ -36,6 +36,8 @@ chunks{
     INTEGER old_end
     INTEGER new_begin
     INTEGER new_end
+    TEXT old_raw
+    TEXT new_raw
 }
 
 patterns{
@@ -49,6 +51,7 @@ normalization_info{
     TEXT hash PK
     INTEGER type
     INTEGER target_id
+    INTEGER order_index
 }
 
 trees{
@@ -58,13 +61,14 @@ trees{
 
 chunk_patterns{
     INTEGER id PK
-    TEXT chunk_hash
+    INTEGER chunk_id
     TEXT pattern_hash
+    TEXT normalization_info_hash
 }
 
-pattern_normalization_info{
+chunk_normalization_info{
     INTEGER id PK
-    TEXT pattern_hash
+    TEXT chunk_patterns_id
     TEXT info_hash
 }
 
