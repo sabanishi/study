@@ -19,7 +19,7 @@ public class HalTreeNode extends HalNode {
     protected HalTreeNode() {
     }
 
-    protected HalTreeNode(String type, String label, Tree original,int pos,int length) {
+    protected HalTreeNode(String type, String label, Tree original, int pos, int length) {
         this.type = type;
         this.label = label;
         this.original = original;
@@ -28,7 +28,7 @@ public class HalTreeNode extends HalNode {
     }
 
     public static HalTreeNode of(Tree tree) {
-        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree,tree.getPos(),tree.getLength());
+        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree, tree.getPos(), tree.getLength());
         for (Tree child : tree.getChildren()) {
             node.addChild(HalTreeNode.of(child));
         }
@@ -37,7 +37,7 @@ public class HalTreeNode extends HalNode {
     }
 
     public static HalTreeNode of(HalTreeNode tree) {
-        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original,tree.getPos(),tree.getLength());
+        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original, tree.getPos(), tree.getLength());
         node.id = tree.id;
         return node;
     }
@@ -57,10 +57,10 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
-    public String toHashString(int depth){
-        String text = String.format("%s%d %s \"%s\"\n",StringUtils.repeat("  ",depth),id,type,label);
-        for(HalNode child:children){
-            text = text.concat(child.toHashString(depth+1));
+    public String toHashString(int depth) {
+        String text = String.format("%s%d %s \"%s\"\n", StringUtils.repeat("  ", depth), id, type, label);
+        for (HalNode child : children) {
+            text = text.concat(child.toHashString(depth + 1));
         }
         return text;
     }
@@ -95,7 +95,7 @@ public class HalTreeNode extends HalNode {
         return hash;
     }
 
-    private int calcMyHashCode(){
+    private int calcMyHashCode() {
         return this.label.hashCode() + this.type.hashCode() + this.length;
     }
 
@@ -111,12 +111,12 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
-    protected void makeFromJsonInternal(JsonObject jsonObject){
+    protected void makeFromJsonInternal(JsonObject jsonObject) {
         type = jsonObject.get("type").getAsString();
         label = jsonObject.get("label").getAsString();
     }
 
-    protected HalTreeNode copyMe(){
+    protected HalTreeNode copyMe() {
         return of(this);
     }
 }

@@ -10,17 +10,17 @@ public class NormalizationInfo {
     int order;
     Hash hash;
 
-    public static NormalizationInfo of(NormalizationType type, int targetId, int order,Hash hash){
-        return new NormalizationInfo(type, targetId,order,hash);
+    public static NormalizationInfo of(NormalizationType type, int targetId, int order, Hash hash) {
+        return new NormalizationInfo(type, targetId, order, hash);
     }
 
-    public static NormalizationInfo of(NormalizationType type,int targetId,int order){
+    public static NormalizationInfo of(NormalizationType type, int targetId, int order) {
         Hash hash = Hash.of(type.toString() + targetId);
-        return new NormalizationInfo(type, targetId,order,hash);
+        return new NormalizationInfo(type, targetId, order, hash);
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return type + ":" + targetId;
     }
 }

@@ -1,22 +1,21 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
-import org.apache.commons.lang3.StringUtils;
 
-public class HalNormalizeNode extends HalTreeNode{
-    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length){
+public class HalNormalizeNode extends HalTreeNode {
+    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length) {
         super(type, label, original, pos, length);
     }
 
-    protected HalNormalizeNode(){
+    protected HalNormalizeNode() {
         super();
     }
 
-    public static HalNormalizeNode of(HalTreeNode node){
+    public static HalNormalizeNode of(HalTreeNode node) {
         String label = "$V" + node.getId();
         HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength());
         normalizeNode.setId(node.getId());
-        for(HalNode child: node.getChildren()){
+        for (HalNode child : node.getChildren()) {
             normalizeNode.addChild(child);
         }
         return normalizeNode;
@@ -35,12 +34,12 @@ public class HalNormalizeNode extends HalTreeNode{
     }
 
     @Override
-    protected HalTreeNode copyMe(){
+    protected HalTreeNode copyMe() {
         return of(this);
     }
 
     @Override
-    public String toHashString(int depth){
-        return "NORMALIZED_NODE"+super.toHashString(depth);
+    public String toHashString(int depth) {
+        return "NORMALIZED_NODE" + super.toHashString(depth);
     }
 }

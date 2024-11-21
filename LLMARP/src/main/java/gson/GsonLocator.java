@@ -10,20 +10,20 @@ import model.tree.HalNormalizeNode;
 import model.tree.HalTreeNode;
 
 public class GsonLocator {
-    private GsonLocator(){
+    private static Gson gson;
+
+    private GsonLocator() {
         throw new IllegalStateException("GsonLocator is a Singleton class");
     }
 
-    private static Gson gson;
-
-    public static Gson getGson(){
-        if(gson == null){
+    public static Gson getGson() {
+        if (gson == null) {
             gson = createGson();
         }
         return gson;
     }
 
-    private static Gson createGson(){
+    private static Gson createGson() {
         GsonBuilder builder = new GsonBuilder();
 
         builder.registerTypeAdapter(HalNode.class, new HalNodeSerializer());

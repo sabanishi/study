@@ -17,13 +17,6 @@ public class JGitDifferencer<T> implements IDifferencer<T> {
         this(DiffAlgorithm.SupportedAlgorithm.HISTOGRAM);
     }
 
-    @Override
-    public EditList compute(List<T> left, List<T> right) {
-        EditList result = algorithm.diff(comparator, new ListSequence<>(left), new ListSequence<>(right));
-        mergeAdjacentEdits(result);
-        return result;
-    }
-
     /**
      * 隣接するEditをマージする<br />
      * 引数のEditListの内容を書き換えるので注意
@@ -42,6 +35,13 @@ public class JGitDifferencer<T> implements IDifferencer<T> {
                 i++;
             }
         }
+    }
+
+    @Override
+    public EditList compute(List<T> left, List<T> right) {
+        EditList result = algorithm.diff(comparator, new ListSequence<>(left), new ListSequence<>(right));
+        mergeAdjacentEdits(result);
+        return result;
     }
 
     @Getter

@@ -1,22 +1,21 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
-import org.apache.commons.lang3.StringUtils;
 
-public class HalNormalizeInvocationNode extends HalTreeNode{
-    protected HalNormalizeInvocationNode(String type, String label, Tree original, int pos, int length){
+public class HalNormalizeInvocationNode extends HalTreeNode {
+    protected HalNormalizeInvocationNode(String type, String label, Tree original, int pos, int length) {
         super(type, label, original, pos, length);
     }
 
-    public HalNormalizeInvocationNode(){
+    public HalNormalizeInvocationNode() {
         super();
     }
 
-    public static HalNormalizeInvocationNode of(HalTreeNode node){
+    public static HalNormalizeInvocationNode of(HalTreeNode node) {
         String type = "NORMALIZED_METHOD_INVOCATION_ARGUMENTS";
         HalNormalizeInvocationNode normalizeNode = new HalNormalizeInvocationNode(type, node.getLabel(), node.getOriginal(), node.getPos(), node.getLength());
         normalizeNode.setId(node.getId());
-        for(HalNode child: node.getChildren()){
+        for (HalNode child : node.getChildren()) {
             normalizeNode.addChild(child);
         }
         return normalizeNode;
@@ -35,12 +34,12 @@ public class HalNormalizeInvocationNode extends HalTreeNode{
     }
 
     @Override
-    protected HalTreeNode copyMe(){
+    protected HalTreeNode copyMe() {
         return of(this);
     }
 
     @Override
-    public String toHashString(int depth){
-        return "NORMALIZED_INVOCATION_ARGUMENTS"+super.toHashString(depth);
+    public String toHashString(int depth) {
+        return "NORMALIZED_INVOCATION_ARGUMENTS" + super.toHashString(depth);
     }
 }

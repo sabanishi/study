@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -26,17 +25,17 @@ public class Hash implements Comparable<Hash> {
         return new Hash(digest(text));
     }
 
-    public static Hash of(final Consumer<MessageDigest> fn){
+    public static Hash of(final Consumer<MessageDigest> fn) {
         return new Hash(digest(fn));
     }
 
-    public static Hash of(Stream<Hash> hashes){
-        return Hash.of(md ->{
+    public static Hash of(Stream<Hash> hashes) {
+        return Hash.of(md -> {
             hashes.forEach(h -> {
-                if(h!=null){
+                if (h != null) {
                     md.update(h.getRaw());
-                }else{
-                    md.update((byte)0);
+                } else {
+                    md.update((byte) 0);
                 }
             });
         });
@@ -46,18 +45,18 @@ public class Hash implements Comparable<Hash> {
         return digest(md -> md.update(text.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private static byte[] digest(final Consumer<MessageDigest> fn){
-        try{
+    private static byte[] digest(final Consumer<MessageDigest> fn) {
+        try {
             final MessageDigest md = MessageDigest.getInstance("MD5");
             fn.accept(md);
             return md.digest();
-        }catch(NoSuchAlgorithmException e){
-            log.error(e.getMessage(),e);
+        } catch (NoSuchAlgorithmException e) {
+            log.error(e.getMessage(), e);
             return null;
         }
     }
 
-    public Hash copy(){
+    public Hash copy() {
         return new Hash(Arrays.copyOf(raw, raw.length));
     }
 
@@ -66,7 +65,7 @@ public class Hash implements Comparable<Hash> {
         return getName();
     }
 
-    public String getName(){
+    public String getName() {
         return BASE16L.encode(raw);
     }
 
