@@ -34,14 +34,14 @@ public interface Dao {
     @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.text)")
     void insertTree(@BindBean("t")final HalNode tree,@Bind("structure")String structure);
 
-    @SqlUpdate("INSERT OR IGNORE INTO normalization_info (hash, type, target_id) VALUES (:i.hash.name, :i.type,:i.targetId)")
+    @SqlUpdate("INSERT OR IGNORE INTO normalization_info (hash, type, target_id,order_index) VALUES (:i.hash.name, :i.type,:i.targetId,:i.order)")
     void insertNormalizationInfo(@BindBean("i")NormalizationInfo info);
 
-    @SqlQuery("INSERT OR IGNORE INTO chunk_patterns (chunk_hash, pattern_hash) VALUES (:chunkId, :p.hash.name) RETURNING id")
+    @SqlQuery("INSERT OR IGNORE INTO chunk_patterns (chunk_id, pattern_hash) VALUES (:chunkId, :p.hash.name) RETURNING id")
     long insertChunkPatternRelationship(@Bind("chunkId")final long chunkId,final @BindBean("p")Pattern pattern);
 
-    @SqlQuery("INSERT OR IGNORE INTO pattern_normalization_info (pattern_hash, info_hash) VALUES (:p.hash.name, :i.hash.name) RETURNING id")
-    long insertPatternInfoRelationship(@BindBean("p")Pattern pattern, @BindBean("i")NormalizationInfo info);
+    @SqlQuery("INSERT OR IGNORE INTO chunk_normalization_info (chunk_patterns_id, info_hash) VALUES (:chunkPatternsId, :i.hash.name) RETURNING id")
+    long insertChunkInfoRelationship(@Bind("chunkPatternsId")final long chunkPatternsId, @BindBean("i")NormalizationInfo info);
 
     @SqlQuery("SELECT * FROM trees WHERE hash = :hash")
     @RegisterRowMapper(TreeJsonRawMapper.class)
@@ -55,7 +55,7 @@ public interface Dao {
         }
     }
 
-    @SqlQuery("SELECT chunk_hash FROM chunk_patterns WHERE pattern_hash = :hash")
+    @SqlQuery("SELECT chunk_id FROM chunk_patterns WHERE pattern_hash = :hash")
     ResultIterable<String> searchChunkHashByPatternHash(@Bind("hash")String hash);
 
 }

@@ -22,10 +22,10 @@ public class Database {
         handle.execute("CREATE TABLE commits (id INTEGER PRIMARY KEY AUTOINCREMENT,repository_id INTEGER,hash TEXT,message TEXT)");
         handle.execute("CREATE TABLE chunks (id INTEGER PRIMARY KEY AUTOINCREMENT,commit_id INTEGER,file TEXT,old_begin INTEGER,old_end INTEGER,new_begin INTEGER,new_end INTEGER)");
         handle.execute("CREATE TABLE patterns (hash TEXT PRIMARY KEY,old_tree_hash TEXT,new_tree_hash TEXT,is_normalized INTEGER)");
-        handle.execute("CREATE TABLE normalization_info (hash TEXT PRIMARY KEY, type INTEGER,target_id INTEGER)");
+        handle.execute("CREATE TABLE normalization_info (hash TEXT PRIMARY KEY, type INTEGER,target_id INTEGER,order_index INTEGER)");
         handle.execute("CREATE TABLE trees (hash TEXT PRIMARY KEY,structure TEXT, text TEXT)");
-        handle.execute("CREATE TABLE chunk_patterns (id INTEGER PRIMARY KEY AUTOINCREMENT,chunk_hash TEXT,pattern_hash TEXT)");
-        handle.execute("CREATE TABLE pattern_normalization_info (id INTEGER PRIMARY KEY AUTOINCREMENT,pattern_hash TEXT,info_hash TEXT)");
+        handle.execute("CREATE TABLE chunk_patterns (id INTEGER PRIMARY KEY AUTOINCREMENT,chunk_id INTEGER,pattern_hash TEXT)");
+        handle.execute("CREATE TABLE chunk_normalization_info (id INTEGER PRIMARY KEY AUTOINCREMENT,chunk_patterns_id INTEGER,info_hash TEXT)");
 
         log.info("Table created");
     }

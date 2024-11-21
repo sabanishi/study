@@ -84,7 +84,7 @@ public class Pattern {
                         }
 
                         //正規化情報を追加
-                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Method,normalizedNode.getId()));
+                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Method,normalizedNode.getId(),copyInfoList.size()));
                         Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
                         result.add(copy);
                     }
@@ -162,7 +162,7 @@ public class Pattern {
                         }
 
                         //正規化情報を追加
-                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Argument,normalizedNode.getId()));
+                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Argument,normalizedNode.getId(),copyInfoList.size()));
                         Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
                         result.add(copy);
                     }
@@ -223,7 +223,7 @@ public class Pattern {
                         }
 
                         //正規化情報を追加
-                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId()));
+                        copyInfoList.add(NormalizationInfo.of(NormalizationType.Name,normalizedNode.getId(),copyInfoList.size()));
                         Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
                         result.add(copy);
                         break;

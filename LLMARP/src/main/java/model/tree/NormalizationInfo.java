@@ -7,15 +7,16 @@ import model.Hash;
 public class NormalizationInfo {
     NormalizationType type;
     int targetId;
+    int order;
     Hash hash;
 
-    public static NormalizationInfo of(NormalizationType type, int targetId, Hash hash){
-        return new NormalizationInfo(type, targetId, hash);
+    public static NormalizationInfo of(NormalizationType type, int targetId, int order,Hash hash){
+        return new NormalizationInfo(type, targetId,order,hash);
     }
 
-    public static NormalizationInfo of(NormalizationType type,int targetId){
+    public static NormalizationInfo of(NormalizationType type,int targetId,int order){
         Hash hash = Hash.of(type.toString() + targetId);
-        return new NormalizationInfo(type, targetId, hash);
+        return new NormalizationInfo(type, targetId,order,hash);
     }
 
     @Override
