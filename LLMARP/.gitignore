@@ -44,3 +44,5 @@ bin/
 Test/
 
 **.db
+
+rest/

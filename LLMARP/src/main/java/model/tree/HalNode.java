@@ -41,6 +41,9 @@ public abstract class HalNode {
             case "HalNormalizeInvocationNode":
                 node = new HalNormalizeInvocationNode();
                 break;
+            case "HalEmptyNode":
+                node = new HalEmptyNode();
+                break;
             default:
                 log.error("Unknown class: {}", className);
                 return null;
