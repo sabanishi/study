@@ -1,10 +1,16 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import org.apache.commons.lang3.StringUtils;
 
 public class HalNormalizeNode extends HalTreeNode {
-    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length) {
-        super(type, label, original, pos, length);
+    private String originalLabel;
+
+    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length,String rawText, String originalLabel) {
+        super(type, label, original, pos, length,rawText);
+        this.originalLabel = originalLabel;
     }
 
     protected HalNormalizeNode() {
@@ -13,7 +19,7 @@ public class HalNormalizeNode extends HalTreeNode {
 
     public static HalNormalizeNode of(HalTreeNode node) {
         String label = "$V" + node.getId();
-        HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength());
+        HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength(),node.getRawText(),node.getLabel());
         normalizeNode.setId(node.getId());
         for (HalNode child : node.getChildren()) {
             normalizeNode.addChild(child);
@@ -22,15 +28,13 @@ public class HalNormalizeNode extends HalTreeNode {
     }
 
     @Override
-    public boolean equals(HalNode node) {
+    public boolean equalsInternal(HalNode node) {
         if (!(node instanceof HalNormalizeNode treeNode)) {
             return false;
         }
 
         return this.getLabel().equals(treeNode.getLabel())
-                && this.getType().equals(treeNode.getType())
-                && this.getPos() == treeNode.getPos()
-                && this.getLength() == treeNode.getLength();
+                && this.getType().equals(treeNode.getType());
     }
 
     @Override
@@ -39,7 +43,19 @@ public class HalNormalizeNode extends HalTreeNode {
     }
 
     @Override
-    public String toHashString(int depth) {
-        return "NORMALIZED_NODE" + super.toHashString(depth);
+    protected void makeToJsonInternal(JsonObject jsonObject, JsonSerializationContext context) {
+        super.makeToJsonInternal(jsonObject, context);
+        jsonObject.addProperty("original_text", originalLabel);
+    }
+
+    @Override
+    protected void makeFromJsonInternal(JsonObject jsonObject) {
+        super.makeFromJsonInternal(jsonObject);
+        originalLabel = jsonObject.get("original_text").getAsString();
+    }
+
+    @Override
+    public String makeNormalizeTextInternal(String rawText) {
+        return rawText.replace(rawText, getLabel());
     }
 }

@@ -12,6 +12,7 @@ import model.tree.NormalizationInfo;
 import org.eclipse.jgit.diff.Edit;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ToString(of = {"fileName", "oldStatement", "newStatement"})
 @RequiredArgsConstructor
@@ -43,11 +44,14 @@ public class Chunk {
         Statement oldStatement = Statement.joint(oldSlice, Range.of(oldLineBegin, oldLineEnd), Range.of(oldCharBegin, oldCharEnd));
         Statement newStatement = Statement.joint(newSlice, Range.of(newLineBegin, newLineEnd), Range.of(newCharBegin, newCharEnd));
 
+        String oldSource = oldStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
+        String newSource = newStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
+
         Tree oldTree = extractSubTree(oldAllTree, oldStatement);
         Tree newTree = extractSubTree(newAllTree, newStatement);
 
-        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree);
-        HalTreeNode newTreeRoot = HalTreeNode.of(newTree);
+        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree,oldSource);
+        HalTreeNode newTreeRoot = HalTreeNode.of(newTree,newSource);
 
         Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>());
 

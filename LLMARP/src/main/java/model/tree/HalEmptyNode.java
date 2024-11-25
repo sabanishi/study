@@ -3,8 +3,8 @@ package model.tree;
 import com.github.gumtreediff.tree.Tree;
 
 public class HalEmptyNode extends HalTreeNode{
-    protected HalEmptyNode(Tree original, int pos, int length) {
-        super("", "", original, pos, length);
+    protected HalEmptyNode(String type,String label,Tree original, int pos, int length,String rawText) {
+        super(type, label, original, pos, length,rawText);
     }
 
     protected HalEmptyNode() {
@@ -12,7 +12,9 @@ public class HalEmptyNode extends HalTreeNode{
     }
 
     public static HalEmptyNode of(HalTreeNode node) {
-        HalEmptyNode emptyNode = new HalEmptyNode(node.getOriginal(), node.getPos(), node.getLength());
+        String type = "EMPTY_NODE";
+        String label = "[$V" + node.getId() + "]";
+        HalEmptyNode emptyNode = new HalEmptyNode(type, label, node.getOriginal(), node.getPos(), node.getLength(), node.getRawText());
         emptyNode.setId(node.getId());
         for (HalNode child : node.getChildren()) {
             emptyNode.addChild(child);
@@ -21,13 +23,13 @@ public class HalEmptyNode extends HalTreeNode{
     }
 
     @Override
-    public boolean equals(HalNode node) {
+    public boolean equalsInternal(HalNode node) {
         if (!(node instanceof HalEmptyNode treeNode)) {
             return false;
         }
 
-        return this.getPos() == treeNode.getPos()
-                && this.getLength() == treeNode.getLength();
+        return this.getLabel().equals(treeNode.getLabel())
+                && this.getType().equals(treeNode.getType());
     }
 
     @Override
@@ -36,7 +38,7 @@ public class HalEmptyNode extends HalTreeNode{
     }
 
     @Override
-    public String toHashString(int depth) {
-        return "EMPTY_NODE" + super.toHashString(depth);
+    public String makeNormalizeTextInternal(String rawText) {
+        return rawText.replace(rawText, getLabel());
     }
 }

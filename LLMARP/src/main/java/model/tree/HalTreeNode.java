@@ -10,34 +10,33 @@ import org.apache.commons.lang3.StringUtils;
 
 @Getter
 public class HalTreeNode extends HalNode {
-    @Setter(AccessLevel.PUBLIC)
     protected String type;
-    @Setter(AccessLevel.PUBLIC)
     protected String label;
     protected Tree original;
 
     protected HalTreeNode() {
     }
 
-    protected HalTreeNode(String type, String label, Tree original, int pos, int length) {
+    protected HalTreeNode(String type, String label, Tree original, int pos, int length,String rawText) {
         this.type = type;
         this.label = label;
         this.original = original;
         this.pos = pos;
         this.length = length;
+        this.rawText = rawText;
     }
 
-    public static HalTreeNode of(Tree tree) {
-        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree, tree.getPos(), tree.getLength());
+    public static HalTreeNode of(Tree tree,String rawText) {
+        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree, tree.getPos(), tree.getLength(),rawText);
         for (Tree child : tree.getChildren()) {
-            node.addChild(HalTreeNode.of(child));
+            node.addChild(HalTreeNode.of(child,rawText));
         }
 
         return node;
     }
 
-    public static HalTreeNode of(HalTreeNode tree) {
-        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original, tree.getPos(), tree.getLength());
+    public static HalTreeNode of(HalTreeNode tree,String rawText) {
+        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original, tree.getPos(), tree.getLength(),rawText);
         node.id = tree.id;
         return node;
     }
@@ -75,15 +74,13 @@ public class HalTreeNode extends HalNode {
     }
 
     @Override
-    public boolean equals(HalNode node) {
+    public boolean equalsInternal(HalNode node) {
         if (!(node instanceof HalTreeNode treeNode)) {
             return false;
         }
 
         return this.getLabel().equals(treeNode.getLabel())
-                && this.getType().equals(treeNode.getType())
-                && this.getPos() == treeNode.getPos()
-                && this.getLength() == treeNode.getLength();
+                && this.getType().equals(treeNode.getType());
     }
 
     @Override
@@ -117,6 +114,11 @@ public class HalTreeNode extends HalNode {
     }
 
     protected HalTreeNode copyMe() {
-        return of(this);
+        return of(this,rawText);
+    }
+
+    @Override
+    protected String makeNormalizeTextInternal(String oldText) {
+        return oldText;
     }
 }

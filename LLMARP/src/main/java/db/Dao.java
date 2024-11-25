@@ -1,8 +1,7 @@
 package db;
 
 import gson.GsonLocator;
-import model.Chunk;
-import model.Pattern;
+import model.*;
 import model.tree.HalNode;
 import model.tree.NormalizationInfo;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -30,7 +29,7 @@ public interface Dao {
     @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_normalized) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:isNormalized)")
     void insertPattern(@Bind("isNormalized") boolean isNormalized, @BindBean("p") final Pattern pattern);
 
-    @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.text)")
+    @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.normalizeText)")
     void insertTree(@BindBean("t") final HalNode tree, @Bind("structure") String structure);
 
     @SqlUpdate("INSERT OR IGNORE INTO normalization_info (hash, type, target_id,order_index) VALUES (:i.hash.name, :i.type,:i.targetId,:i.order)")
@@ -57,4 +56,37 @@ public interface Dao {
         }
     }
 
+    @SqlQuery("SELECT * FROM chunks WHERE id = :chunkId")
+    @RegisterRowMapper(ChunkInfoMapper.class)
+    ResultIterable<ChunkInfo> searchChunkById(@Bind("chunkId")long chunkId);
+
+    class ChunkInfoMapper implements RowMapper<ChunkInfo> {
+        @Override
+        public ChunkInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
+            String fileName = rs.getString("file");
+            int oldBegin = rs.getInt("old_begin");
+            int oldEnd = rs.getInt("old_end");
+            int newBegin = rs.getInt("new_begin");
+            int newEnd = rs.getInt("new_end");
+            String oldRaw = rs.getString("old_raw");
+            String newRaw = rs.getString("new_raw");
+
+            return ChunkInfo.of(fileName, oldBegin, oldEnd, newBegin, newEnd, oldRaw, newRaw);
+        }
+    }
+
+    @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternInfo> searchPattern(@Bind("hash") String hash);
+
+    class PatternMapper implements RowMapper<PatternInfo> {
+        @Override
+        public PatternInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
+            String hash = rs.getString("hash");
+            String oldTreeHash = rs.getString("old_tree_hash");
+            String newTreeHash = rs.getString("new_tree_hash");
+            boolean isNormalized = rs.getBoolean("is_normalized");
+            return PatternInfo.of(hash,oldTreeHash, newTreeHash, isNormalized);
+        }
+    }
 }

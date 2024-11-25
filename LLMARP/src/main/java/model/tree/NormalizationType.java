@@ -1,7 +1,8 @@
 package model.tree;
 
 public enum NormalizationType {
-    Name,
+    Label,
+    Type,
     Argument,
     Method,
 }
