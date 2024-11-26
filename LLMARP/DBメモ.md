@@ -15,6 +15,8 @@ chunk_patterns ||--|{ chunk_normalization_info:""
 
 patterns ||--|{ trees :""
 
+patterns ||--|{ pattern_connections :""
+
 
 repositories{
     INTEGER id PK
@@ -70,6 +72,12 @@ chunk_normalization_info{
     INTEGER id PK
     TEXT chunk_patterns_id
     TEXT info_hash
+}
+
+pattern_connections{
+    INTEGER id PK
+    TEXT parent_hash
+    TEXT child_hash
 }
 
 ```
