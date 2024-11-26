@@ -1,7 +1,8 @@
 package db;
 
 import gson.GsonLocator;
-import model.*;
+import model.Chunk;
+import model.Pattern;
 import model.db.ChunkDbInfo;
 import model.db.PatternDbInfo;
 import model.tree.HalNode;
@@ -52,6 +53,15 @@ public interface Dao {
     @SqlQuery("SELECT * FROM trees WHERE hash = :hash")
     @RegisterRowMapper(TreeJsonRawMapper.class)
     ResultIterable<HalNode> searchTree(@Bind("hash") final String hash);
+
+    @SqlQuery("SELECT * FROM chunks WHERE id = :chunkId")
+    @RegisterRowMapper(ChunkInfoMapper.class)
+    ResultIterable<ChunkDbInfo> searchChunkById(@Bind("chunkId") long chunkId);
+
+    @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> searchPattern(@Bind("hash") String hash);
+
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
         public HalNode map(ResultSet rs, StatementContext ctx) throws SQLException {
@@ -60,9 +70,6 @@ public interface Dao {
         }
     }
 
-    @SqlQuery("SELECT * FROM chunks WHERE id = :chunkId")
-    @RegisterRowMapper(ChunkInfoMapper.class)
-    ResultIterable<ChunkDbInfo> searchChunkById(@Bind("chunkId")long chunkId);
     class ChunkInfoMapper implements RowMapper<ChunkDbInfo> {
         @Override
         public ChunkDbInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
@@ -78,9 +85,6 @@ public interface Dao {
         }
     }
 
-    @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
-    @RegisterRowMapper(PatternMapper.class)
-    ResultIterable<PatternDbInfo> searchPattern(@Bind("hash") String hash);
     class PatternMapper implements RowMapper<PatternDbInfo> {
         @Override
         public PatternDbInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
@@ -88,7 +92,7 @@ public interface Dao {
             String oldTreeHash = rs.getString("old_tree_hash");
             String newTreeHash = rs.getString("new_tree_hash");
             boolean isNormalized = rs.getBoolean("is_normalized");
-            return PatternDbInfo.of(hash,oldTreeHash, newTreeHash, isNormalized);
+            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isNormalized);
         }
     }
 }

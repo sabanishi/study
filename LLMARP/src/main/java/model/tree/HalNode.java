@@ -28,7 +28,7 @@ public abstract class HalNode {
     protected List<HalNode> children = new ArrayList<>();
     protected HalTreeNode parent;
     protected String rawText;
-    @Getter(lazy=true)
+    @Getter(lazy = true)
     private final String normalizeText = makeNormalizeText();
 
     public static HalNode makeFromJson(JsonObject jsonObject) {
@@ -152,16 +152,16 @@ public abstract class HalNode {
         makeToJsonInternal(jsonObject, context);
     }
 
-    public String makeNormalizeText(){
+    public String makeNormalizeText() {
         String baseText = rawText.substring(pos, pos + length);
         return makeNormalizeLoop(baseText);
     }
 
-    private String makeNormalizeLoop(String baseText){
+    private String makeNormalizeLoop(String baseText) {
         String newText = makeNormalizeTextInternal(baseText);
         baseText = baseText.replace(baseText, newText);
 
-        for(HalNode child:children) {
+        for (HalNode child : children) {
             String childOriginalText = rawText.substring(child.getPos(), child.getPos() + child.getLength());
             String childNewText = child.makeNormalizeLoop(childOriginalText);
             baseText = baseText.replace(childOriginalText, childNewText);
@@ -173,23 +173,23 @@ public abstract class HalNode {
     @Override
     public boolean equals(Object obj) {
         //objがHalNodeのサブクラスである時
-        if(!(obj instanceof HalNode node)) return false;
+        if (!(obj instanceof HalNode node)) return false;
 
-        if(!equalsInternal(obj))return false;
+        if (!equalsInternal(obj)) return false;
 
         if (children.size() != node.children.size()) {
             return false;
         }
 
-        for(HalNode child : children){
+        for (HalNode child : children) {
             boolean found = false;
-            for(HalNode otherChild : node.children){
-                if(child.equals(otherChild)){
+            for (HalNode otherChild : node.children) {
+                if (child.equals(otherChild)) {
                     found = true;
                     break;
                 }
             }
-            if(!found){
+            if (!found) {
                 return false;
             }
         }

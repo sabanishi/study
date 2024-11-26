@@ -50,8 +50,8 @@ public class Chunk {
         Tree oldTree = extractSubTree(oldAllTree, oldStatement);
         Tree newTree = extractSubTree(newAllTree, newStatement);
 
-        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree,oldSource);
-        HalTreeNode newTreeRoot = HalTreeNode.of(newTree,newSource);
+        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree, oldSource);
+        HalTreeNode newTreeRoot = HalTreeNode.of(newTree, newSource);
 
         Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>());
 

@@ -1,11 +1,10 @@
 package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
-import org.apache.commons.lang3.StringUtils;
 
 public class HalNormalizeInvocationNode extends HalTreeNode {
-    protected HalNormalizeInvocationNode(String type, String label, Tree original, int pos, int length,String rawText) {
-        super(type, label, original, pos, length,rawText);
+    protected HalNormalizeInvocationNode(String type, String label, Tree original, int pos, int length, String rawText) {
+        super(type, label, original, pos, length, rawText);
     }
 
     public HalNormalizeInvocationNode() {
@@ -15,7 +14,7 @@ public class HalNormalizeInvocationNode extends HalTreeNode {
     public static HalNormalizeInvocationNode of(HalTreeNode node) {
         String type = "NORMALIZED_METHOD_INVOCATION_ARGUMENTS";
         String label = "<$V" + node.getId() + ">";
-        HalNormalizeInvocationNode normalizeNode = new HalNormalizeInvocationNode(type, label, node.getOriginal(), node.getPos(), node.getLength(),node.getRawText());
+        HalNormalizeInvocationNode normalizeNode = new HalNormalizeInvocationNode(type, label, node.getOriginal(), node.getPos(), node.getLength(), node.getRawText());
         normalizeNode.setId(node.getId());
         for (HalNode child : node.getChildren()) {
             normalizeNode.addChild(child);

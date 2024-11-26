@@ -3,9 +3,7 @@ package model.tree;
 import com.github.gumtreediff.tree.Tree;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 @Getter
@@ -17,7 +15,7 @@ public class HalTreeNode extends HalNode {
     protected HalTreeNode() {
     }
 
-    protected HalTreeNode(String type, String label, Tree original, int pos, int length,String rawText) {
+    protected HalTreeNode(String type, String label, Tree original, int pos, int length, String rawText) {
         this.type = type;
         this.label = label;
         this.original = original;
@@ -26,17 +24,17 @@ public class HalTreeNode extends HalNode {
         this.rawText = rawText;
     }
 
-    public static HalTreeNode of(Tree tree,String rawText) {
-        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree, tree.getPos(), tree.getLength(),rawText);
+    public static HalTreeNode of(Tree tree, String rawText) {
+        HalTreeNode node = new HalTreeNode(tree.getType().toString(), tree.getLabel(), tree, tree.getPos(), tree.getLength(), rawText);
         for (Tree child : tree.getChildren()) {
-            node.addChild(HalTreeNode.of(child,rawText));
+            node.addChild(HalTreeNode.of(child, rawText));
         }
 
         return node;
     }
 
-    public static HalTreeNode of(HalTreeNode tree,String rawText) {
-        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original, tree.getPos(), tree.getLength(),rawText);
+    public static HalTreeNode of(HalTreeNode tree, String rawText) {
+        HalTreeNode node = new HalTreeNode(tree.getType(), tree.getLabel(), tree.original, tree.getPos(), tree.getLength(), rawText);
         node.id = tree.id;
         return node;
     }
@@ -114,7 +112,7 @@ public class HalTreeNode extends HalNode {
     }
 
     protected HalTreeNode copyMe() {
-        return of(this,rawText);
+        return of(this, rawText);
     }
 
     @Override
