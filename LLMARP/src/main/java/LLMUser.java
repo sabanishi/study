@@ -12,7 +12,7 @@ public class LLMUser {
     /**
      * LLMにテキストを送信してその返信結果を返す
      */
-    public String send(String systemMessage,String userMessage) {
+    public String send(String systemMessage, String userMessage) {
         try {
             String reformattedUserMessage = reformatText(userMessage);
             String reformattedSystemMessage = reformatText(systemMessage);
@@ -51,7 +51,7 @@ public class LLMUser {
         return "";
     }
 
-    private String reformatText(String text){
+    private String reformatText(String text) {
         return text.replace("\"", "\\\"").replace("\n", "\\n");
     }
 }

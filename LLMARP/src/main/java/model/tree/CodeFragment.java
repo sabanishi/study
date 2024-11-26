@@ -18,7 +18,7 @@ public class CodeFragment {
         this.body = body;
     }
 
-    public static CodeFragment of(HalNode node,String text){
+    public static CodeFragment of(HalNode node, String text) {
         int nodeId = node.getId();
         int begin = node.getPos();
         int end = node.getPos() + node.getLength();

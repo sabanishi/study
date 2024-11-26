@@ -52,7 +52,7 @@ public class Pattern {
      * 自身に対して正規化を行い、その結果を引数のSetに追加する
      */
     public void normalize(Set<Pattern> result) {
-        if(this.isNormalized)return;
+        if (this.isNormalized) return;
         this.isNormalized = true;
 
         normalizeInternal(result);
@@ -62,7 +62,7 @@ public class Pattern {
             parentsList.add(parents);
             pattern.normalize(parents);
         }
-        for(HashSet<Pattern> parents : parentsList){
+        for (HashSet<Pattern> parents : parentsList) {
             result.addAll(parents);
         }
     }
@@ -74,11 +74,11 @@ public class Pattern {
         normalizeMethod(result);
     }
 
-    private void normalizeVariable(Set<Pattern> result){
+    private void normalizeVariable(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
             if (oldNode instanceof HalTreeNode oldTargetNode) {
                 NormalizeNameInfo info = canNormalizeVariable(oldTargetNode);
-                if(info.canNormalize){
+                if (info.canNormalize) {
                     oldTargetNode = info.targetNode;
                     HalNode copyOldRoot = getOldTreeRoot().deepCopy();
                     HalNode copyNewRoot = getNewTreeRoot().deepCopy();
@@ -104,14 +104,14 @@ public class Pattern {
         }
     }
 
-    private NormalizeNameInfo canNormalizeVariable(HalNode targetNode){
-        if(!(targetNode instanceof HalTreeNode targetTreeNode)
+    private NormalizeNameInfo canNormalizeVariable(HalNode targetNode) {
+        if (!(targetNode instanceof HalTreeNode targetTreeNode)
                 || targetNode instanceof HalNormalizeInvocationNode
-                || targetNode instanceof HalEmptyNode){
+                || targetNode instanceof HalEmptyNode) {
             return new NormalizeNameInfo(false, null);
         }
 
-        if(targetNode instanceof HalNormalizeNode) return new NormalizeNameInfo(true, targetTreeNode);
+        if (targetNode instanceof HalNormalizeNode) return new NormalizeNameInfo(true, targetTreeNode);
 
         for (HalNode child : targetNode.getChildren()) {
             NormalizeNameInfo childInfo = canNormalizeVariable(child);
@@ -325,13 +325,13 @@ public class Pattern {
         return new NormalizeNameInfo(false, null);
     }
 
-    private void addPatternToResultSet(Pattern target,Set<Pattern> result){
-        if(!result.contains(target)){
+    private void addPatternToResultSet(Pattern target, Set<Pattern> result) {
+        if (!result.contains(target)) {
             target.getParents().add(this);
             result.add(target);
-        }else{
-            for(Pattern pattern : result){
-                if(pattern.hashCode() == target.hashCode()){
+        } else {
+            for (Pattern pattern : result) {
+                if (pattern.hashCode() == target.hashCode()) {
                     pattern.getParents().add(this);
                     break;
                 }

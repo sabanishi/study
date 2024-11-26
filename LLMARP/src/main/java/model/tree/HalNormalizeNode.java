@@ -3,13 +3,12 @@ package model.tree;
 import com.github.gumtreediff.tree.Tree;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.apache.commons.lang3.StringUtils;
 
 public class HalNormalizeNode extends HalTreeNode {
     private String originalLabel;
 
-    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length,String rawText, String originalLabel) {
-        super(type, label, original, pos, length,rawText);
+    protected HalNormalizeNode(String type, String label, Tree original, int pos, int length, String rawText, String originalLabel) {
+        super(type, label, original, pos, length, rawText);
         this.originalLabel = originalLabel;
     }
 
@@ -19,7 +18,7 @@ public class HalNormalizeNode extends HalTreeNode {
 
     public static HalNormalizeNode of(HalTreeNode node) {
         String label = "$V" + node.getId();
-        HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength(),node.getRawText(),node.getLabel());
+        HalNormalizeNode normalizeNode = new HalNormalizeNode(node.getType(), label, node.getOriginal(), node.getPos(), node.getLength(), node.getRawText(), node.getLabel());
         normalizeNode.setId(node.getId());
         for (HalNode child : node.getChildren()) {
             normalizeNode.addChild(child);

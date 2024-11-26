@@ -2,9 +2,9 @@ package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
 
-public class HalEmptyNode extends HalTreeNode{
-    protected HalEmptyNode(String type,String label,Tree original, int pos, int length,String rawText) {
-        super(type, label, original, pos, length,rawText);
+public class HalEmptyNode extends HalTreeNode {
+    protected HalEmptyNode(String type, String label, Tree original, int pos, int length, String rawText) {
+        super(type, label, original, pos, length, rawText);
     }
 
     protected HalEmptyNode() {
