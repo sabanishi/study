@@ -28,8 +28,8 @@ public class HalNormalizeNode extends HalTreeNode {
     }
 
     @Override
-    public boolean equalsInternal(HalNode node) {
-        if (!(node instanceof HalNormalizeNode treeNode)) {
+    public boolean equalsInternal(Object obj) {
+        if (!(obj instanceof HalNormalizeNode treeNode)) {
             return false;
         }
 

@@ -172,10 +172,10 @@ public abstract class HalNode {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof HalNode node)) {
-            return false;
-        }
-        if(!equalsInternal(node))return false;
+        //objがHalNodeのサブクラスである時
+        if(!(obj instanceof HalNode node)) return false;
+
+        if(!equalsInternal(obj))return false;
 
         if (children.size() != node.children.size()) {
             return false;
@@ -203,7 +203,7 @@ public abstract class HalNode {
 
     public abstract HalNode deepCopy();
 
-    protected abstract boolean equalsInternal(HalNode tree);
+    protected abstract boolean equalsInternal(Object obj);
 
     public abstract int hashCode();
 

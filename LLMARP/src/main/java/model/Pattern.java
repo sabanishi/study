@@ -21,6 +21,8 @@ public class Pattern {
     private final List<NormalizationInfo> appliedNormalizations;
     @Getter
     private final Hash hash;
+    @Getter
+    private final Set<Pattern> parents = new HashSet<>();
 
     private boolean isNormalized = false;
 
@@ -50,27 +52,26 @@ public class Pattern {
      * 自身に対して正規化を行い、その結果を引数のSetに追加する
      */
     public void normalize(Set<Pattern> result) {
-        Set<Pattern> normalized = normalizeInternal();
-
-        //resultに既に含まれているものは除外する
-        normalized.removeIf(result::contains);
-        result.addAll(normalized);
+        if(this.isNormalized)return;
         this.isNormalized = true;
 
-        for (Pattern pattern : normalized) {
-            if (pattern.isNormalized) continue;
-            pattern.normalize(result);
+        normalizeInternal(result);
+        List<HashSet<Pattern>> parentsList = new ArrayList<>();
+        for (Pattern pattern : result) {
+            HashSet<Pattern> parents = new HashSet<>(result);
+            parentsList.add(parents);
+            pattern.normalize(parents);
+        }
+        for(HashSet<Pattern> parents : parentsList){
+            result.addAll(parents);
         }
     }
 
-    private Set<Pattern> normalizeInternal() {
-        Set<Pattern> result = new HashSet<>();
+    private void normalizeInternal(Set<Pattern> result) {
         normalizeName(result);
         normalizeVariable(result);
         normalizeArg(result);
         normalizeMethod(result);
-
-        return result;
     }
 
     private void normalizeVariable(Set<Pattern> result){
@@ -97,7 +98,7 @@ public class Pattern {
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Type, normalizedNode.getId(), copyInfoList.size()));
                     Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
-                    result.add(copy);
+                    addPatternToResultSet(copy, result);
                 }
             }
         }
@@ -146,7 +147,7 @@ public class Pattern {
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Method, normalizedNode.getId(), copyInfoList.size()));
                     Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
-                    result.add(copy);
+                    addPatternToResultSet(copy, result);
                 }
             }
         }
@@ -228,7 +229,7 @@ public class Pattern {
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Argument, normalizedNode.getId(), copyInfoList.size()));
                     Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
-                    result.add(copy);
+                    addPatternToResultSet(copy, result);
                 }
             }
         }
@@ -287,7 +288,7 @@ public class Pattern {
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
                     Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
-                    result.add(copy);
+                    addPatternToResultSet(copy, result);
                 }
             }
         }
@@ -322,6 +323,20 @@ public class Pattern {
             }
         }
         return new NormalizeNameInfo(false, null);
+    }
+
+    private void addPatternToResultSet(Pattern target,Set<Pattern> result){
+        if(!result.contains(target)){
+            target.getParents().add(this);
+            result.add(target);
+        }else{
+            for(Pattern pattern : result){
+                if(pattern.hashCode() == target.hashCode()){
+                    pattern.getParents().add(this);
+                    break;
+                }
+            }
+        }
     }
 
     public record NormalizeNameInfo(boolean canNormalize, HalTreeNode targetNode) {

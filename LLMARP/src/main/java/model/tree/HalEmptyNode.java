@@ -23,8 +23,8 @@ public class HalEmptyNode extends HalTreeNode{
     }
 
     @Override
-    public boolean equalsInternal(HalNode node) {
-        if (!(node instanceof HalEmptyNode treeNode)) {
+    public boolean equalsInternal(Object obj) {
+        if (!(obj instanceof HalEmptyNode treeNode)) {
             return false;
         }
 
