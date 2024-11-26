@@ -2,6 +2,8 @@ package db;
 
 import gson.GsonLocator;
 import model.*;
+import model.db.ChunkDbInfo;
+import model.db.PatternDbInfo;
 import model.tree.HalNode;
 import model.tree.NormalizationInfo;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -41,13 +43,15 @@ public interface Dao {
     @SqlQuery("INSERT OR IGNORE INTO chunk_normalization_info (chunk_patterns_id, info_hash) VALUES (:chunkPatternsId, :i.hash.name) RETURNING id")
     long insertChunkInfoRelationship(@Bind("chunkPatternsId") final long chunkPatternsId, @BindBean("i") NormalizationInfo info);
 
-    @SqlQuery("SELECT * FROM trees WHERE hash = :hash")
-    @RegisterRowMapper(TreeJsonRawMapper.class)
-    ResultIterable<HalNode> searchTree(@Bind("hash") final String hash);
+    @SqlQuery("INSERT OR IGNORE INTO pattern_connections (parent_hash, child_hash) VALUES (:parent.hash.name, :child.hash.name) RETURNING id")
+    long insertPatternConnection(@BindBean("parent") final Pattern parent, @BindBean("child") final Pattern child);
 
     @SqlQuery("SELECT chunk_id FROM chunk_patterns WHERE pattern_hash = :hash")
     ResultIterable<String> searchChunkHashByPatternHash(@Bind("hash") String hash);
 
+    @SqlQuery("SELECT * FROM trees WHERE hash = :hash")
+    @RegisterRowMapper(TreeJsonRawMapper.class)
+    ResultIterable<HalNode> searchTree(@Bind("hash") final String hash);
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
         public HalNode map(ResultSet rs, StatementContext ctx) throws SQLException {
@@ -58,11 +62,10 @@ public interface Dao {
 
     @SqlQuery("SELECT * FROM chunks WHERE id = :chunkId")
     @RegisterRowMapper(ChunkInfoMapper.class)
-    ResultIterable<ChunkInfo> searchChunkById(@Bind("chunkId")long chunkId);
-
-    class ChunkInfoMapper implements RowMapper<ChunkInfo> {
+    ResultIterable<ChunkDbInfo> searchChunkById(@Bind("chunkId")long chunkId);
+    class ChunkInfoMapper implements RowMapper<ChunkDbInfo> {
         @Override
-        public ChunkInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
+        public ChunkDbInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
             String fileName = rs.getString("file");
             int oldBegin = rs.getInt("old_begin");
             int oldEnd = rs.getInt("old_end");
@@ -71,22 +74,21 @@ public interface Dao {
             String oldRaw = rs.getString("old_raw");
             String newRaw = rs.getString("new_raw");
 
-            return ChunkInfo.of(fileName, oldBegin, oldEnd, newBegin, newEnd, oldRaw, newRaw);
+            return ChunkDbInfo.of(fileName, oldBegin, oldEnd, newBegin, newEnd, oldRaw, newRaw);
         }
     }
 
     @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
     @RegisterRowMapper(PatternMapper.class)
-    ResultIterable<PatternInfo> searchPattern(@Bind("hash") String hash);
-
-    class PatternMapper implements RowMapper<PatternInfo> {
+    ResultIterable<PatternDbInfo> searchPattern(@Bind("hash") String hash);
+    class PatternMapper implements RowMapper<PatternDbInfo> {
         @Override
-        public PatternInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
+        public PatternDbInfo map(ResultSet rs, StatementContext ctx) throws SQLException {
             String hash = rs.getString("hash");
             String oldTreeHash = rs.getString("old_tree_hash");
             String newTreeHash = rs.getString("new_tree_hash");
             boolean isNormalized = rs.getBoolean("is_normalized");
-            return PatternInfo.of(hash,oldTreeHash, newTreeHash, isNormalized);
+            return PatternDbInfo.of(hash,oldTreeHash, newTreeHash, isNormalized);
         }
     }
 }

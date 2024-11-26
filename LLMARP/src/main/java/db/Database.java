@@ -26,6 +26,7 @@ public class Database {
         handle.execute("CREATE TABLE trees (hash TEXT PRIMARY KEY,structure TEXT, text TEXT)");
         handle.execute("CREATE TABLE chunk_patterns (id INTEGER PRIMARY KEY AUTOINCREMENT,chunk_id INTEGER,pattern_hash TEXT)");
         handle.execute("CREATE TABLE chunk_normalization_info (id INTEGER PRIMARY KEY AUTOINCREMENT,chunk_patterns_id INTEGER,info_hash TEXT)");
+        handle.execute("CREATE TABLE pattern_connections (id INTEGER PRIMARY KEY AUTOINCREMENT, parent_hash TEXT, child_hash TEXT)");
 
         log.info("Table created");
     }

@@ -1,11 +1,11 @@
-package model;
+package model.db;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 @RequiredArgsConstructor(staticName = "of")
-public class PatternInfo {
+public class PatternDbInfo {
     String hash;
     String oldTreeHash;
     String newTreeHash;

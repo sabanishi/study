@@ -1,11 +1,11 @@
-package model;
+package model.db;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 @RequiredArgsConstructor(staticName = "of")
-public class ChunkInfo {
+public class ChunkDbInfo {
     String fileName;
     int oldBegin;
     int oldEnd;
