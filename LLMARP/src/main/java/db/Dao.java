@@ -29,7 +29,7 @@ public interface Dao {
     @SqlQuery("INSERT INTO chunks (commit_id, file, old_begin, old_end, new_begin, new_end,old_raw,new_raw) VALUES (:commitId, :c.fileName, :c.oldStatement.lines.begin, :c.oldStatement.lines.end, :c.newStatement.lines.begin, :c.newStatement.lines.end,:c.oldStatement.raw,:c.newStatement.raw) RETURNING id")
     long insertChunk(@Bind("commitId") final long commitId, @BindBean("c") final Chunk chunk);
 
-    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_normalized) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:isNormalized)")
+    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_normalized,is_useful) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:isNormalized,0)")
     void insertPattern(@Bind("isNormalized") boolean isNormalized, @BindBean("p") final Pattern pattern);
 
     @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.normalizeText)")
@@ -61,6 +61,9 @@ public interface Dao {
     @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> searchPattern(@Bind("hash") String hash);
+
+    @SqlUpdate("UPDATE patterns SET is_useful = :isUseful WHERE hash = :hash")
+    void updatePatternIsUseful(@Bind("hash") String hash, @Bind("isUseful") boolean isUseful);
 
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
