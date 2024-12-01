@@ -25,13 +25,15 @@ def generate():
 
     system_data = data.get('system', 'Default system message')
     user_data = data.get('user', 'Default user message')
+    temperature = data.get('temperature', 1.0)
 
     response = completion(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "user", "content": user_data},
             {"role": "user", "content": system_data}
-        ]
+        ],
+        temperature=temperature,
     )
 
     # 結果から出力を切り出す

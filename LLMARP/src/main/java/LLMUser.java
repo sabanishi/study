@@ -12,7 +12,7 @@ public class LLMUser {
     /**
      * LLMにテキストを送信してその返信結果を返す
      */
-    public String send(String systemMessage, String userMessage) {
+    public String send(String systemMessage, String userMessage,float temperature) {
         try {
             String reformattedUserMessage = reformatText(userMessage);
             String reformattedSystemMessage = reformatText(systemMessage);
@@ -26,7 +26,8 @@ public class LLMUser {
             String json =
                     "{" +
                             "\"system\": \"" + reformattedSystemMessage + "\"," +
-                            "\"user\": \"" + reformattedUserMessage + "\"" +
+                            "\"user\": \"" + reformattedUserMessage + "\"," +
+                            "\"temperature\": " + temperature +
                             "}";
 
             //log.info("Request: {}", json);
