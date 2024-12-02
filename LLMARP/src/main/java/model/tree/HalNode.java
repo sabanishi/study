@@ -27,6 +27,7 @@ public abstract class HalNode {
     protected int length;
     protected List<HalNode> children = new ArrayList<>();
     protected HalTreeNode parent;
+    @Setter(AccessLevel.PUBLIC)
     protected String rawText;
     @Getter(lazy = true)
     private final String normalizeText = makeNormalizeText();
