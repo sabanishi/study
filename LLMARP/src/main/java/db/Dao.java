@@ -65,6 +65,10 @@ public interface Dao {
     @SqlUpdate("UPDATE patterns SET is_useful = :isUseful WHERE hash = :hash")
     void updatePatternIsUseful(@Bind("hash") String hash, @Bind("isUseful") boolean isUseful);
 
+    @SqlQuery("SELECT * FROM patterns WHERE is_useful = 1")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchUsefulPatterns();
+
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
         public HalNode map(ResultSet rs, StatementContext ctx) throws SQLException {

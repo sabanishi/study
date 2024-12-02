@@ -47,6 +47,7 @@ patterns{
     TEXT old_tree_hash
     TEXT new_tree_hash
     INTEGER is_normalized
+    INTEGER is_useful
 }
 
 normalization_info{
