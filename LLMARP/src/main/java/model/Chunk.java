@@ -80,6 +80,12 @@ public class Chunk {
         List<Pattern> normalizedPatterns = new ArrayList<>();
 
         Chunk chunk = new Chunk(fileName, oldStatement, newStatement, originalPattern, normalizedPatterns);
+
+        //beforeとafterのASTが一致する時、正規化を行わない
+        if(oldTree != null && oldTree.isIsomorphicTo(newTree)){
+            return chunk;
+        }
+
         chunk.normalize();
         return chunk;
     }

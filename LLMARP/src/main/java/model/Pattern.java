@@ -45,29 +45,34 @@ public class Pattern {
 
     @Override
     public int hashCode() {
-        return oldTreeRoot.hashCode() + newTreeRoot.hashCode();
+        return 31*oldTreeRoot.hashCode() + newTreeRoot.hashCode();
     }
 
     /**
      * 自身に対して正規化を行い、その結果を引数のSetに追加する
      */
     public void normalize(Set<Pattern> result) {
+        normalizeInternal(result, result);
+    }
+
+    /**
+     *
+     * @param result 自分だけの子供
+     * @param allResult 自分の親、祖父も含めた全ての子供
+     */
+    private void normalizeInternal(Set<Pattern> result,Set<Pattern> allResult){
         if (this.isNormalized) return;
         this.isNormalized = true;
 
-        normalizeInternal(result);
-        List<HashSet<Pattern>> parentsList = new ArrayList<>();
+        doNormalize(result);
         for (Pattern pattern : result) {
-            HashSet<Pattern> parents = new HashSet<>(result);
-            parentsList.add(parents);
-            pattern.normalize(parents);
-        }
-        for (HashSet<Pattern> parents : parentsList) {
-            result.addAll(parents);
+            HashSet<Pattern> childResult = new HashSet<>();
+            pattern.normalizeInternal(childResult,allResult);
+            allResult.addAll(childResult);
         }
     }
 
-    private void normalizeInternal(Set<Pattern> result) {
+    private void doNormalize(Set<Pattern> result) {
         normalizeName(result);
         normalizeVariable(result);
         normalizeArg(result);

@@ -91,7 +91,9 @@ public class HalTreeNode extends HalNode {
     }
 
     private int calcMyHashCode() {
-        return this.label.hashCode() + this.type.hashCode() + this.length;
+        return 31*31*this.label.hashCode()
+                + 31*this.type.hashCode()
+                + this.length;
     }
 
     @Override
