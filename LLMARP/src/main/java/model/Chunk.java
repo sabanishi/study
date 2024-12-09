@@ -113,6 +113,7 @@ public class Chunk {
     }
 
     private void normalize() {
+        System.out.println(this.getOldStatement().toString());
         //徐々に正規化則を適用していく
         Set<Pattern> normalized = new HashSet<Pattern>();
         originalPattern.normalize(normalized);

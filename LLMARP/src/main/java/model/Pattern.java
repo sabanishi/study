@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import model.tree.*;
+import util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,7 +53,10 @@ public class Pattern {
      * 自身に対して正規化を行い、その結果を引数のSetに追加する
      */
     public void normalize(Set<Pattern> result) {
-        normalizeInternal(result);
+        //変数名だけ先に全て正規化する
+        Pattern variablePattern = normalizeNameAll();
+        result.add(variablePattern);
+        variablePattern.normalizeInternal(result);
     }
 
     /**
@@ -72,7 +76,7 @@ public class Pattern {
     }
 
     private void doNormalize(Set<Pattern> result) {
-        normalizeName(result);
+        //normalizeName(result);
         normalizeVariable(result);
         normalizeArg(result);
         normalizeMethod(result);
@@ -267,6 +271,43 @@ public class Pattern {
             }
         }
         return true;
+    }
+
+    private Pattern normalizeNameAll(){
+        Set<Pair<HalNode,HalNode>> replaceOldSet = new HashSet<>();
+        Set<Pair<HalNode,HalNode>> replaceNewSet = new HashSet<>();
+        List<NormalizationInfo> copyInfoList = new ArrayList<>();
+        for(HalNode oldNode : getOldTreeRoot().preOrder()){
+            if (oldNode instanceof HalTreeNode oldTargetNode) {
+                NormalizeNameInfo info = canNormalizeName(oldTargetNode);
+                if (info.canNormalize) {
+                    oldTargetNode = info.targetNode;
+                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
+                    //oldTreeの該当箇所を置換する
+                    replaceOldSet.add(Pair.of(oldTargetNode,normalizedNode));
+
+                    //newTreeに同じIDのノードがあれば置換する
+                    HalNode newTargetNode = getNewTreeRoot().searchById(normalizedNode.getId());
+                    if (newTargetNode instanceof HalTreeNode) {
+                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode) newTargetNode);
+                        replaceNewSet.add(Pair.of(newTargetNode,normalizeNode2));
+                    }
+
+                    //正規化情報を追加
+                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
+                }
+            }
+        }
+
+        Pattern copy = Pattern.of(getOldTreeRoot(), getNewTreeRoot(), copyInfoList);
+        for(Pair<HalNode,HalNode> pair : replaceOldSet){
+            copy.getOldTreeRoot().replace(pair.getFirst(),pair.getSecond());
+        }
+        for(Pair<HalNode,HalNode> pair : replaceNewSet){
+            copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
+        }
+
+        return copy;
     }
 
     private void normalizeName(Set<Pattern> result) {
