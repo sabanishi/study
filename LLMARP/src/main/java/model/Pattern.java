@@ -67,6 +67,9 @@ public class Pattern {
         if (this.isNormalized) return;
         this.isNormalized = true;
 
+        //System.out.println(this.getHash());
+        //System.out.println(this.getAppliedNormalizations());
+
         Set<Pattern> result = new HashSet<>();
         doNormalize(result);
         for (Pattern pattern : result) {
@@ -132,6 +135,9 @@ public class Pattern {
 
     private void normalizeMethod(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
+            //一番外側のメソッドは正規化しない
+            if(oldNode.getId()==0)continue;
+
             if (oldNode instanceof HalTreeNode oldTargetNode) {
                 //子要素が存在しない、またはHalNormalizeInvocationNodeの時、正規化を行う
                 NormalizeMethodInfo info = canNormalizeMethod(oldTargetNode);

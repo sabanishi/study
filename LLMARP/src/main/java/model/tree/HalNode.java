@@ -74,7 +74,7 @@ public abstract class HalNode {
         return node;
     }
 
-    public List<HalNode> preOrder() {
+    public Iterable<HalNode> preOrder() {
         List<HalNode> list = new ArrayList<>();
         return this.preOrder(list);
     }

@@ -47,8 +47,15 @@ public class Chunk {
         String oldSource = oldStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
         String newSource = newStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
 
+        System.out.println(oldSlice);
+        System.out.println(newSlice);
         Tree oldTree = extractSubTree(oldAllTree, oldStatement);
         Tree newTree = extractSubTree(newAllTree, newStatement);
+
+        //oldTreeまたはnewTreeがnullの場合、正規化を行わない
+        if(oldTree == null || newTree == null){
+            return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
+        }
 
         HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree, oldSource);
         HalTreeNode newTreeRoot = HalTreeNode.of(newTree, newSource);
@@ -114,6 +121,7 @@ public class Chunk {
 
     private void normalize() {
         System.out.println(this.getOldStatement().toString());
+        System.out.println(this.getOriginalPattern().getOldTreeRoot().toHashString(0));
         //徐々に正規化則を適用していく
         Set<Pattern> normalized = new HashSet<Pattern>();
         originalPattern.normalize(normalized);
