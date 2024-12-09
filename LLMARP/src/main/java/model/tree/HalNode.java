@@ -116,7 +116,7 @@ public abstract class HalNode {
     public boolean replace(HalNode oldNode, HalNode newNode) {
         for (int i = 0; i < children.size(); i++) {
             HalNode child = children.get(i);
-            if (child.equalsInternal(oldNode)) {
+            if(child.getId() == oldNode.getId()){
                 children.set(i, newNode);
                 newNode.parent = (HalTreeNode) this;
                 return true;

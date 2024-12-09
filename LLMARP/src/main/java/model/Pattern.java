@@ -52,23 +52,22 @@ public class Pattern {
      * 自身に対して正規化を行い、その結果を引数のSetに追加する
      */
     public void normalize(Set<Pattern> result) {
-        normalizeInternal(result, result);
+        normalizeInternal(result);
     }
 
     /**
      *
-     * @param result 自分だけの子供
      * @param allResult 自分の親、祖父も含めた全ての子供
      */
-    private void normalizeInternal(Set<Pattern> result,Set<Pattern> allResult){
+    private void normalizeInternal(Set<Pattern> allResult){
         if (this.isNormalized) return;
         this.isNormalized = true;
 
+        Set<Pattern> result = new HashSet<>();
         doNormalize(result);
         for (Pattern pattern : result) {
-            HashSet<Pattern> childResult = new HashSet<>();
-            pattern.normalizeInternal(childResult,allResult);
-            allResult.addAll(childResult);
+            allResult.add(pattern);
+            pattern.normalizeInternal(allResult);
         }
     }
 

@@ -51,6 +51,7 @@ public class ChunkCreator {
         return differencer.compute(oldStatements, newStatements)
                 .stream()
                 .filter(e -> e.getType() == Edit.Type.REPLACE)//単純な追加、削除は除外する
+                .filter(e->e.getEndA()-e.getBeginA() <= 1 && e.getEndB()-e.getBeginB() <= 1)//変更範囲が1行以上の物は除外する
                 .map(e -> Chunk.of(entry.getNewPath(), oldStatements, oldAllTree, newStatements, newAllTree, e));
     }
 }
