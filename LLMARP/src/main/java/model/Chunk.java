@@ -47,8 +47,6 @@ public class Chunk {
         String oldSource = oldStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
         String newSource = newStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
 
-        System.out.println(oldSlice);
-        System.out.println(newSlice);
         Tree oldTree = extractSubTree(oldAllTree, oldStatement);
         Tree newTree = extractSubTree(newAllTree, newStatement);
 
@@ -70,7 +68,12 @@ public class Chunk {
                 Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
                 if (newOriginalTree != null) {
                     HalNode newNode = newTreeRoot.searchByGumTree(newOriginalTree);
-                    newNode.setId(id);
+                    //ノードがSimpleNameの時、同じLabelでなければ同じIDとして扱わない
+                    if(oldTreeNode.getType().equals("SimpleName")){
+                        if(oldTreeNode.getLabel().equals(newOriginalTree.getLabel())){
+                            newNode.setId(id);
+                        }
+                    }
                 }
             }
 
@@ -120,8 +123,6 @@ public class Chunk {
     }
 
     private void normalize() {
-        System.out.println(this.getOldStatement().toString());
-        System.out.println(this.getOriginalPattern().getOldTreeRoot().toHashString(0));
         //徐々に正規化則を適用していく
         Set<Pattern> normalized = new HashSet<Pattern>();
         originalPattern.normalize(normalized);

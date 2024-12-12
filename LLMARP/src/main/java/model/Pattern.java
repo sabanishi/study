@@ -54,8 +54,9 @@ public class Pattern {
      */
     public void normalize(Set<Pattern> result) {
         //変数名だけ先に全て正規化する
-        Pattern variablePattern = normalizeNameAll();
+        Pattern variablePattern = normalizeVariables();
         result.add(variablePattern);
+        //正規化パターン候補のSetを生成する
         variablePattern.normalizeInternal(result);
     }
 
@@ -67,9 +68,6 @@ public class Pattern {
         if (this.isNormalized) return;
         this.isNormalized = true;
 
-        //System.out.println(this.getHash());
-        //System.out.println(this.getAppliedNormalizations());
-
         Set<Pattern> result = new HashSet<>();
         doNormalize(result);
         for (Pattern pattern : result) {
@@ -78,17 +76,125 @@ public class Pattern {
         }
     }
 
+    /**
+     * 正規化を行える箇所、1箇所に対してのみ正規化を施す
+     */
     private void doNormalize(Set<Pattern> result) {
-        //normalizeName(result);
-        normalizeVariable(result);
-        normalizeArg(result);
-        normalizeMethod(result);
+        //リテラルの正規化を行う
     }
 
-    private void normalizeVariable(Set<Pattern> result) {
-        for (HalNode oldNode : getOldTreeRoot().preOrder()) {
+    /**
+     * 変数ノードのLabelを全て正規化する
+     */
+    private Pattern normalizeVariables(){
+        Set<Pair<HalNode,HalNode>> replaceOldSet = new HashSet<>();
+        Set<Pair<HalNode,HalNode>> replaceNewSet = new HashSet<>();
+
+        List<NormalizationInfo> copyInfoList = new ArrayList<>();
+        HalNode copyOld = getOldTreeRoot().deepCopy();
+        HalNode copyNew = getNewTreeRoot().deepCopy();
+        Pattern copy = Pattern.of(copyOld,copyNew, copyInfoList);
+
+        for(HalNode oldNode : copyOld.preOrder()){
             if (oldNode instanceof HalTreeNode oldTargetNode) {
                 NormalizeNameInfo info = canNormalizeVariable(oldTargetNode);
+                if (info.canNormalize) {
+                    oldTargetNode = info.targetNode;
+                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
+                    //oldTreeの該当箇所を置換する
+                    replaceOldSet.add(Pair.of(oldTargetNode,normalizedNode));
+
+                    //newTreeに同じIDのノードがあれば置換する
+                    HalNode newTargetNode = copyNew.searchById(normalizedNode.getId());
+                    if (newTargetNode instanceof HalTreeNode) {
+                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode) newTargetNode);
+                        replaceNewSet.add(Pair.of(newTargetNode,normalizeNode2));
+                    }
+
+                    //正規化情報を追加
+                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
+                }
+            }
+        }
+
+        //Old、Newの置換を行う
+        for(Pair<HalNode,HalNode> pair : replaceOldSet){
+            copy.getOldTreeRoot().replace(pair.getFirst(),pair.getSecond());
+        }
+        for(Pair<HalNode,HalNode> pair : replaceNewSet){
+            copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
+        }
+
+        replaceOldSet.clear();
+        replaceNewSet.clear();
+
+        //NewNode限定の部分でも、同様に正規化を行う
+        for(HalNode newNode : copyNew.preOrder()){
+            if (newNode instanceof HalTreeNode newTargetNode) {
+                NormalizeNameInfo info = canNormalizeVariable(newTargetNode);
+                if (info.canNormalize) {
+                    newTargetNode = info.targetNode;
+                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(newTargetNode);
+                    //newTreeの該当箇所を置換する
+                    replaceNewSet.add(Pair.of(newTargetNode,normalizedNode));
+                    //正規化情報を追加
+                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
+                }
+            }
+        }
+
+        //Newの置換を行う
+        for(Pair<HalNode,HalNode> pair : replaceNewSet){
+            copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
+        }
+
+        return copy;
+    }
+
+    private NormalizeNameInfo canNormalizeVariable(HalNode targetNode) {
+        if (targetNode instanceof HalTreeNode targetTreeNode
+                && !(targetNode instanceof HalNormalizeNode)
+                && !(targetNode instanceof HalNormalizeInvocationNode)
+                && !(targetNode instanceof HalEmptyNode)) {
+            if((targetTreeNode.getType().equals("SimpleName"))){
+                if (targetNode.getParent() != null) {
+                    String parentType = targetNode.getParent().getType();
+                    //メソッドの引数または変数宣言の右辺の時のみ、正規化を行う
+                    switch(parentType){
+                        case "METHOD_INVOCATION_RECEIVER":
+                        case "METHOD_INVOCATION_ARGUMENTS":
+                        case "SingleVariableDeclaration":
+                        case "VariableDeclarationFragment":
+                        case "ReturnStatement":
+                            return new NormalizeNameInfo(true, targetTreeNode);
+                    }
+                }
+            }
+        }
+        return new NormalizeNameInfo(false, null);
+    }
+
+    private void addPatternToResultSet(Pattern target, Set<Pattern> result) {
+        if (!result.contains(target)) {
+            target.getParents().add(this);
+            result.add(target);
+        } else {
+            for (Pattern pattern : result) {
+                if (pattern.hashCode() == target.hashCode()) {
+                    pattern.getParents().add(this);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 正規化則4
+     */
+    private void normalizeEmptyNode(Set<Pattern> result) {
+        for (HalNode oldNode : getOldTreeRoot().preOrder()) {
+            if (oldNode instanceof HalTreeNode oldTargetNode) {
+                NormalizeNameInfo info = canNormalizeEmptyNode(oldTargetNode);
                 if (info.canNormalize) {
                     oldTargetNode = info.targetNode;
                     HalNode copyOldRoot = getOldTreeRoot().deepCopy();
@@ -100,7 +206,7 @@ public class Pattern {
                     HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
                     if (newTargetNode instanceof HalTreeNode) {
                         //子要素が全て正規化されている時、正規化を行う
-                        NormalizeNameInfo newInfo = canNormalizeVariable(newTargetNode);
+                        NormalizeNameInfo newInfo = canNormalizeEmptyNode(newTargetNode);
                         if (newInfo.canNormalize) {
                             doNormalizeMethod(copyNewRoot, (HalTreeNode) newTargetNode);
                         }
@@ -115,7 +221,7 @@ public class Pattern {
         }
     }
 
-    private NormalizeNameInfo canNormalizeVariable(HalNode targetNode) {
+    private NormalizeNameInfo canNormalizeEmptyNode(HalNode targetNode) {
         if (!(targetNode instanceof HalTreeNode targetTreeNode)
                 || targetNode instanceof HalNormalizeInvocationNode
                 || targetNode instanceof HalEmptyNode) {
@@ -125,7 +231,7 @@ public class Pattern {
         if (targetNode instanceof HalNormalizeNode) return new NormalizeNameInfo(true, targetTreeNode);
 
         for (HalNode child : targetNode.getChildren()) {
-            NormalizeNameInfo childInfo = canNormalizeVariable(child);
+            NormalizeNameInfo childInfo = canNormalizeEmptyNode(child);
             if (childInfo.canNormalize) {
                 return childInfo;
             }
@@ -133,6 +239,9 @@ public class Pattern {
         return new NormalizeNameInfo(false, null);
     }
 
+    /**
+     * 正規化則3
+     */
     private void normalizeMethod(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
             //一番外側のメソッドは正規化しない
@@ -219,6 +328,9 @@ public class Pattern {
         return new NormalizeMethodInfo(canNormalize, methodName, receiverName);
     }
 
+    /**
+     * 正規化則2
+     */
     private void normalizeArg(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
             if (oldNode instanceof HalTreeNode oldTargetNode) {
@@ -272,50 +384,16 @@ public class Pattern {
             if (canNormalizeName(child).canNormalize
                     || canNormalizeArg(child)
                     || canNormalizeMethod(child).canNormalize
-                    || canNormalizeVariable(child).canNormalize) {
+                    || canNormalizeEmptyNode(child).canNormalize) {
                 return false;
             }
         }
         return true;
     }
 
-    private Pattern normalizeNameAll(){
-        Set<Pair<HalNode,HalNode>> replaceOldSet = new HashSet<>();
-        Set<Pair<HalNode,HalNode>> replaceNewSet = new HashSet<>();
-        List<NormalizationInfo> copyInfoList = new ArrayList<>();
-        for(HalNode oldNode : getOldTreeRoot().preOrder()){
-            if (oldNode instanceof HalTreeNode oldTargetNode) {
-                NormalizeNameInfo info = canNormalizeName(oldTargetNode);
-                if (info.canNormalize) {
-                    oldTargetNode = info.targetNode;
-                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
-                    //oldTreeの該当箇所を置換する
-                    replaceOldSet.add(Pair.of(oldTargetNode,normalizedNode));
-
-                    //newTreeに同じIDのノードがあれば置換する
-                    HalNode newTargetNode = getNewTreeRoot().searchById(normalizedNode.getId());
-                    if (newTargetNode instanceof HalTreeNode) {
-                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode) newTargetNode);
-                        replaceNewSet.add(Pair.of(newTargetNode,normalizeNode2));
-                    }
-
-                    //正規化情報を追加
-                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
-                }
-            }
-        }
-
-        Pattern copy = Pattern.of(getOldTreeRoot(), getNewTreeRoot(), copyInfoList);
-        for(Pair<HalNode,HalNode> pair : replaceOldSet){
-            copy.getOldTreeRoot().replace(pair.getFirst(),pair.getSecond());
-        }
-        for(Pair<HalNode,HalNode> pair : replaceNewSet){
-            copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
-        }
-
-        return copy;
-    }
-
+    /**
+     * 正規化則1
+     */
     private void normalizeName(Set<Pattern> result) {
         for (HalNode oldNode : getOldTreeRoot().preOrder()) {
             if (oldNode instanceof HalTreeNode oldTargetNode) {
@@ -374,20 +452,6 @@ public class Pattern {
             }
         }
         return new NormalizeNameInfo(false, null);
-    }
-
-    private void addPatternToResultSet(Pattern target, Set<Pattern> result) {
-        if (!result.contains(target)) {
-            target.getParents().add(this);
-            result.add(target);
-        } else {
-            for (Pattern pattern : result) {
-                if (pattern.hashCode() == target.hashCode()) {
-                    pattern.getParents().add(this);
-                    break;
-                }
-            }
-        }
     }
 
     public record NormalizeNameInfo(boolean canNormalize, HalTreeNode targetNode) {
