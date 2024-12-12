@@ -167,6 +167,8 @@ public class Pattern {
                         case "VariableDeclarationFragment":
                         case "ReturnStatement":
                             return new NormalizeNameInfo(true, targetTreeNode);
+                        default:
+                            break;
                     }
                 }
             }
