@@ -1,6 +1,7 @@
 package util;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawText;
@@ -20,6 +21,7 @@ import java.util.List;
 /**
  * Gitリポジトリを操作するためのクラス
  */
+@Slf4j
 public class RepositoryAccess implements AutoCloseable {
     @Getter
     private final Repository repository;
@@ -70,25 +72,41 @@ public class RepositoryAccess implements AutoCloseable {
     }
 
     /**
-     * 全コミットを回す
+     * 指定したコミット範囲を回す
      */
-    public Iterable<RevCommit> walk() {
-        RevWalk walk = getWalk();
-        try {
-            Ref head = repository.findRef("HEAD");
-            if (head == null) {
-                throw new RuntimeException("HEAD not found");
+    public Iterable<RevCommit> walk(final String commitFrom,final String commitTo){
+        final RevWalk walk = getWalk();
+        // from: exclusive (from, to]
+        if (commitFrom != null) {
+            try {
+                final RevCommit c = walk.parseCommit(repository.resolve(commitFrom));
+                log.info("Range from [exclusive]: {} ({})", commitFrom, c.getId().name());
+                walk.markUninteresting(c);
+            } catch (final IOException e) {
+                log.error("Invalid rev: {} ({})", commitFrom, e);
             }
+        }
 
-            RevCommit commit = walk.parseCommit(head.getObjectId());
-            walk.markStart(commit);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // end: inclusive (from, to]
+        if(commitTo != null){
+            try {
+                final RevCommit c = walk.parseCommit(repository.resolve(commitTo));
+                log.info("Range to (inclusive): {} ({})", commitTo, c.getId().name());
+                walk.markStart(c);
+            } catch (final IOException e) {
+                log.error("Invalid rev: {} ({})", commitTo, e);
+            }
         }
 
         walk.setRevFilter(RevFilter.NO_MERGES);
         return walk;
+    }
+
+    /**
+     * 全コミットを回す
+     */
+    public Iterable<RevCommit> walk() {
+        return walk(null,"HEAD");
     }
 
     /**

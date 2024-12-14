@@ -105,9 +105,6 @@ public class Chunk {
         final int begin = range.getBegin();
         final int end = range.getEnd();
 
-        System.out.println("begin: " + begin + ", end: " + end);
-        System.out.println(root.toTreeString());
-
         Stack<Tree> stack = new Stack<>();
         stack.push(root);
 
