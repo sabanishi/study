@@ -51,7 +51,7 @@ public class Chunk {
         Tree newTree = extractSubTree(newAllTree, newStatement);
 
         //oldTreeまたはnewTreeがnullの場合、正規化を行わない
-        if(oldTree == null || newTree == null){
+        if (oldTree == null || newTree == null) {
             return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
         }
 
@@ -69,11 +69,11 @@ public class Chunk {
                 if (newOriginalTree != null) {
                     HalNode newNode = newTreeRoot.searchByGumTree(newOriginalTree);
                     //ノードがSimpleNameの時、同じLabelでなければ同じIDとして扱わない
-                    if(oldTreeNode.getType().equals("SimpleName")){
-                        if(oldTreeNode.getLabel().equals(newOriginalTree.getLabel())){
-                            newNode.setId(id);
-                        }
+                    if (oldTreeNode.getType().equals("SimpleName")
+                            && !oldTreeNode.getLabel().equals(newOriginalTree.getLabel())) {
+                        continue;
                     }
+                    newNode.setId(id);
                 }
             }
 
@@ -92,7 +92,7 @@ public class Chunk {
         Chunk chunk = new Chunk(fileName, oldStatement, newStatement, originalPattern, normalizedPatterns);
 
         //beforeとafterのASTが一致する時、正規化を行わない
-        if(oldTree != null && oldTree.isIsomorphicTo(newTree)){
+        if (oldTree != null && oldTree.isIsomorphicTo(newTree)) {
             return chunk;
         }
 
@@ -105,6 +105,9 @@ public class Chunk {
         final int begin = range.getBegin();
         final int end = range.getEnd();
 
+        System.out.println("begin: " + begin + ", end: " + end);
+        System.out.println(root.toTreeString());
+
         Stack<Tree> stack = new Stack<>();
         stack.push(root);
 
@@ -112,10 +115,10 @@ public class Chunk {
             Tree node = stack.pop();
             if (begin <= node.getPos() && node.getEndPos() <= end) {
                 return node.deepCopy();
-            }
-
-            for (Tree child : node.getChildren()) {
-                stack.push(child);
+            }else if(node.getPos() <= begin && end <= node.getEndPos()){
+                for (Tree child : node.getChildren()) {
+                    stack.push(child);
+                }
             }
         }
 

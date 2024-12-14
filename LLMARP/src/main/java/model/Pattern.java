@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Pattern {
+    private final int MAX_LITERAL = 5;
+
     @Getter
     private final HalNode oldTreeRoot;
     @Getter
@@ -56,8 +58,25 @@ public class Pattern {
         //変数名だけ先に全て正規化する
         Pattern variablePattern = normalizeVariables();
         result.add(variablePattern);
+
+        //変更パターン候補数の爆発を抑えるため、リテラルの数が一定数以下の時のみ、正規化を行う
+        if(countUpLiteral()> MAX_LITERAL) return;
+
         //正規化パターン候補のSetを生成する
         variablePattern.normalizeInternal(result);
+    }
+
+    /**
+     * 正規化対象となるリテラルの数を数える
+     */
+    private int countUpLiteral(){
+        int count = 0;
+        for(HalNode oldNode : getOldTreeRoot().preOrder()){
+            if(canNormalizeLiteral(oldNode).canNormalize){
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
