@@ -29,8 +29,8 @@ public interface Dao {
     @SqlQuery("INSERT INTO chunks (commit_id, file, old_begin, old_end, new_begin, new_end,old_raw,new_raw) VALUES (:commitId, :c.fileName, :c.oldStatement.lines.begin, :c.oldStatement.lines.end, :c.newStatement.lines.begin, :c.newStatement.lines.end,:c.oldStatement.raw,:c.newStatement.raw) RETURNING id")
     long insertChunk(@Bind("commitId") final long commitId, @BindBean("c") final Chunk chunk);
 
-    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:p.isCandidate,:isNormalized,0)")
-    void insertPattern(@Bind("isNormalized") boolean isNormalized, @BindBean("p") final Pattern pattern);
+    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:p.isCandidate,:isNormalized,:isUseful)")
+    void insertPattern(@BindBean("p") final Pattern pattern,@Bind("isNormalized") boolean isNormalized, @Bind("isUseful") boolean isUseful);
 
     @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.normalizeText)")
     void insertTree(@BindBean("t") final HalNode tree, @Bind("structure") String structure);
