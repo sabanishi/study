@@ -80,7 +80,57 @@ public class Pattern {
      * 正規化を行える箇所、1箇所に対してのみ正規化を施す
      */
     private void doNormalize(Set<Pattern> result) {
+        normalizeLiteral(result);
+    }
+
+    private void normalizeLiteral(Set<Pattern> result){
         //リテラルの正規化を行う
+        for (HalNode oldNode : getOldTreeRoot().preOrder()) {
+            if (oldNode instanceof HalTreeNode oldTargetNode) {
+                NormalizeNameInfo info = canNormalizeLiteral(oldTargetNode);
+                if(info.canNormalize){
+                    oldTargetNode = info.targetNode;
+                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
+                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
+                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
+                    //oldTreeの該当箇所を置換する
+                    copyOldRoot.replace(oldTargetNode, normalizedNode);
+
+                    //newTreeに同じIDのノードがあれば置換する
+                    HalNode newTargetNode = copyNewRoot.searchById(normalizedNode.getId());
+                    if (newTargetNode instanceof HalTreeNode) {
+                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode) newTargetNode);
+                        copyNewRoot.replace(newTargetNode, normalizeNode2);
+                    }
+
+                    //正規化情報を追加
+                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    addPatternToResultSet(copy, result);
+                }
+            }
+        }
+    }
+
+    private NormalizeNameInfo canNormalizeLiteral(HalNode targetNode){
+        if (targetNode instanceof HalTreeNode targetTreeNode
+                && !(targetNode instanceof HalNormalizeNode)
+                && !(targetNode instanceof HalNormalizeInvocationNode)
+                && !(targetNode instanceof HalEmptyNode)) {
+
+            //一番外側のリテラルは正規化しない
+            if(targetTreeNode.getId()==0)return new NormalizeNameInfo(false, null);
+
+            switch (targetTreeNode.getType()) {
+                case "StringLiteral":
+                case "CharacterLiteral":
+                case "NumberLiteral":
+                case "BooleanLiteral":
+                    return new NormalizeNameInfo(true, targetTreeNode);
+            }
+        }
+        return new NormalizeNameInfo(false, null);
     }
 
     /**
@@ -156,6 +206,10 @@ public class Pattern {
                 && !(targetNode instanceof HalNormalizeNode)
                 && !(targetNode instanceof HalNormalizeInvocationNode)
                 && !(targetNode instanceof HalEmptyNode)) {
+
+            //一番外側の変数は正規化しない
+            if(targetTreeNode.getId()==0)return new NormalizeNameInfo(false, null);
+
             if((targetTreeNode.getType().equals("SimpleName"))){
                 if (targetNode.getParent() != null) {
                     String parentType = targetNode.getParent().getType();
