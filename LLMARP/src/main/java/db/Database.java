@@ -50,8 +50,9 @@ public class Database {
                     hash TEXT PRIMARY KEY,
                     old_tree_hash TEXT,
                     new_tree_hash TEXT,
-                    is_normalized INTEGER,
-                    is_useful INTEGER
+                    is_candidate BIT,
+                    is_normalized BIT,
+                    is_useful BIT
                 )""");
 
         handle.execute("""

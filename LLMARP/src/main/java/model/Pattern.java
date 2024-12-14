@@ -24,18 +24,24 @@ public class Pattern {
     private final List<NormalizationInfo> appliedNormalizations;
     @Getter
     private final Hash hash;
+    private final boolean isCandidate;
     @Getter
     private final Set<Pattern> parents = new HashSet<>();
 
-    private boolean isNormalized = false;
-
-    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations) {
-        Hash hash = Hash.of(Stream.of(oldTreeRoot.getHash(), newTreeRoot.getHash()));
-        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash);
+    //NOTE:なぜか@GetterだとDaoのinsertPatternでエラーが出るので明示的にgetterを作成
+    public boolean getIsCandidate(){
+        return isCandidate;
     }
 
-    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations, Hash hash) {
-        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash);
+    private boolean isNormalized = false;
+
+    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations,boolean isCandidate) {
+        Hash hash = Hash.of(Stream.of(oldTreeRoot.getHash(), newTreeRoot.getHash()));
+        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash,isCandidate);
+    }
+
+    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations, Hash hash,boolean isCandidate) {
+        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash,isCandidate);
     }
 
     @Override
@@ -125,7 +131,7 @@ public class Pattern {
 
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
                     addPatternToResultSet(copy, result);
                 }
             }
@@ -162,7 +168,7 @@ public class Pattern {
         List<NormalizationInfo> copyInfoList = new ArrayList<>();
         HalNode copyOld = getOldTreeRoot().deepCopy();
         HalNode copyNew = getNewTreeRoot().deepCopy();
-        Pattern copy = Pattern.of(copyOld,copyNew, copyInfoList);
+        Pattern copy = Pattern.of(copyOld,copyNew, copyInfoList,false);
 
         for(HalNode oldNode : copyOld.preOrder()){
             if (oldNode instanceof HalTreeNode oldTargetNode) {
@@ -289,7 +295,7 @@ public class Pattern {
 
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Type, normalizedNode.getId(), copyInfoList.size()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
                     addPatternToResultSet(copy, result);
                 }
             }
@@ -344,7 +350,7 @@ public class Pattern {
 
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Method, normalizedNode.getId(), copyInfoList.size()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
                     addPatternToResultSet(copy, result);
                 }
             }
@@ -429,7 +435,7 @@ public class Pattern {
 
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Argument, normalizedNode.getId(), copyInfoList.size()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
                     addPatternToResultSet(copy, result);
                 }
             }
@@ -491,7 +497,7 @@ public class Pattern {
 
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
-                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList);
+                    Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
                     addPatternToResultSet(copy, result);
                 }
             }

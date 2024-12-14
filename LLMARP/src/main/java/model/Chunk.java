@@ -58,7 +58,7 @@ public class Chunk {
         HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree, oldSource);
         HalTreeNode newTreeRoot = HalTreeNode.of(newTree, newSource);
 
-        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>());
+        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>(),false);
 
         //originalPatternのNodeにIDを付与する
         int id = 0;
