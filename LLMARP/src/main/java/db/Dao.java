@@ -69,6 +69,10 @@ public interface Dao {
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchUsefulPatterns();
 
+    @SqlQuery("SELECT * FROM patterns WHERE is_candidate = 1")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchCandidatePatterns();
+
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
         public HalNode map(ResultSet rs, StatementContext ctx) throws SQLException {

@@ -9,7 +9,7 @@ import model.tree.HalNode;
 import model.tree.NormalizationInfo;
 import org.eclipse.jgit.revwalk.RevCommit;
 import parse.*;
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Mixin;
 import model.Statement;
@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
-@CommandLine.Command(name="extract",description="Extract commit from a  repository")
+@Command(name="extract",description="Extract commit from a  repository")
 public class ExtractCommand extends BaseCommand{
     public static class Config{
         @Option(names={"-r","--repository"},paramLabel="<repo>",description="repository path")

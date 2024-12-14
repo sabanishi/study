@@ -12,7 +12,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Slf4j
-@Command(version ="halfix",sortOptions = false,subcommandsRepeatable = true,subcommands = {InitCommand.class, ExtractCommand.class})
+@Command(version ="halfix",sortOptions = false,subcommandsRepeatable = true,subcommands = {
+        InitCommand.class, ExtractCommand.class,CheckCommand.class})
 public class AppCommand implements Callable<Integer> {
     public static class Config{
         @Option(names = "--log", paramLabel = "<level>", description = "log level (default: ${DEFAULT-VALUE})")
