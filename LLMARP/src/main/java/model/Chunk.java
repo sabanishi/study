@@ -7,14 +7,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
 import model.tree.HalNode;
+import model.tree.HalRootNode;
 import model.tree.HalTreeNode;
 import model.tree.NormalizationInfo;
 import org.eclipse.jgit.diff.Edit;
+import util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ToString(of = {"fileName", "oldStatement", "newStatement"})
 @RequiredArgsConstructor
 @Value
 public class Chunk {
@@ -47,23 +48,40 @@ public class Chunk {
         String oldSource = oldStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
         String newSource = newStatements.stream().map(Statement::getRaw).collect(Collectors.joining("\n"));
 
-        Tree oldTree = extractSubTree(oldAllTree, oldStatement);
-        Tree newTree = extractSubTree(newAllTree, newStatement);
+        Stack<Tree> oldTreeStack = extractSubTree(oldAllTree, oldStatement);
+        Stack<Tree> newTreeStack = extractSubTree(newAllTree, newStatement);
 
         //oldTreeまたはnewTreeがnullの場合、正規化を行わない
-        if (oldTree == null || newTree == null) {
+        if (oldTreeStack.empty()|| newTreeStack.empty()) {
             return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
         }
 
-        HalTreeNode oldTreeRoot = HalTreeNode.of(oldTree, oldSource);
-        HalTreeNode newTreeRoot = HalTreeNode.of(newTree, newSource);
+        List<Pair<Tree,String>> oldInfo = new ArrayList<>();
+        while(!oldTreeStack.isEmpty()){
+            Tree tree = oldTreeStack.pop();
+            //treeの範囲に対応したStatementを切り出す
+            String rawText = oldSource.substring(tree.getPos(),tree.getEndPos());
+            oldInfo.add(Pair.of(tree,rawText));
+        }
 
-        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>(),false);
+        List<Pair<Tree,String>> newInfo = new ArrayList<>();
+        while(!newTreeStack.isEmpty()){
+            Tree tree = newTreeStack.pop();
+            //treeの範囲に対応したStatementを切り出す
+            String rawText = newSource.substring(tree.getPos(),tree.getEndPos());
+            newInfo.add(Pair.of(tree,rawText));
+        }
+
+        HalRootNode oldTreeRoot = HalRootNode.of(oldInfo,oldSource);
+        HalRootNode newTreeRoot = HalRootNode.of(newInfo,newSource);
 
         //originalPatternのNodeにIDを付与する
-        int id = 0;
-        MappingStore mapping = Matchers.getInstance().getMatcher().match(oldTree, newTree);
+        int id = 1;
+        oldTreeRoot.setId(0);
+        newTreeRoot.setId(0);
+        MappingStore mapping = Matchers.getInstance().getMatcher().match(oldAllTree, newAllTree);
         for (HalNode oldNode : oldTreeRoot.preOrder()) {
+            if(oldNode instanceof HalRootNode)continue;
             if (oldNode instanceof HalTreeNode oldTreeNode) {
                 Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
                 if (newOriginalTree != null) {
@@ -71,7 +89,9 @@ public class Chunk {
                     if (!oldTreeNode.getType().equals("SimpleName")
                             || oldTreeNode.getLabel().equals(newOriginalTree.getLabel())) {
                         HalNode newNode = newTreeRoot.searchByGumTree(newOriginalTree);
-                        newNode.setId(id);
+                        if(newNode!=null){
+                            newNode.setId(id);
+                        }
                     }
                 }
             }
@@ -86,31 +106,45 @@ public class Chunk {
             id++;
         }
 
+        Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>(),false);
+
         List<Pattern> normalizedPatterns = new ArrayList<>();
 
         Chunk chunk = new Chunk(fileName, oldStatement, newStatement, originalPattern, normalizedPatterns);
 
         //beforeとafterのASTが一致する時、正規化を行わない
-        if (oldTree != null && oldTree.isIsomorphicTo(newTree)) {
-            return chunk;
+        if(oldTreeRoot.getChildren().size()==newTreeRoot.getChildren().size()){
+            boolean isSame = true;
+            for(int i=0;i<oldTreeRoot.getChildren().size();i++){
+                Tree oldTree = ((HalTreeNode)(oldTreeRoot.getChildren().get(i))).getOriginal();
+                Tree newTree = ((HalTreeNode)(newTreeRoot.getChildren().get(i))).getOriginal();
+                if(oldTree == null || !oldTree.isIsomorphicTo(newTree)){
+                    isSame = false;
+                    break;
+                }
+            }
+            if(isSame){
+                return chunk;
+            }
         }
 
         chunk.normalize();
         return chunk;
     }
 
-    private static Tree extractSubTree(Tree root, Statement statement) {
+    private static Stack<Tree> extractSubTree(Tree root, Statement statement) {
         Range range = statement.getChars();
         final int begin = range.getBegin();
         final int end = range.getEnd();
 
         Stack<Tree> stack = new Stack<>();
         stack.push(root);
+        Stack<Tree> result = new Stack<>();
 
         while (!stack.empty()) {
             Tree node = stack.pop();
             if (begin <= node.getPos() && node.getEndPos() <= end) {
-                return node.deepCopy();
+                result.push(node);
             }else if(node.getPos() <= begin && end <= node.getEndPos()){
                 for (Tree child : node.getChildren()) {
                     stack.push(child);
@@ -118,7 +152,7 @@ public class Chunk {
             }
         }
 
-        return null;
+        return result;
     }
 
     private void normalize() {
@@ -126,5 +160,19 @@ public class Chunk {
         Set<Pattern> normalized = new HashSet<Pattern>();
         originalPattern.normalize(normalized);
         normalizedPatterns.addAll(normalized);
+    }
+
+    @Override
+    public String toString(){
+        return """
+                Chunk(
+                fileName=%s,
+                oldBegin=%d,oldEnd=%d,
+                newBegin=%d,newEnd=%d,
+                olsStatement=
+                %s,
+                newStatement=
+                %s
+                """.formatted(fileName,oldStatement.getLines().getBegin(),oldStatement.getLines().getEnd(),newStatement.getLines().getBegin(),newStatement.getLines().getEnd(),oldStatement,newStatement);
     }
 }

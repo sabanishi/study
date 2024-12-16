@@ -39,27 +39,24 @@ public class HalTreeNode extends HalNode {
         return node;
     }
 
-    public void addChild(HalNode child) {
-        children.add(child);
-        child.parent = this;
-    }
-
     @Override
     public String toString(int depth) {
-        String text = String.format("%s%d %s \"%s\"\n", StringUtils.repeat("  ", depth), id, type, label);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s%d %s \"%s\"\n", StringUtils.repeat("  ", depth), id, type, label));
         for (HalNode child : children) {
-            text = text.concat(child.toString(depth + 1));
+            sb.append(child.toString(depth + 1));
         }
-        return text;
+        return sb.toString();
     }
 
     @Override
     public String toHashString(int depth) {
-        String text = String.format("%s%d %s \"%s\"\n", StringUtils.repeat("  ", depth), id, type, label);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s%d %s \"%s\"\n", StringUtils.repeat("  ", depth), id, type, label));
         for (HalNode child : children) {
-            text = text.concat(child.toHashString(depth + 1));
+            sb.append(child.toHashString(depth + 1));
         }
-        return text;
+        return sb.toString();
     }
 
     @Override

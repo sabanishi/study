@@ -12,21 +12,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Pattern {
-    private final int MAX_LITERAL = 5;
+    private final int MAX_LITERAL = 4;
 
     @Getter
-    private final HalNode oldTreeRoot;
+    private final HalRootNode oldTreeRoot;
     @Getter
-    private final HalNode newTreeRoot;
+    private final HalRootNode newTreeRoot;
     @Getter
     private final List<NormalizationInfo> appliedNormalizations;
-    @Getter
-    private final Hash hash;
     private final boolean isCandidate;
     @Getter
     private final Set<Pattern> parents = new HashSet<>();
+
+    public Hash getHash(){
+        return Hash.of(Stream.of(oldTreeRoot.getHash(), newTreeRoot.getHash()));
+    }
 
     //NOTE:なぜか@GetterだとDaoのinsertPatternでエラーが出るので明示的にgetterを作成
     public boolean getIsCandidate(){
@@ -35,13 +36,15 @@ public class Pattern {
 
     private boolean isNormalized = false;
 
-    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations,boolean isCandidate) {
-        Hash hash = Hash.of(Stream.of(oldTreeRoot.getHash(), newTreeRoot.getHash()));
-        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash,isCandidate);
+    private Pattern(HalRootNode oldTreeRoot, HalRootNode newTreeRoot, List<NormalizationInfo> appliedNormalizations,boolean isCandidate) {
+        this.oldTreeRoot = oldTreeRoot;
+        this.newTreeRoot = newTreeRoot;
+        this.appliedNormalizations = appliedNormalizations;
+        this.isCandidate = isCandidate;
     }
 
-    public static Pattern of(HalNode oldTreeRoot, HalNode newTreeRoot, List<NormalizationInfo> appliedNormalizations, Hash hash,boolean isCandidate) {
-        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations, hash,isCandidate);
+    public static Pattern of(HalRootNode oldTreeRoot, HalRootNode newTreeRoot, List<NormalizationInfo> appliedNormalizations,boolean isCandidate) {
+        return new Pattern(oldTreeRoot, newTreeRoot, appliedNormalizations,isCandidate);
     }
 
     @Override
@@ -116,8 +119,8 @@ public class Pattern {
                 if(info.canNormalize){
                     oldTargetNode = info.targetNode;
                     HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    HalRootNode copyOldRoot = (HalRootNode)getOldTreeRoot().deepCopy();
+                    HalRootNode copyNewRoot = (HalRootNode)getNewTreeRoot().deepCopy();
                     List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
                     //oldTreeの該当箇所を置換する
                     copyOldRoot.replace(oldTargetNode, normalizedNode);
@@ -166,8 +169,8 @@ public class Pattern {
         Set<Pair<HalNode,HalNode>> replaceNewSet = new HashSet<>();
 
         List<NormalizationInfo> copyInfoList = new ArrayList<>();
-        HalNode copyOld = getOldTreeRoot().deepCopy();
-        HalNode copyNew = getNewTreeRoot().deepCopy();
+        HalRootNode copyOld = (HalRootNode)getOldTreeRoot().deepCopy();
+        HalRootNode copyNew = (HalRootNode)getNewTreeRoot().deepCopy();
         Pattern copy = Pattern.of(copyOld,copyNew, copyInfoList,false);
 
         for(HalNode oldNode : copyOld.preOrder()){
@@ -213,8 +216,8 @@ public class Pattern {
             if(targetTreeNode.getId()==0)return new NormalizeNameInfo(false, null);
 
             if((targetTreeNode.getType().equals("SimpleName"))){
-                if (targetNode.getParent() != null) {
-                    String parentType = targetNode.getParent().getType();
+                if (targetNode.getParent() != null && targetNode.getParent() instanceof HalTreeNode parentTreeNode) {
+                    String parentType = parentTreeNode.getType();
                     //メソッドの引数または変数宣言の右辺の時のみ、正規化を行う
                     switch(parentType){
                         case "METHOD_INVOCATION_RECEIVER":
@@ -255,8 +258,8 @@ public class Pattern {
                 NormalizeNameInfo info = canNormalizeEmptyNode(oldTargetNode);
                 if (info.canNormalize) {
                     oldTargetNode = info.targetNode;
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    HalRootNode copyOldRoot = (HalRootNode)getOldTreeRoot().deepCopy();
+                    HalRootNode copyNewRoot = (HalRootNode)getNewTreeRoot().deepCopy();
                     List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
                     HalTreeNode normalizedNode = doNormalizeMethod(copyOldRoot, oldTargetNode);
 
@@ -310,8 +313,8 @@ public class Pattern {
                 NormalizeMethodInfo info = canNormalizeMethod(oldTargetNode);
 
                 if (info.canNormalize) {
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    HalRootNode copyOldRoot = (HalRootNode)getOldTreeRoot().deepCopy();
+                    HalRootNode copyNewRoot = (HalRootNode)getNewTreeRoot().deepCopy();
                     List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
                     HalTreeNode normalizedNode = doNormalizeMethod(copyOldRoot, oldTargetNode);
 
@@ -394,8 +397,8 @@ public class Pattern {
             if (oldNode instanceof HalTreeNode oldTargetNode) {
                 //子要素が全て正規化されている時、正規化を行う
                 if (canNormalizeArg(oldTargetNode)) {
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    HalRootNode copyOldRoot = (HalRootNode)getOldTreeRoot().deepCopy();
+                    HalRootNode copyNewRoot = (HalRootNode)getNewTreeRoot().deepCopy();
                     List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
 
                     HalNormalizeInvocationNode normalizedNode = doNormalizeArg(copyOldRoot, oldTargetNode);
@@ -459,8 +462,8 @@ public class Pattern {
                 if (info.canNormalize) {
                     oldTargetNode = info.targetNode;
                     HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
-                    HalNode copyOldRoot = getOldTreeRoot().deepCopy();
-                    HalNode copyNewRoot = getNewTreeRoot().deepCopy();
+                    HalRootNode copyOldRoot = (HalRootNode)getOldTreeRoot().deepCopy();
+                    HalRootNode copyNewRoot = (HalRootNode)getNewTreeRoot().deepCopy();
                     List<NormalizationInfo> copyInfoList = new ArrayList<>(getAppliedNormalizations());
                     //oldTreeの該当箇所を置換する
                     copyOldRoot.replace(oldTargetNode, normalizedNode);
@@ -488,8 +491,8 @@ public class Pattern {
                 && !(targetNode instanceof HalEmptyNode)) {
             switch (targetTreeNode.getType()) {
                 case "SimpleName":
-                    if (targetNode.getParent() != null) {
-                        String parentType = targetNode.getParent().getType();
+                    if (targetNode.getParent() != null && targetNode.getParent() instanceof HalTreeNode parentTreeNode) {
+                        String parentType = parentTreeNode.getType();
                         //親がメソッドかクラスの時、正規化を行わない
                         if (parentType.equals("MethodInvocation") || parentType.equals("TypeDeclaration")) {
                             return new NormalizeNameInfo(false, null);

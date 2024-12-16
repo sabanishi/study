@@ -20,19 +20,21 @@ import java.util.List;
 @Getter
 public abstract class HalNode {
     @Getter(lazy = true)
-    private final Hash hash = Hash.of(toHashString(0));
-    @Getter(lazy = true)
     private final String text = toHashString(0);
     @Setter(AccessLevel.PUBLIC)
     protected int id = -1;
     protected int pos;
     protected int length;
     protected List<HalNode> children = new ArrayList<>();
-    protected HalTreeNode parent;
+    protected HalNode parent;
     @Setter(AccessLevel.PUBLIC)
     protected String rawText;
     @Getter(lazy = true)
     private final String normalizeText = makeNormalizeText();
+
+    public Hash getHash() {
+        return Hash.of(toHashString(0));
+    }
 
     /**
      * DBに保存したJsonからHalNodeを再構築する
@@ -41,6 +43,9 @@ public abstract class HalNode {
         String className = jsonObject.get("class").getAsString();
         HalNode node;
         switch (className) {
+            case "HalRootNode":
+                node = new HalRootNode();
+                break;
             case "HalTreeNode":
                 node = new HalTreeNode();
                 break;
@@ -65,12 +70,11 @@ public abstract class HalNode {
 
         List<JsonElement> childElements = jsonObject.getAsJsonArray("children").asList();
 
-        HalTreeNode halNode = (HalTreeNode) node;
         for (JsonElement element : childElements) {
             JsonObject childObject = element.getAsJsonObject();
             HalNode child = makeFromJson(childObject);
             if (child == null) continue;
-            child.parent = halNode;
+            child.parent = node;
             node.children.add(child);
         }
 
@@ -134,6 +138,11 @@ public abstract class HalNode {
         return null;
     }
 
+    public void addChild(HalNode child) {
+        children.add(child);
+        child.parent = this;
+    }
+
     /*+*
      * IDを元に子ノードを検索する
      */
@@ -161,7 +170,7 @@ public abstract class HalNode {
             HalNode child = children.get(i);
             if(child.getId() == oldNode.getId()){
                 children.set(i, newNode);
-                newNode.parent = (HalTreeNode) this;
+                newNode.parent = this;
                 return true;
             }
             if (child.replace(oldNode, newNode)) {
@@ -202,12 +211,14 @@ public abstract class HalNode {
     private void makeNormalizeLoop(List<Change> changes,String baseText,int startPos){
         String myText = baseText.substring(getPos()-startPos, getPos() + getLength()-startPos);
         String normalizedText = makeNormalizeTextInternal(myText);
-        if(!myText.equals(normalizedText)){
-            Change change = new Change(
-                    Range.of(getPos()-startPos, getPos() + getLength()-startPos),
-                    myText,
-                    normalizedText);
-            changes.add(change);
+        if(!(this instanceof HalRootNode)){
+            if(!myText.equals(normalizedText)){
+                Change change = new Change(
+                        Range.of(getPos()-startPos, getPos() + getLength()-startPos),
+                        myText,
+                        normalizedText);
+                changes.add(change);
+            }
         }
         for (HalNode child : children) {
             child.makeNormalizeLoop(changes,baseText,startPos);

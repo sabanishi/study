@@ -33,6 +33,8 @@ public class GsonLocator {
         builder.registerTypeAdapter(HalNormalizeInvocationNode.class, new HalNodeDeserializer());
         builder.registerTypeAdapter(HalEmptyNode.class, new HalNodeSerializer());
         builder.registerTypeAdapter(HalEmptyNode.class, new HalNodeDeserializer());
+        builder.registerTypeAdapter(HalRootNode.class, new HalNodeSerializer());
+        builder.registerTypeAdapter(HalRootNode.class, new HalNodeDeserializer());
 
         return builder.create();
     }

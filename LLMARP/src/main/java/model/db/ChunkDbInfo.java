@@ -13,4 +13,17 @@ public class ChunkDbInfo {
     int newEnd;
     String oldStatement;
     String newStatement;
+
+    @Override
+    public String toString(){
+        return """
+                ChunkDbInfo(fileName=%s,
+                oldBegin=%d,oldEnd=%d,
+                newBegin=%d,newEnd=%d,
+                oldStatement=
+                %s,
+                newStatement=
+                %s)
+                """.formatted(fileName,oldBegin,oldEnd,newBegin,newEnd,oldStatement,newStatement);
+    }
 }
