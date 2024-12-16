@@ -43,4 +43,6 @@ bin/
 
 Test/
 
+match/*
+
 **.db

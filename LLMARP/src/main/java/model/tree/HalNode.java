@@ -10,8 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import model.Hash;
+import model.Range;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -74,7 +76,7 @@ public abstract class HalNode {
         return node;
     }
 
-    public List<HalNode> preOrder() {
+    public Iterable<HalNode> preOrder() {
         List<HalNode> list = new ArrayList<>();
         return this.preOrder(list);
     }
@@ -155,20 +157,40 @@ public abstract class HalNode {
 
     public String makeNormalizeText() {
         String baseText = rawText.substring(pos, pos + length);
-        return makeNormalizeLoop(baseText);
+        List<Change> changes = new ArrayList<>();
+        makeNormalizeLoop(changes,baseText,pos);
+
+        return makeNormalized(changes,baseText);
     }
 
-    private String makeNormalizeLoop(String baseText) {
-        String newText = makeNormalizeTextInternal(baseText);
-        baseText = baseText.replace(baseText, newText);
-
-        for (HalNode child : children) {
-            String childOriginalText = rawText.substring(child.getPos(), child.getPos() + child.getLength());
-            String childNewText = child.makeNormalizeLoop(childOriginalText);
-            baseText = baseText.replace(childOriginalText, childNewText);
+    private String makeNormalized(List<Change> changes,String baseText){
+        //startが小さい順にソートする
+        List<Change> sortedChanges = changes.stream().sorted(Comparator.comparingInt(a -> a.getOldRange().getBegin())).toList();
+        StringBuilder sb = new StringBuilder();
+        int pos = 0;
+        for (Change change : sortedChanges) {
+            sb.append(baseText, pos, change.getOldRange().getBegin());
+            sb.append(change.getNewText());
+            pos = change.getOldRange().getEnd();
         }
+        sb.append(baseText, pos, baseText.length());
 
-        return baseText;
+        return sb.toString();
+    }
+
+    private void makeNormalizeLoop(List<Change> changes,String baseText,int startPos){
+        String myText = baseText.substring(getPos()-startPos, getPos() + getLength()-startPos);
+        String normalizedText = makeNormalizeTextInternal(myText);
+        if(!myText.equals(normalizedText)){
+            Change change = new Change(
+                    Range.of(getPos()-startPos, getPos() + getLength()-startPos),
+                    myText,
+                    normalizedText);
+            changes.add(change);
+        }
+        for (HalNode child : children) {
+            child.makeNormalizeLoop(changes,baseText,startPos);
+        }
     }
 
     @Override
