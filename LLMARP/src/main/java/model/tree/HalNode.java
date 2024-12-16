@@ -34,6 +34,9 @@ public abstract class HalNode {
     @Getter(lazy = true)
     private final String normalizeText = makeNormalizeText();
 
+    /**
+     * DBに保存したJsonからHalNodeを再構築する
+     */
     public static HalNode makeFromJson(JsonObject jsonObject) {
         String className = jsonObject.get("class").getAsString();
         HalNode node;
@@ -76,65 +79,9 @@ public abstract class HalNode {
         return node;
     }
 
-    public Iterable<HalNode> preOrder() {
-        List<HalNode> list = new ArrayList<>();
-        return this.preOrder(list);
-    }
-
-    protected List<HalNode> preOrder(List<HalNode> list) {
-        list.add(this);
-        for (HalNode child : children) {
-            list = child.preOrder(list);
-        }
-        return list;
-    }
-
-    public HalNode searchByGumTree(Tree target) {
-        if (isSameTree(target)) {
-            return this;
-        }
-        for (HalNode child : children) {
-            HalNode result = child.searchByGumTree(target);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
-
-    public HalNode searchById(int id) {
-        if (this.id == id) {
-            return this;
-        }
-        for (HalNode child : children) {
-            HalNode result = child.searchById(id);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
-
-    public boolean replace(HalNode oldNode, HalNode newNode) {
-        for (int i = 0; i < children.size(); i++) {
-            HalNode child = children.get(i);
-            if(child.getId() == oldNode.getId()){
-                children.set(i, newNode);
-                newNode.parent = (HalTreeNode) this;
-                return true;
-            }
-            if (child.replace(oldNode, newNode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return toString(0);
-    }
-
+    /**
+     * DBに保存するためのJsonを生成する
+     */
     public void makeToJson(JsonObject jsonObject, JsonSerializationContext context) {
         jsonObject.addProperty("class", getClass().getSimpleName());
         jsonObject.addProperty("id", id);
@@ -153,6 +100,80 @@ public abstract class HalNode {
         }
         jsonObject.add("children", childList);
         makeToJsonInternal(jsonObject, context);
+    }
+
+    /**
+     * 自身および子ノードを全て取得する
+     */
+    public Iterable<HalNode> preOrder() {
+        List<HalNode> list = new ArrayList<>();
+        return this.preOrderInternal(list);
+    }
+
+    private List<HalNode> preOrderInternal(List<HalNode> list) {
+        list.add(this);
+        for (HalNode child : children) {
+            list = child.preOrderInternal(list);
+        }
+        return list;
+    }
+
+    /**
+     * GumTree木とマッチする子ノードを検索する
+     */
+    public HalNode searchByGumTree(Tree target) {
+        if (isSameTree(target)) {
+            return this;
+        }
+        for (HalNode child : children) {
+            HalNode result = child.searchByGumTree(target);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /*+*
+     * IDを元に子ノードを検索する
+     */
+    public HalNode searchById(int id) {
+        if (this.id == id) {
+            return this;
+        }
+        for (HalNode child : children) {
+            HalNode result = child.searchById(id);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 子ノードを置換する
+     * @param oldNode 置換対象となる子ノード
+     * @param newNode 置換後の子ノード
+     * @return 置換に成功したらtrueを返す
+     */
+    public boolean replace(HalNode oldNode, HalNode newNode) {
+        for (int i = 0; i < children.size(); i++) {
+            HalNode child = children.get(i);
+            if(child.getId() == oldNode.getId()){
+                children.set(i, newNode);
+                newNode.parent = (HalTreeNode) this;
+                return true;
+            }
+            if (child.replace(oldNode, newNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return toString(0);
     }
 
     public String makeNormalizeText() {
@@ -218,6 +239,65 @@ public abstract class HalNode {
         }
 
         return true;
+    }
+
+    /**
+     * 自身がsourceとマッチングできるかを調べる
+     */
+    public boolean isMatch(HalNode source){
+        //自身とsourceのマッチング可能性を判定し、falseならばマッチングしない
+        if(!isMatchInternal(source)) return false;
+
+        //sourceがHalNormalizeInvocation、HalEmptyNodeの時、子Nodeを調べずにマッチングする
+        if(source instanceof HalNormalizeInvocationNode || source instanceof HalEmptyNode){
+            return true;
+        }
+
+        List<HalNode> targetChildren = getChildren();
+        List<HalNode> sourceChildren = source.getChildren();
+
+        //子Nodeに対してマッチング可能性を判定する
+        if(targetChildren.size() != sourceChildren.size()) return false;
+        for(int index=0; index < targetChildren.size(); index++){
+            HalNode targetChild = targetChildren.get(index);
+            HalNode sourceChild = sourceChildren.get(index);
+            if(!targetChild.isMatch(sourceChild)) return false;
+        }
+
+        return true;
+    }
+
+    private boolean isMatchInternal(HalNode source){
+        //sourceがHalEmptyNodeの時、無条件でマッチングする
+        if(source instanceof HalEmptyNode) return true;
+
+        //sourceがHalNormalizeInvocationNodeの時、自身のTypeがMethodInvocationであればマッチングする
+        if(source instanceof HalNormalizeInvocationNode){
+            if(this instanceof HalNormalizeInvocationNode) return true;
+            if(this instanceof HalTreeNode targetNode){
+                return targetNode.getType().equals("MethodInvocation");
+            }
+            return false;
+        }
+
+        //sourceがHalNormalizeNodeの時、Typeが一致していればマッチングする
+        if(source instanceof HalNormalizeNode sourceNode){
+            if(this instanceof HalTreeNode targetNode){
+                return targetNode.getType().equals(sourceNode.getType());
+            }
+            return false;
+        }
+
+        //sourceがHalTreeNodeの時、TypeとLabelが一致していればマッチングする
+        if(source instanceof HalTreeNode sourceNode){
+            if(this instanceof HalTreeNode targetNode){
+                return targetNode.getType().equals(sourceNode.getType()) &&
+                        targetNode.getLabel().equals(sourceNode.getLabel());
+            }
+            return false;
+        }
+
+        return false;
     }
 
     public abstract String toString(int depth);

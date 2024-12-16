@@ -1,16 +1,19 @@
 package cmd;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
 import com.github.gumtreediff.tree.Tree;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import model.Statement;
 import model.db.PatternDbInfo;
 import model.tree.HalNode;
 import model.tree.HalTreeNode;
 import model.tree.ReplaceNode;
-import model.tree.HalNormalizeInvocationNode;
-import model.tree.HalEmptyNode;
-import model.tree.HalNormalizeNode;
 import org.jdbi.v3.core.result.ResultIterable;
+import parse.ISplitter;
+import parse.Splitter;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Mixin;
@@ -72,20 +75,22 @@ public class MatchingCommand extends BaseCommand{
 
                     String result = copyRoot.makeNormalizeText();
 
-                    if(result.equals(targetSource)){
-                        //log.debug("no match: {} with {}",filePath,info.getHash());
-                    }else{
+                    if(!result.equals(targetSource)){
                         log.info("match: {} with {}",filePath,info.getHash());
                         //結果をファイルに書き込む
                         Path beforePath = Path.of("match/"+matchCount+"_before.java");
                         Path afterPath = Path.of("match/"+matchCount+"_after.java");
                         Path patternOldPath = Path.of("match/"+matchCount+"_pattern_old.txt");
                         Path patternNewPath = Path.of("match/"+matchCount+"_pattern_new.txt");
+                        Path diffPath = Path.of("match/"+matchCount+"_diff.txt");
 
                         FileUtil.write(beforePath,targetSource);
                         FileUtil.write(afterPath,result);
                         FileUtil.write(patternOldPath,info.getOldTree().toHashString(0));
                         FileUtil.write(patternNewPath,info.getNewTree().toHashString(0));
+
+                        String diff = makeDiff(targetSource,result);
+                        FileUtil.write(diffPath,diff);
 
                         matchCount++;
                     }
@@ -94,6 +99,26 @@ public class MatchingCommand extends BaseCommand{
                 log.error(e.getMessage());
             }
         }
+    }
+
+    /**
+     * targetとresultの差分を生成する
+     */
+    private String makeDiff(String target,String result){
+        ISplitter splitter = new Splitter();
+        List<Statement> targetStatements = splitter.split(target);
+        List<Statement> resultStatements = splitter.split(result);
+        Patch<Statement> diff = DiffUtils.diff(targetStatements,resultStatements);
+
+        StringBuilder sb = new StringBuilder();
+        for(AbstractDelta<Statement> delta : diff.getDeltas()){
+            sb.append(delta.getSource().toString());
+            sb.append("\n");
+            sb.append(delta.getTarget().toString());
+            sb.append("\n\n");
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -107,13 +132,16 @@ public class MatchingCommand extends BaseCommand{
 
         //マッチングした各部分木に対して、適用を行う
         for(HalNode matchedNode : matchedNodes){
-            HalNode newMatchedNode = exchange(matchedNode, patternOldRoot, patternNewRoot);
+            HalNode newMatchedNode = exchange(matchedNode, patternNewRoot);
             ReplaceNode replaceNode = ReplaceNode.of((HalTreeNode)matchedNode,newMatchedNode.makeNormalizeText());
             targetRoot.replace(matchedNode,replaceNode);
         }
     }
 
-    private HalNode exchange(HalNode target, HalNode patternOld, HalNode patternNew){
+    /**
+     * targetに対してpatternNewを適用した木を生成する
+     */
+    private HalNode exchange(HalNode target, HalNode patternNew){
         HalNode result = patternNew.deepCopy();
         result.setRawText(patternNew.getRawText());
 
@@ -139,11 +167,16 @@ public class MatchingCommand extends BaseCommand{
         return result;
     }
 
+    /**
+     * targetの子Nodeを舐めて、patternとマッチするNodeを返す
+     */
     private List<HalNode> match(HalNode target, HalNode pattern){
         List<HalNode> result = new ArrayList<>();
 
         for(HalNode targetChild : target.preOrder()){
-            if(isMatch(targetChild, pattern)){
+            if(targetChild.isMatch(pattern)){
+                //後にtargetChildとpatternをReplaceするが、その際にIDが一致している必要があるため、IDをコピーする
+                targetChild.setId(pattern.getId());
                 result.add(targetChild);
             }
         }
@@ -151,56 +184,9 @@ public class MatchingCommand extends BaseCommand{
         return result;
     }
 
-    private boolean isMatch(HalNode target, HalNode source){
-        if(!equals(target,source)) return false;
-
-        target.setId(source.getId());
-
-        List<HalNode> targetChildren = target.getChildren();
-        List<HalNode> sourceChildren = source.getChildren();
-
-        if(source instanceof HalNormalizeInvocationNode || source instanceof HalEmptyNode){
-            return true;
-        }
-
-        if(targetChildren.size() != sourceChildren.size()) return false;
-
-        for(int index=0; index < targetChildren.size(); index++){
-            if(!isMatch(targetChildren.get(index), sourceChildren.get(index))) return false;
-        }
-
-        return true;
-    }
-
-    private boolean equals(HalNode target,HalNode source){
-        if(source instanceof HalEmptyNode) return true;
-
-        if(source instanceof HalNormalizeInvocationNode){
-            if(target instanceof HalNormalizeInvocationNode) return true;
-            if(target instanceof HalTreeNode targetNode){
-                return targetNode.getType().equals("MethodInvocation");
-            }
-            return false;
-        }
-
-        if(source instanceof HalNormalizeNode sourceNode){
-            if(target instanceof HalTreeNode targetNode){
-                return targetNode.getType().equals(sourceNode.getType());
-            }
-            return false;
-        }
-
-        if(source instanceof HalTreeNode sourceNode){
-            if(target instanceof HalTreeNode targetNode){
-                return targetNode.getType().equals(sourceNode.getType()) &&
-                        targetNode.getLabel().equals(sourceNode.getLabel());
-            }
-            return false;
-        }
-
-        return false;
-    }
-
+    /**
+     * 引数のハッシュ値を持つ木をDBから検索する
+     */
     private HalNode searchTree(String hash){
         ResultIterable<HalNode> result = dao.searchTree(hash);
         if(result.iterator().hasNext()){
@@ -211,6 +197,9 @@ public class MatchingCommand extends BaseCommand{
         return null;
     }
 
+    /**
+     * 指定されたディレクトリ内から指定された拡張子のファイルを検索する
+     */
     private List<Path> searchFiles(Path rootPath, String extension){
         try(Stream<Path> stream = Files.walk(rootPath)){
             return stream.filter(p->p.toString().endsWith(extension)).toList();

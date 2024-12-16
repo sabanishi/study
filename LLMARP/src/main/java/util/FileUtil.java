@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,9 +19,8 @@ public class FileUtil {
                 .collect(Collectors.joining(System.getProperty("line.separator")));
     }
 
-    public static String write(Path path, String content) throws IOException{
+    public static void write(Path path, String content) throws IOException{
         log.debug("Writing to {}", path);
         Files.write(path, content.getBytes());
-        return content;
     }
 }
