@@ -62,7 +62,6 @@ public class MatchingCommand extends BaseCommand{
 
         int matchCount = 0;
         for(Path filePath : filePaths){
-            log.debug("Matching: {}",filePath);
             try{
                 String targetSource = FileUtil.read(filePath);
                 Tree targetTree = TreeUtil.createTree(targetSource);
@@ -174,9 +173,7 @@ public class MatchingCommand extends BaseCommand{
         List<HalNode> result = new ArrayList<>();
 
         for(HalNode targetChild : target.preOrder()){
-            if(targetChild.isMatch(pattern)){
-                //後にtargetChildとpatternをReplaceするが、その際にIDが一致している必要があるため、IDをコピーする
-                targetChild.setId(pattern.getId());
+            if(targetChild.match(pattern)){
                 result.add(targetChild);
             }
         }

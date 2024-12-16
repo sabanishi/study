@@ -242,11 +242,13 @@ public abstract class HalNode {
     }
 
     /**
-     * 自身がsourceとマッチングできるかを調べる
+     * 自身とsourceをマッチングさせ、マッチング可能ならば自身のIDをsourceのIDに書き換える
      */
-    public boolean isMatch(HalNode source){
+    public boolean match(HalNode source){
         //自身とsourceのマッチング可能性を判定し、falseならばマッチングしない
         if(!isMatchInternal(source)) return false;
+
+        setId(source.getId());
 
         //sourceがHalNormalizeInvocation、HalEmptyNodeの時、子Nodeを調べずにマッチングする
         if(source instanceof HalNormalizeInvocationNode || source instanceof HalEmptyNode){
@@ -261,7 +263,7 @@ public abstract class HalNode {
         for(int index=0; index < targetChildren.size(); index++){
             HalNode targetChild = targetChildren.get(index);
             HalNode sourceChild = sourceChildren.get(index);
-            if(!targetChild.isMatch(sourceChild)) return false;
+            if(!targetChild.match(sourceChild)) return false;
         }
 
         return true;
