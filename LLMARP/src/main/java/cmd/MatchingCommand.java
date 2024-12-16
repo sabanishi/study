@@ -1,11 +1,15 @@
 package cmd;
 
 import com.github.gumtreediff.tree.Tree;
-import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import model.db.PatternDbInfo;
-import model.tree.*;
+import model.tree.HalNode;
+import model.tree.HalTreeNode;
+import model.tree.ReplaceNode;
+import model.tree.HalNormalizeInvocationNode;
+import model.tree.HalEmptyNode;
+import model.tree.HalNormalizeNode;
 import org.jdbi.v3.core.result.ResultIterable;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -28,8 +32,8 @@ public class MatchingCommand extends BaseCommand{
         @Option(names = {"-r","--repository"},paramLabel = "<repo>",description = "repository path")
         Path repository = Path.of("");
 
-        @Option(names = {"-a","--at"},paramLabel = "<revision>",description = "revision to retrieve (default: ${DEFAULT-VALUE})")
-        Path dbPath = Path.of("halfix.db");
+        @Option(names = "-n",paramLabel = "<num>",description = "number of pattern list")
+        int nPattern = 10000;
     }
 
     @Mixin
@@ -40,7 +44,8 @@ public class MatchingCommand extends BaseCommand{
         log.info("Matching: {}",config.repository);
         List<Path> filePaths = searchFiles(config.repository,".java");
 
-        ResultIterable<PatternDbInfo> patterns = dao.fetchUsefulPatterns();
+        ResultIterable<String> patternHashList = dao.fetchHighScorePatternHash(config.nPattern);
+        List<PatternDbInfo> patterns = patternHashList.stream().flatMap(h-> dao.searchPattern(h).stream()).toList();
         List<PatternInfo> patternInfoList = new ArrayList<>();
 
         //PatternDbInfoからPatternInfoを作成
