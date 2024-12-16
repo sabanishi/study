@@ -200,29 +200,6 @@ public class Pattern {
             copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
         }
 
-        replaceOldSet.clear();
-        replaceNewSet.clear();
-
-        //NewNode限定の部分でも、同様に正規化を行う
-        for(HalNode newNode : copyNew.preOrder()){
-            if (newNode instanceof HalTreeNode newTargetNode) {
-                NormalizeNameInfo info = canNormalizeVariable(newTargetNode);
-                if (info.canNormalize) {
-                    newTargetNode = info.targetNode;
-                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(newTargetNode);
-                    //newTreeの該当箇所を置換する
-                    replaceNewSet.add(Pair.of(newTargetNode,normalizedNode));
-                    //正規化情報を追加
-                    copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
-                }
-            }
-        }
-
-        //Newの置換を行う
-        for(Pair<HalNode,HalNode> pair : replaceNewSet){
-            copy.getNewTreeRoot().replace(pair.getFirst(),pair.getSecond());
-        }
-
         return copy;
     }
 
