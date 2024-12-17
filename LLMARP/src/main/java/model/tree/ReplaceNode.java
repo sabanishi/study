@@ -2,6 +2,8 @@ package model.tree;
 
 import com.github.gumtreediff.tree.Tree;
 
+import java.util.List;
+
 public class ReplaceNode extends HalTreeNode{
     private String replaceText;
 
@@ -9,7 +11,12 @@ public class ReplaceNode extends HalTreeNode{
         super(type, label, original, pos, length, rawText);
     }
 
-    public static ReplaceNode of(HalTreeNode node,String replaceText) {
+    public static ReplaceNode of(List<HalTreeNode> nodes, String replaceText) {
+        HalTreeNode node = nodes.get(0);
+        return of(node, replaceText);
+    }
+
+    public static ReplaceNode of(HalTreeNode node, String replaceText) {
         String type = "REPLACE_NODE[" + node.getType() + "]";
         ReplaceNode replaceNode = new ReplaceNode(type, replaceText, node.getOriginal(), node.getPos(), node.getLength(), node.getRawText());
         replaceNode.setId(node.getId());

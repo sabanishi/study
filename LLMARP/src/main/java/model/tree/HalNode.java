@@ -180,6 +180,10 @@ public abstract class HalNode {
         return false;
     }
 
+    public void removeChild(HalNode child){
+        children.remove(child);
+    }
+
     @Override
     public String toString() {
         return toString(0);

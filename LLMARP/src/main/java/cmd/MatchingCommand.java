@@ -4,11 +4,13 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.github.gumtreediff.tree.Tree;
+import db.Dao;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import model.Statement;
 import model.db.PatternDbInfo;
 import model.tree.HalNode;
+import model.tree.HalRootNode;
 import model.tree.HalTreeNode;
 import model.tree.ReplaceNode;
 import org.jdbi.v3.core.result.ResultIterable;
@@ -62,13 +64,15 @@ public class MatchingCommand extends BaseCommand{
 
         int matchCount = 0;
         for(Path filePath : filePaths){
+            log.debug("Matching: {}",filePath);
             try{
                 String targetSource = FileUtil.read(filePath);
                 Tree targetTree = TreeUtil.createTree(targetSource);
                 HalTreeNode targetRoot = HalTreeNode.of(targetTree,targetSource);
                 for(PatternInfo info : patternInfoList){
-                    HalNode oldRoot = info.getOldTree();
-                    HalNode newRoot = info.getNewTree();
+                    log.debug("Matching: {} with {}",filePath,info.getHash());
+                    HalRootNode oldRoot = (HalRootNode)info.getOldTree();
+                    HalRootNode newRoot = (HalRootNode)info.getNewTree();
                     HalNode copyRoot = targetRoot.deepCopy();
                     apply(copyRoot,oldRoot,newRoot);
 
@@ -126,30 +130,39 @@ public class MatchingCommand extends BaseCommand{
      * @param patternOldRoot 変更パターンの変更前木
      * @param patternNewRoot 変更パターンの変更後木
      */
-    private void apply(HalNode targetRoot, HalNode patternOldRoot,HalNode patternNewRoot){
-        List<HalNode> matchedNodes = match(targetRoot, patternOldRoot);
+    private void apply(HalNode targetRoot, HalRootNode patternOldRoot,HalRootNode patternNewRoot){
+        List<List<HalTreeNode>> matchedNodes = match(targetRoot, patternOldRoot);
 
         //マッチングした各部分木に対して、適用を行う
-        for(HalNode matchedNode : matchedNodes){
+        for(List<HalTreeNode> matchedNode : matchedNodes){
             HalNode newMatchedNode = exchange(matchedNode, patternNewRoot);
-            ReplaceNode replaceNode = ReplaceNode.of((HalTreeNode)matchedNode,newMatchedNode.makeNormalizeText());
-            targetRoot.replace(matchedNode,replaceNode);
+            ReplaceNode replaceNode = ReplaceNode.of(matchedNode,newMatchedNode.makeNormalizeText());
+            targetRoot.replace(matchedNode.get(0),replaceNode);
+            for(int i=1;i<matchedNode.size();i++) {
+                targetRoot.removeChild(matchedNode.get(i));
+            }
         }
     }
 
     /**
      * targetに対してpatternNewを適用した木を生成する
      */
-    private HalNode exchange(HalNode target, HalNode patternNew){
+    private HalNode exchange(List<HalTreeNode> target, HalRootNode patternNew){
         HalNode result = patternNew.deepCopy();
         result.setRawText(patternNew.getRawText());
 
         List<Pair<HalNode,HalNode>> replacedNodes = new ArrayList<>();
         for(HalNode resultChild : result.preOrder()){
             if(!(resultChild.getClass().equals(HalTreeNode.class))){
-                HalNode originalNode = target.searchById(resultChild.getId());
+                HalNode originalNode = null;
+                for(HalNode targetChild:target){
+                    originalNode = targetChild.searchById(resultChild.getId());
+                    if(originalNode!=null){
+                        break;
+                    }
+                }
                 if(originalNode==null){
-                    log.error("Node not found: {}",resultChild.getId());
+                    log.error("originalNode is null");
                     continue;
                 }
                 ReplaceNode replaceNode = ReplaceNode.of((HalTreeNode)resultChild,originalNode.makeNormalizeText());
@@ -169,12 +182,49 @@ public class MatchingCommand extends BaseCommand{
     /**
      * targetの子Nodeを舐めて、patternとマッチするNodeを返す
      */
-    private List<HalNode> match(HalNode target, HalNode pattern){
-        List<HalNode> result = new ArrayList<>();
+    private List<List<HalTreeNode>> match(HalNode target,HalRootNode pattern){
+        List<List<HalTreeNode>> result = new ArrayList<>();
+        List<List<HalTreeNode>> myResult = matchLoop(target,pattern);
+        if(myResult!=null){
+            result.addAll(myResult);
+        }
 
-        for(HalNode targetChild : target.preOrder()){
-            if(targetChild.match(pattern)){
-                result.add(targetChild);
+        for(HalNode child : target.getChildren()){
+            List<List<HalTreeNode>> childResult = match(child,pattern);
+            result.addAll(childResult);
+        }
+        return result;
+    }
+
+    /**
+     * targetの子Node中にpatternとマッチするものがあるかを探す
+     */
+    private List<List<HalTreeNode>> matchLoop(HalNode target,HalRootNode pattern){
+        if(target.getChildren().size() < pattern.getChildren().size())return null;
+
+        List<List<HalTreeNode>> result = new ArrayList<>();
+        for(int i=0;i<target.getChildren().size();i++){
+            HalNode targetChild = target.getChildren().get(i);
+            if(targetChild.match(pattern.getChildren().get(0))){
+                List<HalTreeNode> matchedNodes = new ArrayList<>();
+                matchedNodes.add((HalTreeNode)targetChild);
+                if(i == target.getChildren().size()-1 && pattern.getChildren().size()==1){
+                    result.add(matchedNodes);
+                    break;
+                }
+                for(int j=i+1;j<target.getChildren().size();j++){
+                    int patternCount = j-i;
+                    if(patternCount >= pattern.getChildren().size()){
+                        result.add(matchedNodes);
+                        break;
+                    }
+                    if(j >= pattern.getChildren().size())break;
+                    if(target.getChildren().get(j).match(pattern.getChildren().get(j-i))){
+                        matchedNodes.add((HalTreeNode)target.getChildren().get(i));
+                    }else{
+                        break;
+                    }
+                }
             }
         }
 
@@ -190,7 +240,6 @@ public class MatchingCommand extends BaseCommand{
             return result.iterator().next();
         }
 
-        log.error("Tree not found: {}",hash);
         return null;
     }
 
@@ -219,8 +268,8 @@ public class MatchingCommand extends BaseCommand{
             this.newTree = newTree;
         }
 
-        public static PatternInfo of(String hash, HalNode oldTree, HalNode newTree){
-            return new PatternInfo(hash,oldTree,newTree);
+        public static MatchingCommand.PatternInfo of(String hash, HalNode oldTree, HalNode newTree){
+            return new MatchingCommand.PatternInfo(hash,oldTree,newTree);
         }
     }
 }
