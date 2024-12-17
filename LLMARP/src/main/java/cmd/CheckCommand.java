@@ -14,7 +14,7 @@ public class CheckCommand extends BaseCommand{
     private LLMUser user;
 
     final String systemMessage = "You are an excellent programmer.\n" +
-            "Please determine whether normalizing the given change history to the specified change pattern is useful.\n" +
+            "Please determine if the following literal normalization is useful.\n" +
             "\"Useful\" refers to a change pattern that meets all the following conditions:\n" +
             "For any code fragment that matches the \"before\" section of the change pattern, the \"after\" code fragment can be universally generated.\n" +
             "The transformation can be applied to all matched code fragments without breaking their behavior.\n" +
@@ -22,11 +22,40 @@ public class CheckCommand extends BaseCommand{
             "Additionally, if normalized nodes exist in the \"after\" section of the change pattern but not in the \"before\" section, the change pattern cannot be automatically applied and is therefore not useful.\n" +
             "\n" +
             "Output only \"True\" or \"False.\"\n" +
-            "The normalization description format is as follows:\n" +
+            "Example1\n" +
+            "Input:\n" +
+            "History\n" +
+            "//before\n" +
+            "assertEquals($V4,\"Hoge\");\n" +
+            "//after\n" +
+            "assertThat($V4, is(\"Hoge\"));\n" +
             "\n" +
-            "1. \"$V1\" matches any variable or literal.\n" +
-            "2. \"[$V1]\" matches any code fragment.\n" +
-            "3. \"<$V1>\" matches any number of arguments.\n";
+            "Normalized Pattern\n" +
+            "//before\n" +
+            "assertEquals($V4,$V5);\n" +
+            "//after\n" +
+            "assertThat($V4, is($V5));\n" +
+            "\n" +
+            "Output:\n" +
+            "True\n" +
+            "\n" +
+            "\n" +
+            "Example2\n" +
+            "Input:\n" +
+            "History\n" +
+            "//before\n" +
+            "assertEquals($V4,\"\");\n" +
+            "//after\n" +
+            "assertThat($V4).isEmpty();\n" +
+            "\n" +
+            "Normalized Pattern\n" +
+            "//before\n" +
+            "assertEquals($V4,$V5);\n" +
+            "//after\n" +
+            "assertThat($V4).isEmpty();\n" +
+            "\n" +
+            "Output:\n" +
+            "False";
 
     @Override
     protected void setUp(){
