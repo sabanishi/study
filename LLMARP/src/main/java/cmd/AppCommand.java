@@ -12,7 +12,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Slf4j
-@Command(version ="halfix",sortOptions = false,subcommandsRepeatable = true,subcommands = {
+@Command(version ="hal_repair",sortOptions = false,subcommandsRepeatable = true,subcommands = {
         InitCommand.class, ExtractCommand.class,CheckCommand.class, MeasureCommand.class, MatchingCommand.class})
 public class AppCommand implements Callable<Integer> {
     public static class Config{
@@ -20,7 +20,7 @@ public class AppCommand implements Callable<Integer> {
         Level logLevel = Level.DEBUG;
 
         @Option(names = {"-d","--database"}, paramLabel = "<db>", description = "database file path")
-        Path database = Path.of("halfix.db");
+        Path database = Path.of("hal_repair.db");
     }
 
     protected Config config = new Config();
