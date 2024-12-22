@@ -22,7 +22,7 @@ import java.util.Hashtable;
 public class Eval1Command extends BaseCommand{
     public static class Config{
         @Option(names = "--folder", paramLabel = "<path>", description = "folder path (default: ${DEFAULT-VALUE})")
-        String folderPath = "../../higuchi/chaa/match";
+        String folderPath = "../chaa/match";
         @Option(names = "--csv", paramLabel = "<file>", description = "csv file name (default: ${DEFAULT-VALUE})")
         String csvFileName = "match_log.csv";
         @Option(names = "--output", paramLabel = "<file>", description = "output file name (default: ${DEFAULT-VALUE})")
@@ -43,7 +43,7 @@ public class Eval1Command extends BaseCommand{
                 .with(schema)
                 .readValues(new File(matchPath.toString()));
 
-        int count = 0;
+        int count = 135;
         while (iterator.hasNext()) {
             iterator.next();
             count++;
@@ -53,7 +53,7 @@ public class Eval1Command extends BaseCommand{
 
         int beforeNotBroken = 0;
         int afterBroken = 0;
-        for(int i=1;i<2;i++){
+        for(int i=1;i<1120;i++){
             Path beforePath = folderPath.resolve(i+"-before.java");
             Path afterPath = folderPath.resolve(i+"-after.java");
 
