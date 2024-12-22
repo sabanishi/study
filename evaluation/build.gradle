@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    //picocli
+    implementation 'info.picocli:picocli:4.7.6'
+
+    //Logging
+    implementation 'ch.qos.logback:logback-classic:1.4.12'
+
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    implementation 'com.google.guava:guava:32.1.1-jre'
+
+    //ASTParser
+    implementation 'org.eclipse.jdt:org.eclipse.jdt.core:3.26.0'
+
+    //CSV
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass.set("Main")
+}
