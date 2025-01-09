@@ -85,8 +85,12 @@ public class Chunk {
             if (oldNode instanceof HalTreeNode oldTreeNode) {
                 Tree newOriginalTree = mapping.getDstForSrc(oldTreeNode.getOriginal());
                 if (newOriginalTree != null) {
-                    //ノードがSimpleNameの時、同じLabelでなければ同じIDとして扱わない
-                    if (!oldTreeNode.getType().equals("SimpleName")
+                    //ノードがSimpleNameまたはリテラルの時、同じLabelでなければ同じIDとして扱わない
+                    if (!(oldTreeNode.getType().equals("SimpleName") ||
+                            oldTreeNode.getType().equals("CharacterLiteral") ||
+                            oldTreeNode.getType().equals("StringLiteral") ||
+                            oldTreeNode.getLabel().equals("NumberLiteral") ||
+                            oldTreeNode.getLabel().equals("BooleanLiteral"))
                             || oldTreeNode.getLabel().equals(newOriginalTree.getLabel())) {
                         HalNode newNode = newTreeRoot.searchByGumTree(newOriginalTree);
                         if(newNode!=null){
