@@ -65,10 +65,6 @@ public interface Dao {
     @SqlUpdate("UPDATE patterns SET is_useful = :isUseful WHERE hash = :hash")
     void updatePatternIsUseful(@Bind("hash") String hash, @Bind("isUseful") boolean isUseful);
 
-    @SqlQuery("SELECT * FROM patterns WHERE is_useful = 1")
-    @RegisterRowMapper(PatternMapper.class)
-    ResultIterable<PatternDbInfo> fetchUsefulPatterns();
-
     @SqlQuery("SELECT DISTINCT hash FROM scores ORDER BY score DESC LIMIT :limit")
     ResultIterable<String> fetchHighScorePatternHash(@Bind("limit")int limit);
 
@@ -118,7 +114,9 @@ public interface Dao {
             String oldTreeHash = rs.getString("old_tree_hash");
             String newTreeHash = rs.getString("new_tree_hash");
             boolean isNormalized = rs.getBoolean("is_normalized");
-            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isNormalized);
+            boolean isCandidate = rs.getBoolean("is_candidate");
+            boolean isUseful = rs.getBoolean("is_useful");
+            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isNormalized, isCandidate, isUseful);
         }
     }
 }

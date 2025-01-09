@@ -10,4 +10,6 @@ public class PatternDbInfo {
     String oldTreeHash;
     String newTreeHash;
     boolean isNormalized;
+    boolean isCandidate;
+    boolean isUseful;
 }
