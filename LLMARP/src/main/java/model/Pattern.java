@@ -225,6 +225,11 @@ public class Pattern {
                         case "SingleVariableDeclaration":
                         case "VariableDeclarationFragment":
                         case "ReturnStatement":
+                            //1文字目が大文字の時,メソッド名と判断して正規化を行わない
+                            char firstChar = targetTreeNode.getLabel().charAt(0);
+                            if(Character.isUpperCase(firstChar)){
+                                return new NormalizeNameInfo(false, null);
+                            }
                             return new NormalizeNameInfo(true, targetTreeNode);
                         default:
                             break;
