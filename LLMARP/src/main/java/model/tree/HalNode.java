@@ -190,7 +190,12 @@ public abstract class HalNode {
     }
 
     public String makeNormalizeText() {
-        String baseText = rawText.substring(pos, pos + length);
+        String baseText = "";
+        if(this instanceof HalRootNode){
+            baseText = rawText;
+        }else{
+            baseText = rawText.substring(pos, pos + length);
+        }
         List<Change> changes = new ArrayList<>();
         makeNormalizeLoop(changes,baseText,pos);
 

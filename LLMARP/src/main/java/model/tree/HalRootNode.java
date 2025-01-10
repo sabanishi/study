@@ -20,7 +20,7 @@ public class HalRootNode extends HalNode{
         int pos = root.getChildren().get(0).getPos();
         int length = root.getChildren().get(root.getChildren().size()-1).getPos() + root.getChildren().get(root.getChildren().size()-1).getLength() - pos;
 
-        root.rawText = rawText;
+        root.rawText = rawText.substring(pos,pos+length);
         root.pos = pos;
         root.length = length;
 
