@@ -178,14 +178,14 @@ public class Pattern {
                 NormalizeNameInfo info = canNormalizeVariable(oldTargetNode);
                 if (info.canNormalize) {
                     oldTargetNode = info.targetNode;
-                    HalNormalizeNode normalizedNode = HalNormalizeNode.of(oldTargetNode);
+                    HalEmptyNode normalizedNode = HalEmptyNode.of(oldTargetNode);
                     //oldTreeの該当箇所を置換する
                     replaceOldSet.add(Pair.of(oldTargetNode,normalizedNode));
 
                     //newTreeに同じIDのノードがあれば置換する
                     HalNode newTargetNode = copyNew.searchById(normalizedNode.getId());
                     if (newTargetNode instanceof HalTreeNode) {
-                        HalNormalizeNode normalizeNode2 = HalNormalizeNode.of((HalTreeNode) newTargetNode);
+                        HalEmptyNode normalizeNode2 = HalEmptyNode.of((HalTreeNode) newTargetNode);
                         replaceNewSet.add(Pair.of(newTargetNode,normalizeNode2));
                     }
 
