@@ -69,6 +69,10 @@ public interface Dao {
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchUsefulPatterns();
 
+    @SqlQuery("SELECT * FROM patterns WHERE is_candidate = 0")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchAllPatterns();
+
     @SqlQuery("SELECT DISTINCT hash FROM scores ORDER BY score DESC LIMIT :limit")
     ResultIterable<String> fetchHighScorePatternHash(@Bind("limit")int limit);
 
