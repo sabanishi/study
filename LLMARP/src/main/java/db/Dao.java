@@ -44,8 +44,8 @@ public interface Dao {
     @SqlQuery("INSERT OR IGNORE INTO chunk_normalization_info (chunk_patterns_id, info_hash) VALUES (:chunkPatternsId, :i.hash.name) RETURNING id")
     long insertChunkInfoRelationship(@Bind("chunkPatternsId") final long chunkPatternsId, @BindBean("i") NormalizationInfo info);
 
-    @SqlQuery("INSERT OR IGNORE INTO pattern_connections (parent_hash, child_hash) VALUES (:parent.hash.name, :child.hash.name) RETURNING id")
-    long insertPatternConnection(@BindBean("parent") final Pattern parent, @BindBean("child") final Pattern child);
+    @SqlUpdate("INSERT OR IGNORE INTO pattern_connections (parent_hash, child_hash) VALUES (:parent.hash.name, :child.hash.name)")
+    void insertPatternConnection(@BindBean("parent") final Pattern parent, @BindBean("child") final Pattern child);
 
     @SqlQuery("SELECT chunk_id FROM chunk_patterns WHERE pattern_hash = :hash")
     ResultIterable<String> searchChunkHashByPatternHash(@Bind("hash") String hash);
@@ -72,16 +72,16 @@ public interface Dao {
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchCandidatePatterns();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
     void computeSupportH();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
     void computeSupportC();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash AND p2.is_useful = 1) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash)")
     void computeConfidenceH();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash AND p2.is_useful = 1) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash)")
     void computeConfidenceC();
 
     class TreeJsonRawMapper implements RowMapper<HalNode> {

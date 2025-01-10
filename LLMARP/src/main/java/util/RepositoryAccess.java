@@ -2,6 +2,7 @@ package util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawText;
@@ -135,6 +136,21 @@ public class RepositoryAccess implements AutoCloseable {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public int countCommit(){
+        try{
+            Git git = Git.open(repository.getDirectory());
+            Iterable<RevCommit> commits = git.log().call();
+            int count = 0;
+            for(RevCommit c : commits){
+                count++;
+            }
+            return count;
+        }catch(Exception e){
+            log.error("Failed to open git repository",e);
+            return 0;
+        }
     }
 
     @Override

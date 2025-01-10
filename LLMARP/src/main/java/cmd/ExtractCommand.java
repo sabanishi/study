@@ -56,7 +56,11 @@ public class ExtractCommand extends BaseCommand{
             log.info("Process {}",config.repository);
             final long repoId = dao.insertRepository(config.repository.toString());
 
+            int totalNum = ra.countCommit();
+            int now = 0;
             for(final RevCommit c : ra.walk(config.from,config.to)){
+                now++;
+                log.info("Processing ({}/{}): {}",now,totalNum,c.getId().getName());
                 processCommit(c,repoId,ra);
             }
         }
@@ -77,20 +81,11 @@ public class ExtractCommand extends BaseCommand{
         InsertPattern(dao, chunkId, original, false);
         for (Pattern pattern : chunk.getNormalizedPatterns()) {
             InsertPattern(dao, chunkId, pattern, true);
-            log.debug("Inserted pattern: [{}] {} --> {} at {}:{}",
-                    pattern.getHash().getName(),
-                    pattern.getOldTreeRoot().makeNormalizeText(),
-                    pattern.getNewTreeRoot().makeNormalizeText(),
-                    chunk.getFileName(),
-                    chunk.getOldStatement().getLines().getBegin());
         }
     }
 
     private void InsertPattern(Dao dao, long chunkId, Pattern pattern, boolean isNormalized) {
         boolean isUseful = !pattern.getIsCandidate();
-        log.info(pattern.getHash().getName()+" " +isUseful + " " + isNormalized);
-        log.info(pattern.getOldTreeRoot().getHash().getName());
-        log.info(pattern.getOldTreeRoot().toHashString(0));
 
         dao.insertPattern(pattern,isNormalized,isUseful);
         long chunkPatternsId = dao.insertChunkPatternRelationship(chunkId, pattern);

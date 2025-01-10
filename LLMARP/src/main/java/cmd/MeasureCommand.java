@@ -25,7 +25,6 @@ public class MeasureCommand extends BaseCommand{
                 hash,
                 confidenceH+supportH*0.001 AS score
                 FROM patterns
-                WHERE supportH >= 2
                 ORDER BY score DESC
                 """);
         handle.execute("DROP INDEX IF EXISTS scores_hash;");

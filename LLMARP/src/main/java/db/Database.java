@@ -92,8 +92,8 @@ public class Database {
         handle.execute("""
                 CREATE TABLE pattern_connections (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    parent_hash TEXT,
-                    child_hash TEXT
+                    parent_hash TEXT UNIQUE,
+                    child_hash TEXT UNIQUE
                 )""");
 
         log.info("Table created");

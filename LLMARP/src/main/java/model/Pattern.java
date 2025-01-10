@@ -66,7 +66,11 @@ public class Pattern {
     public void normalize(Set<Pattern> result) {
         //変数名だけ先に全て正規化する
         Pattern variablePattern = normalizeVariables();
-        result.add(variablePattern);
+        if(!this.equals(variablePattern))
+        {
+            result.add(variablePattern);
+            variablePattern.getParents().add(this);
+        }
 
         //変更パターン候補数の爆発を抑えるため、リテラルの数が一定数以下の時のみ、正規化を行う
         if(countUpLiteral()> MAX_LITERAL) return;
@@ -225,6 +229,7 @@ public class Pattern {
                         case "SingleVariableDeclaration":
                         case "VariableDeclarationFragment":
                         case "ReturnStatement":
+                        case "Assignment":
                             //1文字目が大文字の時,メソッド名と判断して正規化を行わない
                             char firstChar = targetTreeNode.getLabel().charAt(0);
                             if(Character.isUpperCase(firstChar)){
