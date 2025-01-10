@@ -60,8 +60,12 @@ public class ExtractCommand extends BaseCommand{
             int now = 0;
             for(final RevCommit c : ra.walk(config.from,config.to)){
                 now++;
-                log.info("Processing ({}/{}): {}",now,totalNum,c.getId().getName());
-                processCommit(c,repoId,ra);
+                try{
+                    log.info("Processing ({}/{}): {}",now,totalNum,c.getId().getName());
+                    processCommit(c,repoId,ra);
+                }catch(Exception e){
+                    log.error("Error ({}/{}): {}",now,totalNum,c.getId().getName(),e);
+                }
             }
         }
     }
