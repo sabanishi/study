@@ -45,13 +45,17 @@ public class ChunkCreator {
         List<Statement> oldStatements = splitter.split(oldSource);
         List<Statement> newStatements = splitter.split(newSource);
 
-        Tree oldAllTree = TreeUtil.createTree(oldSource);
-        Tree newAllTree = TreeUtil.createTree(newSource);
-
-        return differencer.compute(oldStatements, newStatements)
-                .stream()
-                .filter(e -> e.getType() == Edit.Type.REPLACE)//単純な追加、削除は除外する
-                .map(e -> Chunk.of(entry.getNewPath(), oldStatements, oldAllTree, newStatements, newAllTree, e))
-                .filter(e -> e.getOriginalPattern()!=null);//正規化できないものは除外する
+        try{
+            Tree oldAllTree = TreeUtil.createTree(oldSource);
+            Tree newAllTree = TreeUtil.createTree(newSource);
+            return differencer.compute(oldStatements, newStatements)
+                    .stream()
+                    .filter(e -> e.getType() == Edit.Type.REPLACE)//単純な追加、削除は除外する
+                    .map(e -> Chunk.of(entry.getNewPath(), oldStatements, oldAllTree, newStatements, newAllTree, e))
+                    .filter(e -> e.getOriginalPattern()!=null);//正規化できないものは除外する
+        }catch(Exception e){
+            //何らかのエラーが出た場合、そのコミットは無視する
+            return Stream.empty();
+        }
     }
 }
