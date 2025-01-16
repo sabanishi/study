@@ -23,6 +23,7 @@ public class Database {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     url TEXT UNIQUE
                 )""");
+        handle.execute("CREATE INDEX repositories_url ON repositories(url)");
 
         handle.execute("""
                 CREATE TABLE commits(
@@ -31,6 +32,8 @@ public class Database {
                     hash TEXT,
                     message TEXT
                     )""");
+        handle.execute("CREATE INDEX commits_repository_id ON commits(repository_id)");
+        handle.execute("CREATE INDEX commits_hash ON commits(hash)");
 
         handle.execute("""
                 CREATE TABLE chunks (
@@ -44,6 +47,7 @@ public class Database {
                     old_raw TEXT,
                     new_raw TEXT
                 )""");
+        handle.execute("CREATE INDEX chunks_commit_id ON chunks(commit_id)");
 
         handle.execute("""
                 CREATE TABLE patterns (
@@ -59,6 +63,16 @@ public class Database {
                     is_useful BIT,
                     UNIQUE(old_tree_hash, new_tree_hash)
                 )""");
+        handle.execute("CREATE INDEX patterns_hash ON patterns(hash)");
+        handle.execute("CREATE INDEX patterns_old_tree_hash ON patterns(old_tree_hash)");
+        handle.execute("CREATE INDEX patterns_new_tree_hash ON patterns(new_tree_hash)");
+        handle.execute("CREATE INDEX patterns_supportH ON patterns(supportH)");
+        handle.execute("CREATE INDEX patterns_supportC ON patterns(supportC)");
+        handle.execute("CREATE INDEX patterns_confidenceH ON patterns(confidenceH)");
+        handle.execute("CREATE INDEX patterns_confidenceC ON patterns(confidenceC)");
+        handle.execute("CREATE INDEX patterns_is_candidate ON patterns(is_candidate)");
+        handle.execute("CREATE INDEX patterns_is_normalized ON patterns(is_normalized)");
+        handle.execute("CREATE INDEX patterns_is_useful ON patterns(is_useful)");
 
         handle.execute("""
                 CREATE TABLE normalization_info (
@@ -67,6 +81,7 @@ public class Database {
                     target_id INTEGER,
                     order_index INTEGER
                 )""");
+        handle.execute("CREATE INDEX normalization_info_hash ON normalization_info(hash)");
 
         handle.execute("""
                 CREATE TABLE trees (
@@ -74,6 +89,7 @@ public class Database {
                     structure TEXT,
                     text TEXT
                 )""");
+        handle.execute("CREATE INDEX trees_hash ON trees(hash)");
 
         handle.execute("""
                 CREATE TABLE chunk_patterns (
@@ -81,6 +97,9 @@ public class Database {
                     chunk_id INTEGER,
                     pattern_hash TEXT
                 )""");
+        handle.execute("CREATE INDEX chunk_patterns_chunk_id ON chunk_patterns(chunk_id)");
+        handle.execute("CREATE INDEX chunk_patterns_pattern_hash ON chunk_patterns(pattern_hash)");
+
 
         handle.execute("""
                 CREATE TABLE chunk_normalization_info (
@@ -88,6 +107,7 @@ public class Database {
                     chunk_patterns_id INTEGER,
                     info_hash TEXT
                 )""");
+        handle.execute("CREATE INDEX chunk_normalization_info_chunk_patterns_id ON chunk_normalization_info(chunk_patterns_id)");
 
         handle.execute("""
                 CREATE TABLE pattern_connections (
@@ -95,6 +115,7 @@ public class Database {
                     parent_hash TEXT UNIQUE,
                     child_hash TEXT UNIQUE
                 )""");
+        handle.execute("CREATE INDEX pattern_connections_parent_hash ON pattern_connections(parent_hash)");
 
         log.info("Table created");
     }

@@ -21,7 +21,7 @@ public class AppCommand implements Callable<Integer> {
         Level logLevel = Level.DEBUG;
 
         @Option(names = {"-d","--database"}, paramLabel = "<db>", description = "database file path")
-        Path database = Path.of("hal_repair.db");
+        Path database = Path.of("all.db");
     }
 
     protected Config config = new Config();

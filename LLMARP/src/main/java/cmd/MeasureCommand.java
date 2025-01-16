@@ -12,9 +12,15 @@ public class MeasureCommand extends BaseCommand{
         log.info("Measure {}",app.config.database);
 
         //support,confidenceを計算
+        log.info("computing supportC");
         dao.computeSupportC();
+
+        log.info("computing supportH");
         dao.computeSupportH();
+
+        log.info("computing confidenceC");
         dao.computeConfidenceC();
+        log.info("computing confidenceH");
         dao.computeConfidenceH();
 
         //scoreを計算し、テーブルを作成する
