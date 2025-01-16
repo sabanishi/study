@@ -6,6 +6,8 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor(staticName = "of")
 public class ChunkDbInfo {
+    long id;
+    long commitId;
     String fileName;
     int oldBegin;
     int oldEnd;
