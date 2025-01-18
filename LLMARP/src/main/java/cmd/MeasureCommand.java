@@ -15,13 +15,10 @@ public class MeasureCommand extends BaseCommand{
         log.info("computing supportC");
         dao.computeSupportC();
 
-        log.info("computing supportH");
-        dao.computeSupportH();
-
         log.info("computing confidenceC");
         dao.computeConfidenceC();
-        log.info("computing confidenceH");
-        dao.computeConfidenceH();
+        log.info("computing score");
+
 
         //scoreを計算し、テーブルを作成する
         handle.execute("DROP TABLE IF EXISTS scores;");
@@ -29,7 +26,7 @@ public class MeasureCommand extends BaseCommand{
                 CREATE TABLE scores AS
                 SELECT
                 hash,
-                confidenceH+supportH*0.001 AS score
+                confidenceC+supportC*0.001 AS score
                 FROM patterns
                 ORDER BY score DESC
                 """);

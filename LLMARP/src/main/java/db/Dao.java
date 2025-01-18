@@ -121,21 +121,38 @@ public interface Dao {
     @SqlQuery("SELECT DISTINCT hash FROM scores ORDER BY score DESC LIMIT :limit")
     ResultIterable<String> fetchHighScorePatternHash(@Bind("limit")int limit);
 
+    @SqlQuery("SELECT * FROM pattern_connections WHERE child_hash = :hash")
+    @RegisterRowMapper(PatternConnectionMapper.class)
+    ResultIterable<PatternConnectionDbInfo> searchParentPattern(@Bind("hash") String hash);
+
+    @SqlQuery("SELECT * FROM pattern_connections WHERE parent_hash = :hash")
+    @RegisterRowMapper(PatternConnectionMapper.class)
+    ResultIterable<PatternConnectionDbInfo> searchChildPattern(@Bind("hash") String hash);
+
+    @SqlQuery("SELECT * FROM scores ORDER BY score DESC")
+    ResultIterable<String> fetchHighScorePattern();
+
     @SqlQuery("SELECT * FROM patterns WHERE is_candidate = 1")
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchCandidatePatterns();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
+    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
     void computeSupportH();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
+    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
     void computeSupportC();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash)")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE (p2.is_useful = 1 AND p2.old_tree_hash = p.old_tree_hash)) WHERE p.is_useful = 1")
     void computeConfidenceH();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash)")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash) WHERE p.is_useful = 1")
     void computeConfidenceC();
+
+    @SqlUpdate("UPDATE patterns AS p SET is_useful = 0")
+    void resetUsefulFlag();
+
+    @SqlUpdate("UPDATE patterns AS p SET is_useful = 1 WHERE hash NOT IN (SELECT parent_hash FROM pattern_connections)")
+    void updateAllNormalizedPatternUsefulFlag();
 
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override
@@ -168,10 +185,10 @@ public interface Dao {
             String hash = rs.getString("hash");
             String oldTreeHash = rs.getString("old_tree_hash");
             String newTreeHash = rs.getString("new_tree_hash");
-            boolean isNormalized = rs.getBoolean("is_normalized");
             boolean isCandidate = rs.getBoolean("is_candidate");
+            boolean isNormalized = rs.getBoolean("is_normalized");
             boolean isUseful = rs.getBoolean("is_useful");
-            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isNormalized, isCandidate, isUseful);
+            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isCandidate, isNormalized,isUseful);
         }
     }
 
