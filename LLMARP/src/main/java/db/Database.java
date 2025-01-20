@@ -117,6 +117,7 @@ public class Database {
                     child_hash TEXT UNIQUE
                 )""");
         handle.execute("CREATE INDEX pattern_connections_parent_hash ON pattern_connections(parent_hash)");
+        handle.execute("CREATE INDEX pattern_connections_child_hash ON pattern_connections(child_hash)");
 
         log.info("Table created");
     }

@@ -158,12 +158,6 @@ public interface Dao {
     @SqlUpdate("UPDATE patterns AS p SET is_useful = 0")
     void resetUsefulFlag();
 
-    @SqlUpdate("UPDATE patterns AS p SET is_useful = 1 WHERE hash NOT IN (SELECT parent_hash FROM pattern_connections)")
-    void updateAllNormalizedPatternUsefulFlag();
-
-    @SqlUpdate("UPDTAE patterns AS p SET is_useful = 1 WHERE p.is_candidate = 1 OR p.is_normalized = 1")
-    void updateAllUsefulFlag();
-
     @SqlUpdate("UPDATE scores SET score = 0 WHERE hash = :hash")
     void resetScore(@Bind("hash") String hash);
 
