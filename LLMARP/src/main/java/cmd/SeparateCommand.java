@@ -19,7 +19,7 @@ public class SeparateCommand extends BaseCommand{
     }
 
     private void noneProcess(){
-        Path nonePath = Path.of("hal_repair.db");
+        Path nonePath = Path.of("hal_repair_new.db");
         final Jdbi noneJdbi = Database.open(nonePath);
         try(final Handle h = noneJdbi.open()){
             h.useTransaction(h0 ->{

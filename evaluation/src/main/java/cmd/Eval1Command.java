@@ -36,7 +36,7 @@ public class Eval1Command extends BaseCommand{
         int beforeNotBroken = 0;
         int afterBroken = 0;
         StringBuilder broken = new StringBuilder();
-        for(int i=0;i<=177;i++){
+        for(int i=0;i<=172;i++){
             Path beforePath = folderPath.resolve(i+"_before.java");
             Path afterPath = folderPath.resolve(i+"_after.java");
 

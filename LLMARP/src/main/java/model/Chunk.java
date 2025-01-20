@@ -51,7 +51,7 @@ public class Chunk {
         Stack<Tree> oldTreeStack = extractSubTree(oldAllTree, oldStatement);
         Stack<Tree> newTreeStack = extractSubTree(newAllTree, newStatement);
 
-        //oldTreeまたはnewTreeがnullの場合、正規化を行わない
+        //oldTreeまたはnewTreeがnullの場合、無視する
         if (oldTreeStack.empty()|| newTreeStack.empty()) {
             return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
         }
@@ -108,6 +108,11 @@ public class Chunk {
             if (newNode.getId() >= 0) continue;
             newNode.setId(id);
             id++;
+        }
+
+        if(oldTreeRoot.getHash().equals(newTreeRoot.getHash())){
+            System.out.println("Hash is same");
+            return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
         }
 
         Pattern originalPattern = Pattern.of(oldTreeRoot, newTreeRoot, new ArrayList<NormalizationInfo>(),false);

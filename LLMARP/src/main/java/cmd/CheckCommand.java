@@ -98,6 +98,12 @@ public class CheckCommand extends BaseCommand{
                 continue;
             }
 
+            //前後の木が同じ時、有用とはしない
+            if(info.getOldTreeHash().equals(info.getNewTreeHash())){
+                log.info("Pattern {} is not useful because old tree and new tree are same",info.getHash());
+                continue;
+            }
+
             //パターンにリテラルが含まれていない時
             if(!info.getIsCandidate()){
                 log.info("Pattern {} is not candidate",info.getHash());

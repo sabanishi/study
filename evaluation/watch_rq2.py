@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 
 class Tuple:
   def __init__(self,hash):
@@ -11,12 +12,15 @@ class Tuple:
   def get_hash(self):
     return self.hash
 
-file_name='match_folder/match/match_log.csv'
+args = sys.argv
+
+file_name=args[1]
+output_file_name=args[2]
 
 df = pd.read_csv(file_name)
 
 # 2列目の値を抽出
-hashes = df["commit"].values.astype('U')
+hashes = df.iloc[:,2].values
 
 list = []
 # どのhashが何個あるかをカウント
@@ -37,3 +41,8 @@ list.sort(key=lambda x: x.count, reverse=True)
 
 for i in range(len(list)):
   print(f"{list[i].get_hash()}:{list[i].count}")
+
+# 結果をファイルに書き込む
+with open(output_file_name, mode='w') as f:
+  for i in range(len(list)):
+    f.write(f"{list[i].get_hash()}:{list[i].count}\n")
