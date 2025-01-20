@@ -20,7 +20,7 @@ import java.util.List;
 public class CheckCommand extends BaseCommand{
     public static class Config{
         @CommandLine.Option(names = "-n",paramLabel = "<num>",description = "number of pattern list")
-        int nPattern = 1000;
+        int nPattern = 10000;
     }
 
     private Config config = new Config();
