@@ -92,6 +92,12 @@ public class CheckCommand extends BaseCommand{
                 continue;
             }
 
+            //子パターンが有用である時、自身は有用とはしない
+            if(!info.getIsChildUseful()){
+                log.info("Pattern {} is not useful because children are useful",info.getHash());
+                continue;
+            }
+
             //パターンにリテラルが含まれていない時
             if(!info.getIsCandidate()){
                 log.info("Pattern {} is not candidate",info.getHash());
@@ -123,6 +129,7 @@ public class CheckCommand extends BaseCommand{
                     if(isAllUseful){
                         //全ての子パターンが有用な場合、親パターンは有用でないとする
                         dao.updatePatternIsUseful(parentHash,false);
+                        dao.updatePatternIsChildUseful(parentHash,false);
                         log.info("Parent Pattern {} is not useful",parentHash);
                         if(checkedPattern.contains(parentHash)){
                             i--;

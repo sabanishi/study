@@ -80,138 +80,161 @@ NewTree:assertThat([$V9]).hasToString($V13);
 LLM: false
 Ans: true
 
+#11
 Hash:de2fed60ba90286495acf4579bb23255
 OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, $V15);
 NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14, $V15);
 LLM: true
 Ans: true
 
+#12
 Hash:6655016843e10c26408bdd42fd7ce661
 OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, $V14, $V15);
 NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, $V15);
 LLM: true
 Ans: true
 
+#13
 Hash:9c1fbc0791baa35d7d7efb2b7160c56b
 OldTree:ASSERT.that([$V13]).has().allOf($V17, $V18).inOrder();
 NewTree:ASSERT.that([$V13]).has().exactly($V17, $V18).inOrder();
 LLM: true
 Ans: true
 
+#14
 Hash:db635f8f613ace9e8883492a6de2cafb
 OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14);
 NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14);
 LLM: true
 Ans: true
 
+#15
 Hash:d11f5ab3e3bb39c62ebae58a94c02cdb
 OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, $V14);
 NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14);
 LLM: true
 Ans: true
 
+#16
 Hash:060244c10b96b68a721f0e92b45da582
 OldTree:@WebIntegrationTest(randomPort = $V5)
 NewTree:@SpringApplicationTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 LLM: false
 Ans: false
 
+#17
 Hash:a4c4b3c0323ea6fac2562f3dce5e7585
 OldTree:OriginTrackedValue [$V5] = this.properties.get($V13);
 NewTree:OriginTrackedValue [$V5] = getFromFirst($V13);
 LLM: true
 Ans: true
 
+#18
 Hash:3621241b630d49170dd4e5d242fb9c01
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, $V20, $V21));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, $V20, $V21));
 LLM: false
 Ans: true
 
+#19
 Hash:0581409b94fde06d3916063e5b6c581a
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", $V20, $V21));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", $V20, $V21));
 LLM: false
 Ans: true
 
+#20
 Hash:0b47f9bda3c7407f23e872f54c21182e
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", "b", $V21));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", "b", $V21));
 LLM: false
 Ans: true
 
+#21
 Hash:1cef67d22f334d7a07f7faa290559964
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, "b", $V21));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, "b", $V21));
 LLM: false
 Ans: true
 
+#22
 Hash:c5496f4b868572ac7a85347674be1583
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, "b", "a"));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, "b", "a"));
 LLM: false
 Ans: true
 
+#23
 Hash:3571669251f662412b920132eb27c933
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", $V20, "a"));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", $V20, "a"));
 LLM: false
 Ans: true
 
+#24
 Hash:1ce729b2a00fef152845c85ed554821a
 OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, $V20, "a"));
 NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, $V20, "a"));
 LLM: false
 Ans: true
 
+#25
 Hash:c0982ad926403481abdcbcbff311a1ee
 OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14);
 NewTree:assertThat([$V9]).iteratesAs("a", $V13, $V14);
 LLM: true
 Ans: true
 
+#26
 Hash:ec7adb26c28a2e228b4e7e5e55b48b96
 OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13, $V14);
 NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14);
 LLM: true
 Ans: true
 
+#27
 Hash:6ca1b2bd2e81d7268b3baa98fef964a5
 OldTree:[$V3] = [$V7].getFormattedValue($V10);
 NewTree:[$V3] = [$V7].getFormattedValue($V10, null);
 LLM: false
 Ans: true
 
+#28
 Hash:867a1dc3c5c1813736e1e44a2a1c3347
 OldTree:[$V3] = [$V7].getFormattedValue($V10, null);
 NewTree:[$V3] = [$V7].getFormattedValue($V10);
 LLM: true
 Ans: true
 
+#29
 Hash:8c94fea3646e4dbbab2a649ff6626d4a
 OldTree:ASSERT.that([$V9]).iteratesAs($V12);
 NewTree:assertThat([$V9]).iteratesAs($V12);
 LLM: true
 Ans: true
 
+#30
 Hash:2e50ecc78c7fa964690706596b80424f
 OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12);
 NewTree:ASSERT.that([$V9]).iteratesAs($V12);
 LLM: true
 Ans: true
 
+#31
 Hash:4282ee8ecdef09faa9be3c3deb4169cc
 OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14, $V15);
 NewTree:assertThat([$V9]).iteratesAs("a", $V13, $V14, $V15);
 LLM: true
 Ans: true
 
+#32
 Hash:a79867f0aa503772e7090b66d0ad53dd
 OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13);
 NewTree:assertThat([$V9]).iteratesAs($V12, $V13);
 LLM: true
 Ans: true
 
+#33
 Hash:1d63ca4927c3c4b1ee31a32ff422a2a6
 OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13, $V14, $V15);
 NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14, $V15);
@@ -299,5 +322,347 @@ Ans: true
 Hash:b5ae25c88e72f001dd8dda55b4102f00
 OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, "c");
 NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14, "c");
+LLM: true
+Ans: true
+
+Hash:ade246716af7d2e681bf5c2633cec2d1
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, $V14, "c");
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, "c");
+LLM: true
+Ans: true
+
+Hash:238b02970067b6e0ceedb3fbf6ea94ce
+OldTree:ASSERT.that([$V13]).has().allOf("a", $V18).inOrder();
+NewTree:ASSERT.that([$V13]).has().exactly("a", $V18).inOrder();
+LLM: true
+Ans: true
+
+Hash:7d9d0c9f614d85b394af85bb5eea5eb2
+OldTree:withEnv("ES_JAVA_OPTS", $V4
+NewTree:withEnv("ES_JAVA_OPTS", "-Xms32m -Xmx512m"
+LLM: false
+Ans: false(?)
+
+Hash:324994b73a4a022d39944fbc9e255930
+OldTree:withEnv($V3, $V4
+NewTree:withEnv($V3, "-Xms32m -Xmx512m"
+LLM: false
+Ans: false(?)
+
+Hash:3d931d82dd7727e05453240d42c075c1
+OldTree:withEnv($V3, "-Xmx1g"
+NewTree:withEnv($V3, "-Xms32m -Xmx512m"
+LLM: false
+Ans: false(?)
+
+Hash:6c25c654f416c6cc24fdb3a4a48d2d69
+OldTree:this.task.setMainClass($V9);
+NewTree:this.task.setMainClassName($V9);
+LLM: false
+Ans: true
+
+Hash:81451008f88e07cf7f5c5f1a6e598fd7
+OldTree:ASSERT.that([$V13]).has().allOf($V17, $V18, $V19).inOrder();
+NewTree:ASSERT.that([$V13]).has().exactly($V17, $V18, $V19).inOrder();
+LLM: true
+Ans: true
+
+Hash:82e12e43f9c0186723eab226e0bb6a85
+OldTree:[$V4].setAxisMinValue($V7);
+NewTree:[$V4].setAxisMinimum($V7);
+LLM: true
+Ans: true
+
+Hash:911bc4e69d1a7f7df25399712cbe7fe8
+OldTree:if ([$V4].isHighlightEnabled())
+                    [$V9].setHighlightEnabled($V12);
+                else
+                    [$V16].setHighlightEnabled($V19);
+                [$V23].invalidate();
+NewTree:if([$V4].getData() != null) {
+                    [$V9].getData().setHighlightEnabled(![$V16].getData().isHighlightEnabled());
+                    [$V23].invalidate();
+                }
+LLM: false
+Ans: false
+
+Hash:45e37192adac5a6f556b924ede418608
+OldTree:if ([$V4].isHighlightEnabled())
+                    [$V9].setHighlightEnabled($V12);
+                else
+                    [$V16].setHighlightEnabled(true);
+                [$V23].invalidate();
+NewTree:if([$V4].getData() != null) {
+                    [$V9].getData().setHighlightEnabled(![$V16].getData().isHighlightEnabled());
+                    [$V23].invalidate();
+                }
+LLM: false
+Ans: false
+
+Hash:b599eb8e1db04c53566fe89abece4b79
+OldTree:if ([$V4].isHighlightEnabled())
+                    [$V9].setHighlightEnabled(false);
+                else
+                    [$V16].setHighlightEnabled($V19);
+                [$V23].invalidate();
+NewTree:if([$V4].getData() != null) {
+                    [$V9].getData().setHighlightEnabled(![$V16].getData().isHighlightEnabled());
+                    [$V23].invalidate();
+                }
+LLM: false
+Ans: false
+
+Hash:ac1a907649c5cc90a4d2b546d19b331a
+OldTree:assertThat([$V9]).extracting($V12).isEqualTo($V15);
+NewTree:assertThat([$V9]).extracting("fileAccess.referenceCount").isEqualTo($V15);
+LLM: false
+Ans: false
+
+Hash:fe9c06c4eadc066f9ed68ebd2e6b381f
+OldTree:assertThat([$V9]).extracting("channel.referenceCount").isEqualTo($V15);
+NewTree:assertThat([$V9]).extracting("fileAccess.referenceCount").isEqualTo($V15);
+LLM: true
+Ans; true
+
+Hash:806e404c50d7deda53a7fc39e6899220
+OldTree:dest[$V5] = UPPER_HEX_DIGITS[cp & $V12];
+NewTree:dest[$V5] = upperHexDigits[cp & $V12];
+LLM: true
+Ans: true
+
+Hash:b7a303c1ad8598fcc49489891bfeccff
+OldTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = $V11, to = $V14) float [$V16]
+NewTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = $V11, to = $V14) float value
+LLM: true
+Ans: true
+
+Hash:d4b5d6ae5312edd0b71c7356a33bbd2e
+OldTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = $V11, to = 1.0) float [$V16]
+NewTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = $V11, to = 1.0) float value
+LLM: false
+Ans: true
+
+Hash:672f2a20df540a6e814a65433768fddb
+OldTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = 0.0, to = $V14) float [$V16]
+NewTree:public static GlideOptions sizeMultiplierOf(@FloatRange(from = 0.0, to = $V14) float value
+LLM: false
+Ans: true
+
+Hash:f3723490ac7e8ea4c5180c962610adb1
+OldTree:public static GlideOptions frameOf(@IntRange(from = $V11) long [$V13]
+NewTree:public static GlideOptions frameOf(@IntRange(from = $V11) long value
+LLM: true
+Ans: true
+
+Hash:0b6452106a6ac07a0a6766b9447ad2a0
+OldTree:public static GlideOptions timeoutOf(@IntRange(from = $V11) int [$V13]
+NewTree:public static GlideOptions timeoutOf(@IntRange(from = $V11) int value
+LLM: false
+Ans: true
+
+Hash:f782a84a4a080adb6e0467ada942a18d
+OldTree:public static GlideOptions encodeQualityOf(@IntRange(from = $V11, to = 100) int [$V16]
+NewTree:public static GlideOptions encodeQualityOf(@IntRange(from = $V11, to = 100) int value
+LLM: false
+Ans: true
+
+Hash:b66bb9d815f5629cb1f6aacd26b3d804
+OldTree:public static GlideOptions encodeQualityOf(@IntRange(from = $V11, to = $V14) int [$V16]
+NewTree:public static GlideOptions encodeQualityOf(@IntRange(from = $V11, to = $V14) int value
+LLM: false
+Ans: true
+
+Hash:d913f2dd965dd065abf7e7c03f37ee61
+OldTree:public static GlideOptions encodeQualityOf(@IntRange(from = 0, to = $V14) int [$V16]
+NewTree:public static GlideOptions encodeQualityOf(@IntRange(from = 0, to = $V14) int value
+LLM: false
+Ans: true
+
+Hash:e93e64b275e4c4bcd06e8d495d7385f7
+OldTree:Map<String, Object> [$V10] = this.errorAttributes.getErrorAttributes(this.webRequest, $V21, $V22);
+NewTree:Map<String, Object> [$V10] = this.errorAttributes.getErrorAttributes(this.webRequest, $V21, $V22, false);
+LLM: false
+Ans: true
+
+Hash:ef416aaf3f02d6a90ba1fed5c8375b85
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, "b", "c");
+NewTree:assertThat([$V9]).iteratesAs($V12, "b", "c");
+LLM: true
+Ans: true
+
+Hash:473af7b33ba87469f5f9fb89a9ad9254
+OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13);
+NewTree:assertThat([$V9]).iteratesAs("a", $V13);
+LLM: true
+Ans: true
+
+Hash:2be5080ea8647e1f0d3d666d1d610676
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, "b", "c");
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, "b", "c");
+LLM: true
+Ans: true
+
+Hash:4648d4ded7b0234c8615415fa9aab179
+OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13);
+NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13);
+LLM: true
+Ans: true
+
+Hash:3e03d5e100d4649ea3c517273e09a35a
+OldTree:assertEquals($V5, Files.simplifyPath($V11));
+NewTree:assertEquals($V5, simplifyPath($V11));
+LLM: true
+Ans: true
+
+Hash:c8e0d256d6bf14a13a71d69ab6a0b2b6
+OldTree:BuildResult [$V5] = this.gradleBuild.build("bootBuildImage", $V14);
+NewTree:BuildResult [$V5] = this.gradleBuild.build("bootBuildImage");
+LLM: false
+Ans: true
+
+Hash:35d2ef6fa79c7ed3f2b3b695172e9e7b
+OldTree:BuildResult [$V5] = this.gradleBuild.build($V13, $V14);
+NewTree:BuildResult [$V5] = this.gradleBuild.build($V13);
+LLM: false
+Ans: true
+
+Hash:6873f16bb8d75f50a715e432a74a1f3c
+OldTree:Map<String, Object> [$V10] = this.errorAttributes.getErrorAttributes(this.webRequest, false, $V22);
+NewTree:Map<String, Object> [$V10] = this.errorAttributes.getErrorAttributes(this.webRequest, false, $V22, false);
+LLM: true
+Ans: true
+
+Hash:36a31ad43f7da482936c57c723b2b92a
+OldTree:dest[$V5] = UPPER_HEX_DIGITS[cp & 0xF];
+NewTree:dest[$V5] = upperHexDigits[cp & 0xF];
+LLM: true
+Ans: true
+
+Hash:578ed3fdc3f9ed23c9007add81db1c4a
+OldTree:try {
+      MediaType.create($V9, $V10);
+      fail();
+    } catch (IllegalArgumentException [$V18]) {
+    }
+NewTree:assertThrows(IllegalArgumentException.class, () -> MediaType.create($V9, $V10));
+LLM: false
+Ans: true
+
+Hash:21127b0375de6719c9809e18a58be249
+OldTree:try {
+      [$V6].next();
+      fail($V12);
+    } catch (ConcurrentModificationException [$V17]) {
+      // success
+    }
+NewTree:assertThrows(ConcurrentModificationException.class, () -> [$V6].next());
+LLM: true
+Ans: true
+
+Hash:120823253442fa4b60b7635d9df7e640
+OldTree:ASSERT.that([$V13]).has().allOf($V17, "b").inOrder();
+NewTree:ASSERT.that([$V13]).has().exactly($V17, "b").inOrder();
+LLM: true
+Ans: true
+
+Hash:62a1e948727f9bb6159e13628a01ba0b
+OldTree:assertContentsInOrder([$V5], $V6, $V7, $V8, $V9);
+NewTree:ASSERT.that([$V5]).hasContentsInOrder($V6, $V7, $V8, $V9);
+LLM: true
+Ans: true
+
+Hash:15a7c7c2dc53d72e4c5e94aa46dafe2c
+OldTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = $V13, to = $V16) float [$V18]
+NewTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = $V13, to = $V16) float value
+LLM: true
+Ans: true
+
+Hash:954e2af840e2bb46e62fe1067126001c
+OldTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = $V13, to = 1.0) float [$V18]
+NewTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = $V13, to = 1.0) float value
+LLM: false
+Ans: false
+
+Hash:a290c3a71de368873630267b554f2505
+OldTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = 0.0, to = $V16) float [$V18]
+NewTree:public GlideRequest<TranscodeType> sizeMultiplier(@FloatRange(from = 0.0, to = $V16) float value
+LLM: true
+Ans: true
+
+Hash:f5037fc0ab6034671f56c2d4901eb68c
+OldTree:public GlideRequest<TranscodeType> encodeQuality(@IntRange(from = $V13, to = $V16) int [$V18]
+NewTree:public GlideRequest<TranscodeType> encodeQuality(@IntRange(from = $V13, to = $V16) int value
+LLM: false
+Ans: true
+
+Hash:a685e4c66be88f7062bf8e1371c06e41
+OldTree:public GlideRequest<TranscodeType> encodeQuality(@IntRange(from = $V13, to = 100) int [$V18]
+NewTree:public GlideRequest<TranscodeType> encodeQuality(@IntRange(from = $V13, to = 100) int value
+LLM: true
+Ans: true
+
+Hash:b45fca10784886224b467f2f1ec8bc9a
+OldTree:public GlideRequest<TranscodeType> frame(@IntRange(from = $V13) long [$V15]
+NewTree:public GlideRequest<TranscodeType> frame(@IntRange(from = $V13) long value
+LLM: false
+Ans: true
+
+Hash:fd6d5ab017a46ab0eec02f7d69872224
+OldTree:public GlideRequest<TranscodeType> timeout(@IntRange(from = $V13) int [$V15]
+NewTree:public GlideRequest<TranscodeType> timeout(@IntRange(from = $V13) int value
+LLM: true
+Ans: true
+
+Hash:0ccfbadfecf92cfa5b6e66fbaf9453f9
+OldTree:BuildResult [$V5] = this.gradleBuild.build($V13, "--pullPolicy=IF_NOT_PRESENT");
+NewTree:BuildResult [$V5] = this.gradleBuild.build($V13);
+LLM: true
+Ans: true
+
+Hash:4bbbd13446442d9bd80f57fda1d73ddf
+OldTree:File [$V5] = this.temporaryFolder.newFile($V13);
+NewTree:File [$V5] = new File(this.tempDir, $V13);
+LLM: true
+Ans: true
+
+Hash:a72890dc6bf16a907cc1e4e0308841ee
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "b", "c");
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, "b", "c");
+LLM: true
+Ans: true
+
+Hash:459f162e77f2ad12e6359f6cf0b17bfe
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "b", $V15);
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, "b", $V15);
+LLM: true
+Ans: true
+
+Hash:6185423f419fe3f19a71fbca30a5aceb
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, "b", "c");
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "b", "c");
+LLM: true
+Ans: true
+
+Hash:b87f47a28c5ecd3040230cbcc609f5d3
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, "b", $V15);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "b", $V15);
+LLM: true
+Ans: true
+
+Hash:a20d42b00b87432466cd810182951014
+OldTree:[$V3] ^= (long) toInt([$V13].get($V16)) << $V18;
+NewTree:[$V3] ^= (long) UnsignedBytes.toInt([$V13].get($V16)) << $V18;
+LLM: false
+Ans: true
+
+Hash:32254d2e10a4aa142a6d4c7525a32bb6
+OldTree:Method [$V5] = TestingUtils.getMethod(Example.class, $V14);
+NewTree:Method [$V5] = TestingUtils.onlyMethod(Example.class);
+LLM: true
+Ans: true
+
+Hash:81c2f413e4adfb36729fae86053ce27f
+OldTree:[$V3] = AnimatableFloatValue.Factory.newInstance([$V10], [$V11], $V12);
+NewTree:[$V3] = AnimatableValueParser.parseFloat([$V10], [$V11], $V12);
 LLM: true
 Ans: true

@@ -61,6 +61,7 @@ public class Database {
                     is_candidate BIT,
                     is_normalized BIT,
                     is_useful BIT,
+                    is_child_useful BIT,
                     UNIQUE(old_tree_hash, new_tree_hash)
                 )""");
         handle.execute("CREATE INDEX patterns_hash ON patterns(hash)");

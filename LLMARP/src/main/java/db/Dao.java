@@ -64,10 +64,10 @@ public interface Dao {
     @SqlQuery("INSERT INTO chunks (commit_id, file, old_begin, old_end, new_begin, new_end,old_raw,new_raw) VALUES (:commitId, :fileName, :oldBegin, :oldEnd, :newBegin, :newEnd,:oldRaw,:newRaw) RETURNING id")
     long insertChunk(@Bind("commitId") final long commitId, @Bind("fileName") final String fileName, @Bind("oldBegin") final int oldBegin, @Bind("oldEnd") final int oldEnd, @Bind("newBegin") final int newBegin, @Bind("newEnd") final int newEnd, @Bind("oldRaw") final String oldRaw, @Bind("newRaw") final String newRaw);
 
-    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:p.isCandidate,:isNormalized,:isUseful)")
+    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful,is_child_useful) VALUES (:p.hash.name,:p.oldTreeRoot.hash.name,:p.newTreeRoot.hash.name,:p.isCandidate,:isNormalized,:isUseful, false)")
     void insertPattern(@BindBean("p") final Pattern pattern,@Bind("isNormalized") boolean isNormalized, @Bind("isUseful") boolean isUseful);
 
-    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful) VALUES (:p.hash,:p.oldTreeHash,:p.newTreeHash,:p.isCandidate,:p.isNormalized,:p.isUseful)")
+    @SqlUpdate("INSERT OR IGNORE INTO patterns (hash,old_tree_hash, new_tree_hash,is_candidate,is_normalized,is_useful,is_child_useful) VALUES (:p.hash,:p.oldTreeHash,:p.newTreeHash,:p.isCandidate,:p.isNormalized,:p.isUseful,:p.isChildUseful)")
     void insertPattern(@BindBean("p") final PatternDbInfo pattern);
 
     @SqlUpdate("INSERT OR IGNORE INTO trees (hash, structure,text) VALUES (:t.hash.name,:structure,:t.normalizeText)")
@@ -117,6 +117,9 @@ public interface Dao {
 
     @SqlUpdate("UPDATE patterns SET is_useful = :isUseful WHERE hash = :hash")
     void updatePatternIsUseful(@Bind("hash") String hash, @Bind("isUseful") boolean isUseful);
+
+    @SqlUpdate("UPDATE patterns SET is_child_useful = :isUseful WHERE hash = :hash")
+    void updatePatternIsChildUseful(@Bind("hash") String hash, @Bind("isUseful") boolean isUseful);
 
     @SqlQuery("SELECT DISTINCT hash FROM scores ORDER BY score DESC LIMIT :limit")
     ResultIterable<String> fetchHighScorePatternHash(@Bind("limit")int limit);

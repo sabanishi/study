@@ -12,6 +12,7 @@ public class PatternDbInfo {
     boolean isCandidate;
     boolean isNormalized;
     boolean isUseful;
+    boolean isChildUseful;
 
     //NOTE:なぜか@GetterだとDaoのinsertPatternでエラーが出るので明示的にgetterを作成
     public boolean getIsCandidate(){
@@ -22,5 +23,8 @@ public class PatternDbInfo {
     }
     public boolean getIsUseful(){
         return isUseful;
+    }
+    public boolean getIsChildUseful(){
+        return isChildUseful;
     }
 }
