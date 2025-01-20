@@ -143,16 +143,16 @@ public interface Dao {
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchUsefulPatterns();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
     void computeSupportH();
 
-    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET supportC = (SELECT count(DISTINCT cp.chunk_id) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash)")
     void computeSupportC();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE (p2.is_useful = 1 AND p2.old_tree_hash = p.old_tree_hash)) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceH = CAST(p.supportH AS REAL) / (SELECT sum(p2.supportH) FROM patterns AS p2 WHERE (p2.is_useful = 1 AND p2.old_tree_hash = p.old_tree_hash))")
     void computeConfidenceH();
 
-    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash) WHERE p.is_useful = 1")
+    @SqlUpdate("UPDATE patterns AS p SET confidenceC = CAST(p.supportC AS REAL) / (SELECT sum(p2.supportC) FROM patterns AS p2 WHERE p2.old_tree_hash = p.old_tree_hash)")
     void computeConfidenceC();
 
     @SqlUpdate("UPDATE patterns AS p SET is_useful = 0")
@@ -160,6 +160,9 @@ public interface Dao {
 
     @SqlUpdate("UPDATE patterns AS p SET is_useful = 1 WHERE hash NOT IN (SELECT parent_hash FROM pattern_connections)")
     void updateAllNormalizedPatternUsefulFlag();
+
+    @SqlUpdate("UPDTAE patterns AS p SET is_useful = 1 WHERE p.is_candidate = 1 OR p.is_normalized = 1")
+    void updateAllUsefulFlag();
 
     @SqlUpdate("UPDATE scores SET score = 0 WHERE hash = :hash")
     void resetScore(@Bind("hash") String hash);

@@ -104,15 +104,6 @@ public class CheckCommand extends BaseCommand{
                 continue;
             }
 
-            //パターンにリテラルが含まれていない時
-            if(!info.getIsCandidate()){
-                log.info("Pattern {} is not candidate",info.getHash());
-                dao.updatePatternIsUseful(info.getHash(),true);
-                i++;
-                continue;
-            }
-
-
             if(judgeIsUseful(info)){
                 //有用なパターンの場合
                 i++;
@@ -150,6 +141,13 @@ public class CheckCommand extends BaseCommand{
     }
 
     private boolean judgeIsUseful(PatternDbInfo info){
+        //パターンにリテラルが含まれていない時
+        if(!info.getIsCandidate()){
+            log.info("Pattern {} is not candidate",info.getHash());
+            dao.updatePatternIsUseful(info.getHash(),true);
+            return true;
+        }
+
         log.info("Check Pattern {}",info.getHash());
 
         StringBuilder sb = new StringBuilder();

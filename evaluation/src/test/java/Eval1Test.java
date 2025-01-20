@@ -16,24 +16,10 @@ import java.nio.file.Path;
 public class Eval1Test {
     @Test
     void test() throws Exception{
-        Path folderPath = Path.of("../../higuchi/chaa/match");
+        Path folderPath = Path.of("match");
         Path matchPath = folderPath.resolve("match_log.csv");
-        //csvファイルを読み込む
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader();
-        MappingIterator<Object> iterator = mapper.readerFor(Object.class)
-                .with(schema)
-                .readValues(new File(matchPath.toString()));
 
-        int count = 0;
-        while (iterator.hasNext()) {
-            iterator.next();
-            count++;
-        }
-
-        log.info("count: {}",count);
-
-        for(int i=1;i<count;i++){
+        for(int i=0;i<=173;i++){
             Path beforePath = folderPath.resolve(i+"-before.java");
             Path afterPath = folderPath.resolve(i+"-after.java");
 

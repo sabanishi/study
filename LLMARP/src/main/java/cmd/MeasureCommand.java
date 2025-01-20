@@ -18,7 +18,9 @@ public class MeasureCommand extends BaseCommand{
         log.info("computing confidenceC");
         dao.computeConfidenceC();
         log.info("computing score");
-
+        //スコアの列を追加する
+        handle.execute("ALTER TABLE patterns ADD COLUMN score REAL;");
+        handle.execute("UPDATE patterns SET score = confidenceC+supportC*0.001;");
 
         //scoreを計算し、テーブルを作成する
         handle.execute("DROP TABLE IF EXISTS scores;");

@@ -82,6 +82,9 @@ public class ExtractCommand extends BaseCommand{
     private void InsertChunk(Dao dao, long commitId, Chunk chunk) {
         long chunkId = dao.insertChunk(commitId, chunk);
         Pattern original = chunk.getOriginalPattern();
+        for(Pattern parent : original.getParents()){
+            dao.insertPatternConnection(parent, original);
+        }
         InsertPattern(dao, chunkId, original, false);
         for (Pattern pattern : chunk.getNormalizedPatterns()) {
             InsertPattern(dao, chunkId, pattern, true);
