@@ -201,7 +201,8 @@ public interface Dao {
             boolean isCandidate = rs.getBoolean("is_candidate");
             boolean isNormalized = rs.getBoolean("is_normalized");
             boolean isUseful = rs.getBoolean("is_useful");
-            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isCandidate, isNormalized,isUseful);
+            boolean isChildUseful = rs.getBoolean("is_child_useful");
+            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isCandidate, isNormalized,isUseful,isChildUseful);
         }
     }
 
