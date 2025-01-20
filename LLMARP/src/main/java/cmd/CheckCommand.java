@@ -144,7 +144,6 @@ public class CheckCommand extends BaseCommand{
     }
 
     private boolean judgeIsUseful(PatternDbInfo info){
-        log.info(info.getIsCandidate()+"");
         log.info("Check Pattern {}",info.getHash());
 
         StringBuilder sb = new StringBuilder();
