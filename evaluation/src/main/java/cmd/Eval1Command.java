@@ -22,11 +22,9 @@ import java.util.Hashtable;
 public class Eval1Command extends BaseCommand{
     public static class Config{
         @Option(names = "--folder", paramLabel = "<path>", description = "folder path (default: ${DEFAULT-VALUE})")
-        String folderPath = "../../higuchi/chaa/match";
-        @Option(names = "--csv", paramLabel = "<file>", description = "csv file name (default: ${DEFAULT-VALUE})")
-        String csvFileName = "match_log.csv";
+        String folderPath = "match";
         @Option(names = "--output", paramLabel = "<file>", description = "output file name (default: ${DEFAULT-VALUE})")
-        String outputFileName = "output.csv";
+        String outputFileName = "match.csv";
     }
 
     private Config config = new Config();
@@ -34,34 +32,17 @@ public class Eval1Command extends BaseCommand{
     @Override
     protected void process() throws Exception {
         Path folderPath = Path.of(config.folderPath);
-        Path matchPath = folderPath.resolve(config.csvFileName);
-
-        //csvファイルを読み込む
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader();
-        MappingIterator<Object> iterator = mapper.readerFor(Object.class)
-                .with(schema)
-                .readValues(new File(matchPath.toString()));
-
-        int count = 0;
-        while (iterator.hasNext()) {
-            iterator.next();
-            count++;
-        }
-
-        log.info("count: {}",count);
 
         int beforeNotBroken = 0;
         int afterBroken = 0;
-        for(int i=1;i<2;i++){
-            Path beforePath = folderPath.resolve(i+"-before.java");
-            Path afterPath = folderPath.resolve(i+"-after.java");
+        StringBuilder broken = new StringBuilder();
+        for(int i=0;i<=177;i++){
+            Path beforePath = folderPath.resolve(i+"_before.java");
+            Path afterPath = folderPath.resolve(i+"_after.java");
 
             //ファイルの内容を読み込む
             String before = Files.readString(beforePath);
             String after = Files.readString(afterPath);
-
-            log.info(after);
 
             boolean isBrokenBefore = isBroken(before);
             boolean isBrokenAfter = isBroken(after);
@@ -71,6 +52,7 @@ public class Eval1Command extends BaseCommand{
                 beforeNotBroken++;
                 //Beforeが壊れていないものに対して、Afterが壊れている場合は出力する
                 if(isBrokenAfter){
+                    broken.append(i).append("\n");
                     afterBroken++;
                 }
             }
@@ -78,9 +60,11 @@ public class Eval1Command extends BaseCommand{
 
         //数を出力
         log.info("{} / {}",afterBroken,beforeNotBroken);
+
         //CSVファイルに出力
+        broken.append("\n").append(afterBroken).append(",").append(beforeNotBroken);
         Path outputPath = folderPath.resolve(config.outputFileName);
-        Files.writeString(outputPath,beforeNotBroken + "," + afterBroken);
+        Files.writeString(outputPath,broken.toString());
     }
 
     private boolean isBroken(String source){

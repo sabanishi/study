@@ -136,6 +136,10 @@ public interface Dao {
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchCandidatePatterns();
 
+    @SqlQuery("SELECT * FROM patterns WHERE is_useful=1")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchUsefulPatterns();
+
     @SqlUpdate("UPDATE patterns AS p SET supportH = (SELECT count(*) FROM chunk_patterns AS cp WHERE cp.pattern_hash = p.hash) WHERE p.is_useful = 1")
     void computeSupportH();
 
@@ -153,6 +157,12 @@ public interface Dao {
 
     @SqlUpdate("UPDATE patterns AS p SET is_useful = 1 WHERE hash NOT IN (SELECT parent_hash FROM pattern_connections)")
     void updateAllNormalizedPatternUsefulFlag();
+
+    @SqlUpdate("UPDATE scores SET score = 0 WHERE hash = :hash")
+    void resetScore(@Bind("hash") String hash);
+
+    @SqlQuery("SELECT score FROM scores ORDER BY score DESC LIMIT :limit")
+    ResultIterable<Float> fetchHighScorePatternNumber(@Bind("limit")int limit);
 
     class TreeJsonRawMapper implements RowMapper<HalNode> {
         @Override

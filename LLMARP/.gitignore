@@ -44,5 +44,6 @@ bin/
 Test/
 
 match/*
+match_folder/*
 
 **.db

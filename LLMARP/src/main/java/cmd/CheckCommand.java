@@ -34,6 +34,8 @@ public class CheckCommand extends BaseCommand{
             "The transformation can be applied to all matched code fragments without breaking their behavior.\n" +
             "Normalized nodes present in the \"after\" section of the change pattern must also exist in the \"before\" section.\n" +
             "Additionally, if normalized nodes exist in the \"after\" section of the change pattern but not in the \"before\" section, the change pattern cannot be automatically applied and is therefore not useful.\n" +
+            "Also, [$V1],[$V2], etc. indicate that the variables are normalized, which does not affect their usefulness.\n" +
+            "And $V1, $V2, etc. indicate that the literal is normalized, and you should only determine if this is the correct normalization.\n" +
             "\n" +
             "Output only \"True\" or \"False.\"\n" +
             "Example1\n" +

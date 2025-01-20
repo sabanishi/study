@@ -23,6 +23,8 @@ import util.FileUtil;
 import util.Pair;
 import util.TreeUtil;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,8 +71,10 @@ public class MatchingCommand extends BaseCommand{
                 String targetSource = FileUtil.read(filePath);
                 Tree targetTree = TreeUtil.createTree(targetSource);
                 HalTreeNode targetRoot = HalTreeNode.of(targetTree,targetSource);
+
+                File logFile = new File("match/match_log.csv");
+
                 for(PatternInfo info : patternInfoList){
-                    log.debug("Matching: {} with {}",filePath,info.getHash());
                     HalRootNode oldRoot = (HalRootNode)info.getOldTree();
                     HalRootNode newRoot = (HalRootNode)info.getNewTree();
                     HalNode copyRoot = targetRoot.deepCopy();
@@ -93,7 +97,12 @@ public class MatchingCommand extends BaseCommand{
                         FileUtil.write(patternNewPath,info.getNewTree().toHashString(0));
 
                         String diff = makeDiff(targetSource,result);
+                        diff = info.getHash()+"\n"+diff;
                         FileUtil.write(diffPath,diff);
+
+                        FileWriter logFw = new FileWriter(logFile,true);
+                        logFw.write(matchCount+","+filePath+","+info.getHash()+"\n");
+                        logFw.close();
 
                         matchCount++;
                     }

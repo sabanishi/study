@@ -1,0 +1,303 @@
+#1
+Hash:6c33a21291595fe7f403d2e0e65d0fcb
+OldTree:@Configuration(proxyBeanMethods = $V5)
+NewTree:@AutoConfiguration
+LLM: false
+Ans: false
+
+#2
+Hash:f90fa37b9b3f5547435302f211ee94e3
+OldTree:@GwtIncompatible($V3)
+NewTree:@GwtIncompatible
+LLM: false
+Ans: true
+
+#3
+Hash:533722f09efc1cf6007fc5a7983d0d0b
+OldTree:[$V4].setWebEnvironment($V7);
+NewTree:[$V4].setWebApplicationType(WebApplicationType.NONE);
+LLM: false
+Ans: false(?)
+
+#4
+Hash:892b4f78fa60cfa22d48430e325c8cd7
+OldTree:endpoint([$V7].getUrl($V10).toString()
+NewTree:baseUrl([$V7].getUrl($V10).toString()
+LLM:true
+EqualsAndHashCode: false
+
+#5
+Hash:dd97a476a29f3c4c63b5b8172d101afd
+OldTree:try {
+      parse($V7);
+      fail("Expected exception");
+    } catch (IllegalArgumentException [$V17]) {
+    }
+NewTree:assertThrows(
+        IllegalArgumentException.class, () -> parse($V7));
+LLM: false
+Ans: true
+
+#6
+Hash:90f6eb9d39850d16e332db4cf30863bf
+OldTree:try {
+      parse($V7);
+      fail($V12);
+    } catch (IllegalArgumentException [$V17]) {
+    }
+NewTree:assertThrows(
+        IllegalArgumentException.class, () -> parse($V7));
+LLM: true
+Ans: true
+
+#7
+Hash:65cd78d03fdbee71a7ba5f3c1ea70a09
+OldTree:@WebAppConfiguration
+@IntegrationTest($V5)
+NewTree:@WebIntegrationTest(randomPort = true)
+LLM: false
+Ans: false(?)
+
+#8
+Hash:7b7cc34ee3d4ce65ec3bdfc1774714ba
+OldTree:SpringBootTestUtils.addEnvironment(this.context, $V10);
+NewTree:EnvironmentTestUtils.addEnvironment(this.context, $V10);
+LLM: true
+Ans: true
+
+#9
+Hash:caf20c86610141c3a20fe66f3383513c
+OldTree:SpringBootTestUtils.addEnviroment(this.context, $V10);
+NewTree:SpringBootTestUtils.addEnvironment(this.context, $V10);
+LLM: true
+Ans: true
+
+#10
+Hash:b9b07a9849eeee680f38886a6125df88
+OldTree:assertThat([$V9].toString())
+				.isEqualTo($V13);
+NewTree:assertThat([$V9]).hasToString($V13);
+LLM: false
+Ans: true
+
+Hash:de2fed60ba90286495acf4579bb23255
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, $V15);
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14, $V15);
+LLM: true
+Ans: true
+
+Hash:6655016843e10c26408bdd42fd7ce661
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, $V14, $V15);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, $V15);
+LLM: true
+Ans: true
+
+Hash:9c1fbc0791baa35d7d7efb2b7160c56b
+OldTree:ASSERT.that([$V13]).has().allOf($V17, $V18).inOrder();
+NewTree:ASSERT.that([$V13]).has().exactly($V17, $V18).inOrder();
+LLM: true
+Ans: true
+
+Hash:db635f8f613ace9e8883492a6de2cafb
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14);
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14);
+LLM: true
+Ans: true
+
+Hash:d11f5ab3e3bb39c62ebae58a94c02cdb
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, $V14);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14);
+LLM: true
+Ans: true
+
+Hash:060244c10b96b68a721f0e92b45da582
+OldTree:@WebIntegrationTest(randomPort = $V5)
+NewTree:@SpringApplicationTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+LLM: false
+Ans: false
+
+Hash:a4c4b3c0323ea6fac2562f3dce5e7585
+OldTree:OriginTrackedValue [$V5] = this.properties.get($V13);
+NewTree:OriginTrackedValue [$V5] = getFromFirst($V13);
+LLM: true
+Ans: true
+
+Hash:3621241b630d49170dd4e5d242fb9c01
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, $V20, $V21));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, $V20, $V21));
+LLM: false
+Ans: true
+
+Hash:0581409b94fde06d3916063e5b6c581a
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", $V20, $V21));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", $V20, $V21));
+LLM: false
+Ans: true
+
+Hash:0b47f9bda3c7407f23e872f54c21182e
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", "b", $V21));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", "b", $V21));
+LLM: false
+Ans: true
+
+Hash:1cef67d22f334d7a07f7faa290559964
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, "b", $V21));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, "b", $V21));
+LLM: false
+Ans: true
+
+Hash:c5496f4b868572ac7a85347674be1583
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, "b", "a"));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, "b", "a"));
+LLM: false
+Ans: true
+
+Hash:3571669251f662412b920132eb27c933
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList("a", $V20, "a"));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList("a", $V20, "a"));
+LLM: false
+Ans: true
+
+Hash:1ce729b2a00fef152845c85ed554821a
+OldTree:Multiset<String> [$V8] = HashMultiset.create(Arrays.asList($V19, $V20, "a"));
+NewTree:Multiset<String> [$V8] = HashMultiset.create(asList($V19, $V20, "a"));
+LLM: false
+Ans: true
+
+Hash:c0982ad926403481abdcbcbff311a1ee
+OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14);
+NewTree:assertThat([$V9]).iteratesAs("a", $V13, $V14);
+LLM: true
+Ans: true
+
+Hash:ec7adb26c28a2e228b4e7e5e55b48b96
+OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13, $V14);
+NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14);
+LLM: true
+Ans: true
+
+Hash:6ca1b2bd2e81d7268b3baa98fef964a5
+OldTree:[$V3] = [$V7].getFormattedValue($V10);
+NewTree:[$V3] = [$V7].getFormattedValue($V10, null);
+LLM: false
+Ans: true
+
+Hash:867a1dc3c5c1813736e1e44a2a1c3347
+OldTree:[$V3] = [$V7].getFormattedValue($V10, null);
+NewTree:[$V3] = [$V7].getFormattedValue($V10);
+LLM: true
+Ans: true
+
+Hash:8c94fea3646e4dbbab2a649ff6626d4a
+OldTree:ASSERT.that([$V9]).iteratesAs($V12);
+NewTree:assertThat([$V9]).iteratesAs($V12);
+LLM: true
+Ans: true
+
+Hash:2e50ecc78c7fa964690706596b80424f
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12);
+LLM: true
+Ans: true
+
+Hash:4282ee8ecdef09faa9be3c3deb4169cc
+OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14, $V15);
+NewTree:assertThat([$V9]).iteratesAs("a", $V13, $V14, $V15);
+LLM: true
+Ans: true
+
+Hash:a79867f0aa503772e7090b66d0ad53dd
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13);
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13);
+LLM: true
+Ans: true
+
+Hash:1d63ca4927c3c4b1ee31a32ff422a2a6
+OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13, $V14, $V15);
+NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13, $V14, $V15);
+LLM: true
+Ans: true
+
+Hash:d67be62b3694fa7346b428a408099e68
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13);
+LLM: true
+Ans: true
+
+Hash:2498456d211a8a6f37e5a67251f93d16
+OldTree:@EqualsAndHashCode(callSuper = $V5)
+NewTree:@EqualsAndHashCode
+LLM: false
+Ans: false
+
+Hash:65e897ea4092bd5402f4cb2e7b44facd
+OldTree:[$V3] = [$V7].get($V10, TimeUnit.SECONDS);
+NewTree:[$V3] = [$V7].get($V10, TimeUnit.SECONDS);
+LLM: false
+Ans: そもそも変更履歴が不適切
+
+Hash:f4cf7d38cb18c7650180cd6742b27dd1
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "c");
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, "c");
+LLM: true
+Ans: true
+
+Hash:8a1647d3c5c09eb07b7af8b7956b29d5
+OldTree:ASSERT.that([$V9]).iteratesAs("a", $V13, "c");
+NewTree:assertThat([$V9]).iteratesAs("a", $V13, "c");
+LLM: true
+Ans: true
+
+Hash:d4a851f49c9569376881e818cda90d7b
+OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", $V13, "c");
+NewTree:ASSERT.that([$V9]).iteratesAs("a", $V13, "c");
+LLM: false
+Ans: true
+
+Hash:707e5014bfe20a0582bc4c74b079c5c1
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, $V13, "c");
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, "c");
+LLM: false
+Ans: true
+
+Hash:d30475054e5084145ad05fdfbfdfe662
+OldTree:ASSERT.that([$V9]).iteratesAs("a", "b", $V14);
+NewTree:assertThat([$V9]).iteratesAs("a", "b", $V14);
+LLM: false
+Ans: false
+
+Hash:9b525987b2bbc2b6e119d88fa105cc4b
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, "b", $V14);
+NewTree:assertThat([$V9]).iteratesAs($V12, "b", $V14);
+LLM: true
+Ans: true
+
+Hash:e21ba60edbbf70c8001a9eea03cd60d8
+OldTree:ASSERT.that([$V9]).iteratesOverSequence("a", "b", $V14);
+NewTree:ASSERT.that([$V9]).iteratesAs("a", "b", $V14);
+LLM: true
+Ans: true
+
+Hash:80142a781b0f2c214acc4be4ad312ad1
+OldTree:ASSERT.that([$V9]).iteratesOverSequence($V12, "b", $V14);
+NewTree:ASSERT.that([$V9]).iteratesAs($V12, "b", $V14);
+LLM: true
+Ans: true
+
+Hash:59b431e6a422d928aac0b1dbca7425e4
+OldTree:assertEquals(Collections.singleton($V10), [$V11]);
+NewTree:assertEquals(singleton($V10), [$V11]);
+LLM: false
+Ans: true
+
+Hash:71a4b2bf907dc801e44d20486ccc2931
+OldTree:containsExactly(Maps.immutableEntry($V8, $V9), Maps.immutableEntry($V15, $V16)
+NewTree:containsExactly(immutableEntry($V8, $V9), immutableEntry($V15, $V16)
+LLM: false
+Ans: true
+
+Hash:b5ae25c88e72f001dd8dda55b4102f00
+OldTree:ASSERT.that([$V9]).iteratesAs($V12, $V13, $V14, "c");
+NewTree:assertThat([$V9]).iteratesAs($V12, $V13, $V14, "c");
+LLM: true
+Ans: true
