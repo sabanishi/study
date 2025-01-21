@@ -47,6 +47,7 @@ public class ExtractCommand extends BaseCommand{
 
     @Override
     protected void process(){
+        log.info(app.config.database.toString());
         if(!Files.isDirectory(config.repository)){
             log.error("Repository not found: {}",config.repository);
             return;

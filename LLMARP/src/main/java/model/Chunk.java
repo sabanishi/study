@@ -6,6 +6,7 @@ import com.github.gumtreediff.tree.Tree;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import model.tree.HalNode;
 import model.tree.HalRootNode;
 import model.tree.HalTreeNode;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Value
+@Slf4j
 public class Chunk {
     String fileName;
 
@@ -111,7 +113,6 @@ public class Chunk {
         }
 
         if(oldTreeRoot.getHash().equals(newTreeRoot.getHash())){
-            System.out.println("Hash is same");
             return new Chunk(fileName, oldStatement, newStatement, null, new ArrayList<Pattern>());
         }
 

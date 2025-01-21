@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 @CommandLine.Command(name="init",description="Initialize database")
 public class InitCommand extends BaseCommand{
+
     @Override
     protected void setUp() throws Exception{
         Files.deleteIfExists(app.config.database);
