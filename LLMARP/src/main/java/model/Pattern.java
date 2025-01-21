@@ -103,6 +103,7 @@ public class Pattern {
         Set<Pattern> result = new HashSet<>();
         doNormalize(result);
         for (Pattern pattern : result) {
+            addPatternToResultSet(pattern, allResult);
             allResult.add(pattern);
             pattern.normalizeInternal(allResult);
         }
@@ -139,7 +140,7 @@ public class Pattern {
                     //正規化情報を追加
                     copyInfoList.add(NormalizationInfo.of(NormalizationType.Label, normalizedNode.getId(), copyInfoList.size()));
                     Pattern copy = Pattern.of(copyOldRoot, copyNewRoot, copyInfoList,true);
-                    addPatternToResultSet(copy, result);
+                    result.add(copy);
                 }
             }
         }

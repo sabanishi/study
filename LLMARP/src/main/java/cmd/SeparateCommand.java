@@ -28,8 +28,8 @@ public class SeparateCommand extends BaseCommand{
     protected void process() throws IOException {
         Path dbPath = app.config.database;
         //ファイルをコピーする
-        //Files.copy(dbPath,config.nonePath);
-        //Files.copy(dbPath,config.allPath);
+        Files.copy(dbPath,config.nonePath);
+        Files.copy(dbPath,config.allPath);
 
         final Jdbi allJdbi = Database.open(config.allPath);
         try(final Handle h = allJdbi.open()){
@@ -40,18 +40,15 @@ public class SeparateCommand extends BaseCommand{
                         (SELECT parent_hash
                         FROM pattern_connections
                        )
-                    AND (hash IN
-                        (SELECT child_hash
-                        FROM pattern_connections
-                       )
-                    OR (p.is_candidate = 0 AND p.is_normalized = 1))
                     """);
-            h.execute("""
+            /*h.execute("""
                     UPDATE patterns AS p
                     SET is_useful = 0
                     WHERE p.is_useful = 1
                         AND p.old_tree_hash = p.new_tree_hash
                     """);
+
+             */
         }catch(Exception e){
             log.error(e.getMessage(),e);
         }
@@ -77,12 +74,14 @@ public class SeparateCommand extends BaseCommand{
                             FROM candidate_children
                         )
                     """);
-            h.execute("""
+            /*h.execute("""
                     UPDATE patterns AS p
                     SET is_useful = 0
                     WHERE p.is_useful = 1
                         AND p.old_tree_hash = p.new_tree_hash
                     """);
+                    
+             */
         }catch(Exception e){
             log.error(e.getMessage(),e);
         }

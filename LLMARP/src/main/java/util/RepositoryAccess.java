@@ -117,7 +117,7 @@ public class RepositoryAccess implements AutoCloseable {
         try (DiffFormatter formatter = createFormatter(repository)) {
             ObjectId parentId = commit.getParentCount() == 1 ? commit.getParent(0).getId() : null;
             return formatter.scan(parentId, commit.getId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -132,7 +132,7 @@ public class RepositoryAccess implements AutoCloseable {
             final RawText text = new RawText(loader.getCachedBytes());
 
             return text.getString(0, text.size(), false);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "";

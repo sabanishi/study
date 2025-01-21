@@ -93,9 +93,7 @@ public class ExtractCommand extends BaseCommand{
     }
 
     private void InsertPattern(Dao dao, long chunkId, Pattern pattern, boolean isNormalized) {
-        boolean isUseful = !pattern.getIsCandidate();
-
-        dao.insertPattern(pattern,isNormalized,isUseful);
+        dao.insertPattern(pattern,isNormalized);
         long chunkPatternsId = dao.insertChunkPatternRelationship(chunkId, pattern);
         InsertTree(dao, pattern.getOldTreeRoot());
         InsertTree(dao, pattern.getNewTreeRoot());
