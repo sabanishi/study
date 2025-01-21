@@ -113,8 +113,8 @@ public class Database {
         handle.execute("""
                 CREATE TABLE pattern_connections (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    parent_hash TEXT UNIQUE,
-                    child_hash TEXT UNIQUE
+                    parent_hash TEXT,
+                    child_hash TEXT
                 )""");
         handle.execute("CREATE INDEX pattern_connections_parent_hash ON pattern_connections(parent_hash)");
         handle.execute("CREATE INDEX pattern_connections_child_hash ON pattern_connections(child_hash)");

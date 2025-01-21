@@ -94,7 +94,7 @@ public interface Dao {
     @SqlQuery("INSERT OR IGNORE INTO chunk_normalization_info (chunk_patterns_id, info_hash) VALUES (:info.chunkPatternsId, :info.hash) RETURNING id")
     long insertChunkInfoRelationship(@BindBean("info")final ChunkNormalizedDbInfo info);
 
-    @SqlUpdate("INSERT OR IGNORE INTO pattern_connections (parent_hash, child_hash) VALUES (:parent.hash.name, :child.hash.name)")
+    @SqlUpdate("INSERT INTO pattern_connections (parent_hash, child_hash) VALUES (:parent.hash.name, :child.hash.name)")
     void insertPatternConnection(@BindBean("parent") final Pattern parent, @BindBean("child") final Pattern child);
 
     @SqlUpdate("INSERT OR IGNORE INTO pattern_connections (parent_hash, child_hash) VALUES (:info.parentHash,:info.childHash)")
@@ -134,6 +134,11 @@ public interface Dao {
 
     @SqlQuery("SELECT * FROM scores ORDER BY score DESC")
     ResultIterable<String> fetchHighScorePattern();
+
+    @SqlQuery("SELECT * FROM patterns WHERE is_normalized = 0")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchUnnormalizedPatterns();
+
 
     @SqlQuery("SELECT * FROM patterns WHERE is_candidate = 1")
     @RegisterRowMapper(PatternMapper.class)

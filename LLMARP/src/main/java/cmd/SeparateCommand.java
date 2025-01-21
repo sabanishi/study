@@ -40,6 +40,11 @@ public class SeparateCommand extends BaseCommand{
                         (SELECT parent_hash
                         FROM pattern_connections
                        )
+                    AND (hash IN
+                        (SELECT child_hash
+                        FROM pattern_connections
+                       )
+                    OR (p.is_candidate = 0 AND p.is_normalized = 1))
                     """);
             h.execute("""
                     UPDATE patterns AS p
