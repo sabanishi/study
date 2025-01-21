@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
-@RequiredArgsConstructor(staticName = "of")
+
 public class PatternDbInfo {
     String hash;
     String oldTreeHash;
@@ -26,5 +26,19 @@ public class PatternDbInfo {
     }
     public boolean getIsChildUseful(){
         return isChildUseful;
+    }
+
+    public PatternDbInfo(String hash, String oldTreeHash, String newTreeHash, boolean isCandidate, boolean isNormalized, boolean isUseful, boolean isChildUseful) {
+        this.hash = hash;
+        this.oldTreeHash = oldTreeHash;
+        this.newTreeHash = newTreeHash;
+        this.isCandidate = isCandidate;
+        this.isNormalized = isNormalized;
+        this.isUseful = isUseful;
+        this.isChildUseful = isChildUseful;
+    }
+
+    public String toString() {
+        return "PatternDbInfo(hash=" + this.getHash() + ", oldTreeHash=" + this.getOldTreeHash() + ", newTreeHash=" + this.getNewTreeHash() + ", isCandidate=" + this.getIsCandidate() + ", isNormalized=" + this.getIsNormalized() + ", isUseful=" + this.getIsUseful() + ", isChildUseful=" + this.getIsChildUseful() + ")";
     }
 }

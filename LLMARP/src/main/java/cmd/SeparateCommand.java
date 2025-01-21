@@ -26,12 +26,12 @@ public class SeparateCommand extends BaseCommand{
 
     @Override
     protected void process() throws IOException {
-        //Path dbPath = app.config.database;
+        Path dbPath = app.config.database;
         //ファイルをコピーする
         //Files.copy(dbPath,config.nonePath);
         //Files.copy(dbPath,config.allPath);
 
-        final Jdbi allJdbi = Database.open(config.nonePath);
+        final Jdbi allJdbi = Database.open(config.allPath);
         try(final Handle h = allJdbi.open()){
             h.execute("""
                     UPDATE patterns AS p
@@ -53,7 +53,7 @@ public class SeparateCommand extends BaseCommand{
 
         log.info("Separate the pattern");
 
-        final Jdbi noneJdbi = Database.open(config.allPath);
+        final Jdbi noneJdbi = Database.open(config.nonePath);
         try(final Handle h = noneJdbi.open()) {
             h.execute("""
                      CREATE TEMPORARY TABLE candidate_children AS
@@ -76,7 +76,7 @@ public class SeparateCommand extends BaseCommand{
                     UPDATE patterns AS p
                     SET is_useful = 0
                     WHERE p.is_useful = 1
-                        AND p.old_tree_hash = p.new_tree_hash;
+                        AND p.old_tree_hash = p.new_tree_hash
                     """);
         }catch(Exception e){
             log.error(e.getMessage(),e);

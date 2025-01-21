@@ -199,7 +199,7 @@ public interface Dao {
             boolean isNormalized = rs.getBoolean("is_normalized");
             boolean isUseful = rs.getBoolean("is_useful");
             boolean isChildUseful = rs.getBoolean("is_child_useful");
-            return PatternDbInfo.of(hash, oldTreeHash, newTreeHash, isCandidate, isNormalized,isUseful,isChildUseful);
+            return new PatternDbInfo(hash, oldTreeHash, newTreeHash, isCandidate, isNormalized, isUseful, isChildUseful);
         }
     }
 
