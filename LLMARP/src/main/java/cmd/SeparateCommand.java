@@ -31,29 +31,52 @@ public class SeparateCommand extends BaseCommand{
         //Files.copy(dbPath,config.nonePath);
         //Files.copy(dbPath,config.allPath);
 
-        /*final Jdbi noneJdbi = Database.open(config.nonePath);
-        try(final Handle h = noneJdbi.open()){
-            h.execute("UPDATE patterns AS p SET is_useful = 1 WHERE hash NOT IN (SELECT child_hash FROM pattern_connections)");
+        final Jdbi allJdbi = Database.open(config.nonePath);
+        try(final Handle h = allJdbi.open()){
+            h.execute("""
+                    UPDATE patterns AS p
+                    SET is_useful = 1
+                    WHERE hash NOT IN
+                        (SELECT parent_hash
+                        FROM pattern_connections
+                       )
+                    """);
+            h.execute("""
+                    UPDATE patterns AS p
+                    SET is_useful = 0
+                    WHERE p.is_useful = 1
+                        AND p.old_tree_hash = p.new_tree_hash
+                    """);
         }catch(Exception e){
             log.error(e.getMessage(),e);
-        }*/
+        }
 
         log.info("Separate the pattern");
 
-        final Jdbi allJdbi = Database.open(config.allPath);
-        try(final Handle h = allJdbi.open()) {
+        final Jdbi noneJdbi = Database.open(config.allPath);
+        try(final Handle h = noneJdbi.open()) {
             h.execute("""
-                    UPDATE patterns AS p SET is_useful = 1
-                    WHERE NOT EXISTS (
-                        SELECT 1
-                        FROM patterns AS cp
-                        WHERE cp.hash IN
-                        (SELECT child_hash
-                            FROM pattern_connections
-                            WHERE parent_hash = p.hash
-                                AND cp.is_candidate = 1
+                     CREATE TEMPORARY TABLE candidate_children AS
+                     SELECT DISTINCT pc.parent_hash
+                     FROM pattern_connections pc
+                     INNER JOIN patterns cp
+                         ON pc.child_hash = cp.hash
+                     WHERE cp.is_candidate = 0
+                    """);
+            h.execute("""
+                    UPDATE patterns AS p
+                    SET is_useful = 1
+                    WHERE p.is_candidate = 0
+                        AND p.hash NOT IN (
+                            SELECT parent_hash
+                            FROM candidate_children
                         )
-                    )
+                    """);
+            h.execute("""
+                    UPDATE patterns AS p
+                    SET is_useful = 0
+                    WHERE p.is_useful = 1
+                        AND p.old_tree_hash = p.new_tree_hash;
                     """);
         }catch(Exception e){
             log.error(e.getMessage(),e);
