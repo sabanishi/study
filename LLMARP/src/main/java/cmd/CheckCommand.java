@@ -82,10 +82,8 @@ public class CheckCommand extends BaseCommand{
     protected void process(){
         //DB上からスコアが高い順にパターンを取得
         ResultIterable<String> patternHashes = dao.fetchHighScorePattern();
-        int i = 0;
-        List<String> checkedPattern = new ArrayList<>();
+        List<String> highScorePatterns = new ArrayList<>();
         for(String patternHash : patternHashes){
-            checkedPattern.add(patternHash);
             PatternDbInfo info = dao.searchPattern(patternHash).first();
             if(info==null){
                 log.error("Pattern not found");
@@ -106,7 +104,6 @@ public class CheckCommand extends BaseCommand{
 
             if(judgeIsUseful(info)){
                 //有用なパターンの場合
-                i++;
                 log.info("{}/Pattern {} is useful",i,info.getHash());
                 //自身の親パターンを取得する
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
@@ -115,14 +112,11 @@ public class CheckCommand extends BaseCommand{
                     //親パターンは有用でないとする
                     dao.updatePatternIsUseful(parentHash,false);
                     dao.updatePatternIsChildUseful(parentHash,true);
-                    if(checkedPattern.contains(parentHash)){
-                        i--;
-                        checkedPattern.remove(parentHash);
-                    }
                 }
-            }
-            if(i>=config.nPattern){
-                break;
+                highScorePatterns.add(patternHash);
+                if(highScorePatterns.size()>=config.nPattern){
+                    break;
+                }
             }
         }
     }
