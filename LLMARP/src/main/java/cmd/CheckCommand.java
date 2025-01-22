@@ -180,10 +180,10 @@ public class CheckCommand extends BaseCommand{
         String lower = result.toLowerCase();
         if(lower.contains("false")) {
             dao.updatePatternIsUseful(info.getHash(), false);
-            return true;
+            return false;
         }else{
             dao.updatePatternIsUseful(info.getHash(),true);
-            return false;
+            return true;
         }
     }
 }
