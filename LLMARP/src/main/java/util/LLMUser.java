@@ -55,7 +55,8 @@ public class LLMUser {
     }
 
     private String reformatText(String text) {
-        return text.replace("\"", "\\\"")
+        return text
+                .replace("\"", "")
                 .replace("\n", "\\n")
                 //空白文字をエスケープする
                 .replace("\t", "");
