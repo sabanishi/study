@@ -43,3 +43,7 @@ bin/
 
 match_folder/*
 match/*
+match_all/*
+match_none/*
+match_chaa/*
+match_my/*

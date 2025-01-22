@@ -45,5 +45,8 @@ Test/
 
 match/*
 match_folder/*
+match_all/*
+match_none/*
+match_my/*
 
 **.db

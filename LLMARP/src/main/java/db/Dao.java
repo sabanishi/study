@@ -135,6 +135,9 @@ public interface Dao {
     @SqlQuery("SELECT * FROM scores ORDER BY score DESC")
     ResultIterable<String> fetchHighScorePattern();
 
+    @SqlQuery("SELECT score FROM scores WHERE hash = :hash")
+    ResultIterable<Float> fetchScore(@Bind("hash") String hash);
+
     @SqlQuery("SELECT * FROM patterns WHERE is_normalized = 0")
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> fetchUnnormalizedPatterns();
