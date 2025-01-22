@@ -112,25 +112,11 @@ public class CheckCommand extends BaseCommand{
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
                 for(PatternConnectionDbInfo parentPatternInfo : parentPatterns){
                     String parentHash = parentPatternInfo.getParentHash();
-                    //親パターンの子パターンを全て取得する
-                    boolean isAllUseful = true;
-                    ResultIterable<PatternConnectionDbInfo> childrenPatterns = dao.searchChildPattern(parentHash);
-                    for(PatternConnectionDbInfo childPatternInfo : childrenPatterns){
-                        //子パターンが有用かどうかを判定する
-                        PatternDbInfo childPattern = dao.searchPattern(childPatternInfo.getChildHash()).first();
-                        if(!childPattern.getIsUseful()){
-                            isAllUseful = false;
-                            break;
-                        }
-                    }
-                    if(isAllUseful){
-                        //全ての子パターンが有用な場合、親パターンは有用でないとする
-                        dao.updatePatternIsUseful(parentHash,false);
-                        dao.updatePatternIsChildUseful(parentHash,true);
-                        log.info("Parent Pattern {} is not useful",parentHash);
-                        if(checkedPattern.contains(parentHash)){
-                            i--;
-                        }
+                    //親パターンは有用でないとする
+                    dao.updatePatternIsUseful(parentHash,false);
+                    dao.updatePatternIsChildUseful(parentHash,true);
+                    if(checkedPattern.contains(parentHash)){
+                        i--;
                     }
                 }
             }
