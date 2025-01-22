@@ -58,6 +58,6 @@ public class LLMUser {
         return text.replace("\"", "\\\"")
                 .replace("\n", "\\n")
                 //空白文字をエスケープする
-                .replace(" ", "0x20");
+                .replace(" ", "\\u0020");
     }
 }
