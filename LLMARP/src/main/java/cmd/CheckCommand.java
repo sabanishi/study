@@ -13,7 +13,9 @@ import util.LLMUser;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Command(name="check",description="Check whether the pattern is useful or not")
@@ -82,7 +84,7 @@ public class CheckCommand extends BaseCommand{
     protected void process(){
         //DB上からスコアが高い順にパターンを取得
         ResultIterable<String> patternHashes = dao.fetchHighScorePattern();
-        List<String> highScorePatterns = new ArrayList<>();
+        Set<String> highScorePatterns = new HashSet<>();
         for(String patternHash : patternHashes){
             PatternDbInfo info = dao.searchPattern(patternHash).first();
             if(info==null){
@@ -104,6 +106,9 @@ public class CheckCommand extends BaseCommand{
 
             if(judgeIsUseful(info)){
                 //有用なパターンの場合
+                highScorePatterns.add(patternHash);
+                int i = highScorePatterns.size();
+
                 log.info("{}/Pattern {} is useful",i,info.getHash());
                 //自身の親パターンを取得する
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
@@ -112,9 +117,10 @@ public class CheckCommand extends BaseCommand{
                     //親パターンは有用でないとする
                     dao.updatePatternIsUseful(parentHash,false);
                     dao.updatePatternIsChildUseful(parentHash,true);
+                    highScorePatterns.remove(parentHash);
                 }
-                highScorePatterns.add(patternHash);
-                if(highScorePatterns.size()>=config.nPattern){
+
+                if(i>=config.nPattern){
                     break;
                 }
             }
