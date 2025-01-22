@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -25,8 +26,11 @@ public class Eval1Command extends BaseCommand{
         String folderPath = "match";
         @Option(names = "--output", paramLabel = "<file>", description = "output file name (default: ${DEFAULT-VALUE})")
         String outputFileName = "match.csv";
+        @Option(names="-n")
+        int n = 100;
     }
 
+    @CommandLine.Mixin
     private Config config = new Config();
 
     @Override
@@ -35,8 +39,9 @@ public class Eval1Command extends BaseCommand{
 
         int beforeNotBroken = 0;
         int afterBroken = 0;
+        int n = config.n;
         StringBuilder broken = new StringBuilder();
-        for(int i=0;i<=172;i++){
+        for(int i=0;i<=n;i++){
             Path beforePath = folderPath.resolve(i+"_before.java");
             Path afterPath = folderPath.resolve(i+"_after.java");
 

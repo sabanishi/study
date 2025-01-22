@@ -117,6 +117,7 @@ public class CheckCommand extends BaseCommand{
                     dao.updatePatternIsChildUseful(parentHash,true);
                     if(checkedPattern.contains(parentHash)){
                         i--;
+                        checkedPattern.remove(parentHash);
                     }
                 }
             }
