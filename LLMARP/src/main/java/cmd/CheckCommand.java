@@ -177,11 +177,11 @@ public class CheckCommand extends BaseCommand{
 
         //結果を小文字にして、「ture」を含むかを確認
         String lower = result.toLowerCase();
-        if(lower.contains("true")) {
-            dao.updatePatternIsUseful(info.getHash(), true);
+        if(lower.contains("false")) {
+            dao.updatePatternIsUseful(info.getHash(), false);
             return true;
         }else{
-            dao.updatePatternIsUseful(info.getHash(),false);
+            dao.updatePatternIsUseful(info.getHash(),true);
             return false;
         }
     }
