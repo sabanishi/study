@@ -3,13 +3,14 @@ package cmd;
 import db.PatternConnectionDbInfo;
 import lombok.extern.slf4j.Slf4j;
 import model.Pattern;
+import model.tree.*;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import model.db.ChunkDbInfo;
 import model.db.PatternDbInfo;
-import model.tree.HalNode;
 import org.jdbi.v3.core.result.ResultIterable;
 import util.LLMUser;
+import util.Pair;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -83,15 +84,10 @@ public class CheckCommand extends BaseCommand{
     @Override
     protected void process(){
         //DB上からスコアが高い順にパターンを取得
-        ResultIterable<String> patternHashes = dao.fetchHighScorePattern();
-        Set<String> highScorePatterns = new HashSet<>();
-        for(String patternHash : patternHashes){
-            PatternDbInfo info = dao.searchPattern(patternHash).first();
-            if(info==null){
-                log.error("Pattern not found");
-                continue;
-            }
+        ResultIterable<PatternDbInfo> patterns = dao.fetchHighScorePattern(2,1);
+        log.info("Check {} patterns",patterns.stream().count());
 
+        for(PatternDbInfo info : patterns){
             //子パターンが有用である時、自身は有用とはしない
             if(info.getIsChildUseful()){
                 log.info("Pattern {} is not useful because children are useful",info.getHash());
@@ -104,12 +100,17 @@ public class CheckCommand extends BaseCommand{
                 continue;
             }
 
-            if(judgeIsUseful(info)){
-                //有用なパターンの場合
-                highScorePatterns.add(patternHash);
-                int i = highScorePatterns.size();
+            //変数を正規化できる時、有用とはしない
+            HalNode before = dao.searchTree(info.getOldTreeHash()).first();
+            if(before!=null){
+                if(canNormalizeVariables(before)){
+                    log.info("Pattern {} is not useful because variables can be normalized",info.getHash());
+                    continue;
+                }
+            }
 
-                log.info("{}/Pattern {} is useful",i,info.getHash());
+            if(judgeIsUseful(info)){
+                log.info("Pattern {} is useful",info.getHash());
                 //自身の親パターンを取得する
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
                 for(PatternConnectionDbInfo parentPatternInfo : parentPatterns){
@@ -117,11 +118,6 @@ public class CheckCommand extends BaseCommand{
                     //親パターンは有用でないとする
                     dao.updatePatternIsUseful(parentHash,false);
                     dao.updatePatternIsChildUseful(parentHash,true);
-                    highScorePatterns.remove(parentHash);
-                }
-
-                if(i>=config.nPattern){
-                    break;
                 }
             }
         }
@@ -185,5 +181,56 @@ public class CheckCommand extends BaseCommand{
             dao.updatePatternIsUseful(info.getHash(),true);
             return true;
         }
+    }
+
+    private boolean canNormalizeVariables(HalNode oldTree){
+        for(HalNode oldNode : oldTree.preOrder()){
+            if (oldNode instanceof HalTreeNode oldTargetNode) {
+                NormalizeNameInfo info = canNormalizeVariable(oldTargetNode);
+                if (info.canNormalize) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static NormalizeNameInfo canNormalizeVariable(HalNode targetNode) {
+        if (targetNode instanceof HalTreeNode targetTreeNode
+                && !(targetNode instanceof HalNormalizeNode)
+                && !(targetNode instanceof HalNormalizeInvocationNode)
+                && !(targetNode instanceof HalEmptyNode)) {
+
+            //一番外側の変数は正規化しない
+            if(targetTreeNode.getId()==0)return new NormalizeNameInfo(false, null);
+
+            if((targetTreeNode.getType().equals("SimpleName"))){
+                if (targetNode.getParent() != null && targetNode.getParent() instanceof HalTreeNode parentTreeNode) {
+                    String parentType = parentTreeNode.getType();
+                    //メソッドの引数または変数宣言の右辺の時のみ、正規化を行う
+                    switch(parentType){
+                        case "METHOD_INVOCATION_RECEIVER":
+                        case "METHOD_INVOCATION_ARGUMENTS":
+                        case "SingleVariableDeclaration":
+                        case "VariableDeclarationFragment":
+                        case "ReturnStatement":
+                        case "Assignment":
+                            //1文字目が大文字の時,メソッド名と判断して正規化を行わない
+                            char firstChar = targetTreeNode.getLabel().charAt(0);
+                            if(Character.isUpperCase(firstChar)){
+                                return new NormalizeNameInfo(false, null);
+                            }
+                            return new NormalizeNameInfo(true, targetTreeNode);
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        return new NormalizeNameInfo(false, null);
+    }
+
+    public record NormalizeNameInfo(boolean canNormalize, HalTreeNode targetNode) {
     }
 }

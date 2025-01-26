@@ -13338,7 +13338,8 @@ NewTree:mockRetrofit.setDelay(100);
     mockRetrofit.setVariancePercentage($V14);
     mockRetrofit.setErrorPercentage($V21);
 LLM: false
-Ans: true
+Ans1: true
+Ans2:
 
 Chunk:retrofit-mock/src/test/java/retrofit/MockRestAdapterTest.java
 234-237
@@ -13672,7 +13673,7 @@ OldTree:this.gradleBuild.script($V12
 NewTree:this.gradleBuild.script($V12)
 				.build($V22);
 LLM: true
-Ans:true
+Ans: true
 
 Chunk:spring-boot-project/spring-boot-tools/spring-boot-gradle-plugin/src/test/java/org/springframework/boot/gradle/docs/GettingStartedDocumentationTests.java
 43-45

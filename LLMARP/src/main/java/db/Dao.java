@@ -135,6 +135,10 @@ public interface Dao {
     @SqlQuery("SELECT * FROM scores ORDER BY score DESC")
     ResultIterable<String> fetchHighScorePattern();
 
+    @SqlQuery("SELECT * FROM patterns WHERE supportC >= :minSupportC AND confidenceC >= :minConfidenceC")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchHighScorePattern(@Bind("minSupportC") int minSupportC, @Bind("minConfidenceC") float minConfidenceC);
+
     @SqlQuery("SELECT score FROM scores WHERE hash = :hash")
     ResultIterable<Float> fetchScore(@Bind("hash") String hash);
 

@@ -17,7 +17,7 @@ OldTree:throw new Error($V5);
 NewTree:throw new NonFatalError($V5);
 推薦して良いケース
 
-noneのみ
+allでは推薦されたいない
 c0b7e605f8ecb5322475a33879fdc32f:1 --> 11a32efeb6fb66519b866418e5b3f67a
 OldTree:[$V4].append($V7);
 NewTree:[$V4].append('[');
