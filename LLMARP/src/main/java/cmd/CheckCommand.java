@@ -86,17 +86,20 @@ public class CheckCommand extends BaseCommand{
         //DB上からスコアが高い順にパターンを取得
         ResultIterable<PatternDbInfo> patterns = dao.fetchHighScorePattern(2,1);
         log.info("Check {} patterns",patterns.stream().count());
+        long max = patterns.stream().count();
 
+        int i = 0;
         for(PatternDbInfo info : patterns){
+            i++;
             //子パターンが有用である時、自身は有用とはしない
             if(info.getIsChildUseful()){
-                log.info("Pattern {} is not useful because children are useful",info.getHash());
+                log.info("{}/Pattern {} is not useful because children are useful",i,info.getHash());
                 continue;
             }
 
             //前後の木が同じ時、有用とはしない
             if(info.getOldTreeHash().equals(info.getNewTreeHash())){
-                log.info("Pattern {} is not useful because old tree and new tree are same",info.getHash());
+                log.info("{}/Pattern {} is not useful because old tree and new tree are same",i,info.getHash());
                 continue;
             }
 
@@ -104,13 +107,13 @@ public class CheckCommand extends BaseCommand{
             HalNode before = dao.searchTree(info.getOldTreeHash()).first();
             if(before!=null){
                 if(canNormalizeVariables(before)){
-                    log.info("Pattern {} is not useful because variables can be normalized",info.getHash());
+                    log.info("{}/Pattern {} is not useful because variables can be normalized",i,info.getHash());
                     continue;
                 }
             }
 
             if(judgeIsUseful(info)){
-                log.info("Pattern {} is useful",info.getHash());
+                log.info("{}/Pattern {} is useful",i,info.getHash());
                 //自身の親パターンを取得する
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
                 for(PatternConnectionDbInfo parentPatternInfo : parentPatterns){
