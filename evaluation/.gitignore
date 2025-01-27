@@ -52,3 +52,5 @@ junit4/match_all/*
 junit4/match_my/*
 junit4/match_none/*
 old/**
+
+check/*

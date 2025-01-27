@@ -84,12 +84,12 @@ public class CheckCommand extends BaseCommand{
     @Override
     protected void process(){
         //DB上からスコアが高い順にパターンを取得
-        ResultIterable<PatternDbInfo> patterns = dao.fetchHighScorePattern(2,1);
-        log.info("Check {} patterns",patterns.stream().count());
-        long max = patterns.stream().count();
+        ResultIterable<String> patternHashes = dao.fetchHighScorePattern();
+        Set<String> usefulPatterns = new HashSet<>();
 
         int i = 0;
-        for(PatternDbInfo info : patterns){
+        for(String hash: patternHashes){
+            PatternDbInfo info = dao.searchPattern(hash).first();
             i++;
             //子パターンが有用である時、自身は有用とはしない
             if(info.getIsChildUseful()){
@@ -116,12 +116,22 @@ public class CheckCommand extends BaseCommand{
                 log.info("{}/Pattern {} is useful",i,info.getHash());
                 //自身の親パターンを取得する
                 ResultIterable<PatternConnectionDbInfo> parentPatterns = dao.searchParentPattern(info.getHash());
+                usefulPatterns.add(info.getHash());
+                i++;
                 for(PatternConnectionDbInfo parentPatternInfo : parentPatterns){
                     String parentHash = parentPatternInfo.getParentHash();
                     //親パターンは有用でないとする
                     dao.updatePatternIsUseful(parentHash,false);
                     dao.updatePatternIsChildUseful(parentHash,true);
+                    if(usefulPatterns.contains(parentHash)){
+                        usefulPatterns.remove(parentHash);
+                        i--;
+                    }
                 }
+            }
+
+            if(i>=config.nPattern){
+                break;
             }
         }
     }
