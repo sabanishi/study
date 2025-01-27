@@ -111,6 +111,14 @@ public interface Dao {
     @RegisterRowMapper(ChunkInfoMapper.class)
     ResultIterable<ChunkDbInfo> searchChunkById(@Bind("chunkId") long chunkId);
 
+    @SqlQuery("SELECT * FROM chunks WHERE hash = :hash")
+    @RegisterRowMapper(ChunkInfoMapper.class)
+    ResultIterable<ChunkDbInfo> searchChunkByHash(@Bind("hash") String hash);
+
+    @SqlQuery("SELECT * FROM commits WHERE id = :commitId")
+    @RegisterRowMapper(CommitMapper.class)
+    ResultIterable<CommitDbInfo> searchCommitById(@Bind("commitId") long commitId);
+
     @SqlQuery("SELECT * FROM patterns WHERE hash = :hash")
     @RegisterRowMapper(PatternMapper.class)
     ResultIterable<PatternDbInfo> searchPattern(@Bind("hash") String hash);
@@ -134,6 +142,14 @@ public interface Dao {
 
     @SqlQuery("SELECT * FROM scores ORDER BY score DESC")
     ResultIterable<String> fetchHighScorePattern();
+
+    @SqlQuery("SELECT * FROM patterns WHERE is_candidate = 1 AND supportC >= 2 AND confidenceC = 1 ORDER BY score DESC")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchHighScoreCandidatePatterns();
+
+    @SqlQuery("SELECT * FROM patterns WHERE is_useful = 1 ORDER BY score DESC")
+    @RegisterRowMapper(PatternMapper.class)
+    ResultIterable<PatternDbInfo> fetchHighScorePatterns();
 
     @SqlQuery("SELECT * FROM patterns WHERE supportC >= :minSupportC AND confidenceC >= :minConfidenceC")
     @RegisterRowMapper(PatternMapper.class)

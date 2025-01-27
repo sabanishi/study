@@ -38,6 +38,9 @@ public class MatchingCommand extends BaseCommand{
     public static class Config{
         @Option(names = {"-r","--repository"},paramLabel = "<repo>",description = "repository path")
         Path repository = Path.of("");
+
+        @Option(names = {"-f","--folder"})
+        String folder = "match";
     }
 
     @Mixin
@@ -68,7 +71,7 @@ public class MatchingCommand extends BaseCommand{
                 Tree targetTree = TreeUtil.createTree(targetSource);
                 HalTreeNode targetRoot = HalTreeNode.of(targetTree,targetSource);
 
-                File logFile = new File("match/match_log.csv");
+                File logFile = new File(config.folder+"/match_log.csv");
 
                 for(PatternInfo info : patternInfoList){
                     HalRootNode oldRoot = (HalRootNode)info.getOldTree();
@@ -81,11 +84,11 @@ public class MatchingCommand extends BaseCommand{
                     if(!result.equals(targetSource)){
                         log.info("match: {} with {}",filePath,info.getHash());
                         //結果をファイルに書き込む
-                        Path beforePath = Path.of("match/"+matchCount+"_before.java");
-                        Path afterPath = Path.of("match/"+matchCount+"_after.java");
-                        Path patternOldPath = Path.of("match/"+matchCount+"_pattern_old.txt");
-                        Path patternNewPath = Path.of("match/"+matchCount+"_pattern_new.txt");
-                        Path diffPath = Path.of("match/"+matchCount+"_diff.txt");
+                        Path beforePath = Path.of(config.folder+"/"+matchCount+"_before.java");
+                        Path afterPath = Path.of(config.folder+"/"+matchCount+"_after.java");
+                        Path patternOldPath = Path.of(config.folder+"/"+matchCount+"_pattern_old.txt");
+                        Path patternNewPath = Path.of(config.folder+"/"+matchCount+"_pattern_new.txt");
+                        Path diffPath = Path.of(config.folder+"/"+matchCount+"_diff.txt");
 
                         FileUtil.write(beforePath,targetSource);
                         FileUtil.write(afterPath,result);
