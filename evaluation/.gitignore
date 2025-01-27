@@ -27,6 +27,7 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+.txt
 
 ### NetBeans ###
 /nbproject/private/
@@ -47,3 +48,7 @@ match_all/*
 match_none/*
 match_chaa/*
 match_my/*
+junit4/match_all/*
+junit4/match_my/*
+junit4/match_none/*
+old/**

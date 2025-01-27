@@ -40,15 +40,15 @@ public class SeparateCommand extends BaseCommand{
                         (SELECT parent_hash
                         FROM pattern_connections
                        )
+                    AND confidenceC = 1
+                    AND supportC >= 2
                     """);
-            /*h.execute("""
+            h.execute("""
                     UPDATE patterns AS p
                     SET is_useful = 0
                     WHERE p.is_useful = 1
                         AND p.old_tree_hash = p.new_tree_hash
                     """);
-
-             */
         }catch(Exception e){
             log.error(e.getMessage(),e);
         }
@@ -73,15 +73,15 @@ public class SeparateCommand extends BaseCommand{
                             SELECT parent_hash
                             FROM candidate_children
                         )
+                        AND confidenceC = 1
+                        AND supportC >= 2
                     """);
-            /*h.execute("""
+            h.execute("""
                     UPDATE patterns AS p
                     SET is_useful = 0
                     WHERE p.is_useful = 1
                         AND p.old_tree_hash = p.new_tree_hash
                     """);
-                    
-             */
         }catch(Exception e){
             log.error(e.getMessage(),e);
         }
