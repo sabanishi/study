@@ -103,7 +103,7 @@ public class MatchingCommand extends BaseCommand{
                         matchCount++;
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
         }
