@@ -36,7 +36,6 @@ public class CheckCommand extends BaseCommand{
             "For any code fragment that matches the \"before\" section of the change pattern, the \"after\" code fragment can be universally generated.\n" +
             "The transformation can be applied to all matched code fragments without breaking their behavior.\n" +
             "Normalized nodes present in the \"after\" section of the change pattern must also exist in the \"before\" section.\n" +
-            "Additionally, if normalized nodes exist in the \"after\" section of the change pattern but not in the \"before\" section, the change pattern cannot be automatically applied and is therefore not useful.\n" +
             "Also, [$V1],[$V2], etc. indicate that the variables are normalized, which does not affect their usefulness.\n" +
             "And $V1, $V2, etc. indicate that the literal is normalized, and you should only determine if this is the correct normalization.\n" +
             "\n" +
@@ -84,12 +83,11 @@ public class CheckCommand extends BaseCommand{
     @Override
     protected void process(){
         //DB上からスコアが高い順にパターンを取得
-        ResultIterable<String> patternHashes = dao.fetchHighScorePattern();
+        ResultIterable<PatternDbInfo> patterns = dao.fetchHighScorePattern(2,1);
         Set<String> usefulPatterns = new HashSet<>();
 
         int i = 0;
-        for(String hash: patternHashes){
-            PatternDbInfo info = dao.searchPattern(hash).first();
+        for(PatternDbInfo info: patterns){
             i++;
             //子パターンが有用である時、自身は有用とはしない
             if(info.getIsChildUseful()){

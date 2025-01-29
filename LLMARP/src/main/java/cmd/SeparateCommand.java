@@ -55,6 +55,7 @@ public class SeparateCommand extends BaseCommand{
 
         log.info("Separate the pattern");
 
+
         final Jdbi noneJdbi = Database.open(config.nonePath);
         try(final Handle h = noneJdbi.open()) {
             h.execute("""

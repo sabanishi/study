@@ -1,0 +1,18 @@
+## 1.単純なリネーム、リファクタリングなど,振る舞いが変わらない変更
+- endpoint([$V7].getUrl($V10).toString())
++ baseUrl([$V7].getUrl($V10).toString())
+
+## 2.正規化に関わらず振る舞いが変わる変更(振る舞いが変わることを意図している変更)
+- @PutMapping(value = $V5)
++ @RequestMapping(value = $V5, method = {RequestMethod.PUT,RequestMethod.POST})
+
+## 3.変更パターンが良くない
+- public static GlideOptions timeoutOf(@IntRange(from = $V11) int [$V13])
++ public static GlideOptions timeoutOf(@IntRange(from = $V11) int value)
+
+## 4.正規化によって振る舞いが変わる変更(不適切な変更)
+- @EqualsAndHashCode(callSuper = $V5)
++ @EqualsAndHashCode
+
+正規化が妥当か
+パターンが妥当か
