@@ -13,6 +13,7 @@ import model.tree.HalNode;
 import model.tree.HalRootNode;
 import model.tree.HalTreeNode;
 import model.tree.ReplaceNode;
+import org.eclipse.core.internal.resources.Folder;
 import org.jdbi.v3.core.result.ResultIterable;
 import parse.ISplitter;
 import parse.Splitter;
@@ -47,12 +48,22 @@ public class MatchingCommand extends BaseCommand{
     Config config = new Config();
 
     @Override
-    protected void process(){
+    protected void process() throws IOException {
         log.info("Matching: {}",config.repository);
         List<Path> filePaths = searchFiles(config.repository,".java");
 
         ResultIterable<PatternDbInfo> patterns = dao.fetchUsefulPatterns();
         List<PatternInfo> patternInfoList = new ArrayList<>();
+
+        //ディレクトリが存在すれば中身を全て削除、存在しなければ作成
+        if(Files.exists(Path.of(config.folder))){
+            Files.walk(Path.of(config.folder))
+                    .map(Stream::of)
+                    .reduce(Stream.empty(),(x,y)->Stream.concat(y,x))
+                    .forEach(x->x.toFile().delete());
+        }
+
+        Files.createDirectory(Path.of(config.folder));
 
         //PatternDbInfoからPatternInfoを作成
         //DBInfoに含まれるハッシュ値からHalNodeの参照を作成する

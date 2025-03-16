@@ -50,3 +50,5 @@ match_none/*
 match_my/*
 
 **.db
+
+**.tar.gz

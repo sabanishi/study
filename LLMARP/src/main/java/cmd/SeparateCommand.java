@@ -41,7 +41,22 @@ public class SeparateCommand extends BaseCommand{
                         FROM pattern_connections
                        )
                     AND confidenceC = 1
-                    AND supportC >= 2
+                    AND supportC >= 3
+                    """);
+            h.execute("""
+                    UPDATE patterns AS p
+                    SET is_useful = 1
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                    	FROM pattern_connections pc
+                    	JOIN patterns cp
+                    		ON pc.child_hash = cp.hash
+                    		WHERE pc.parent_hash = p.hash
+                    		  AND cp.is_useful = 1
+                    )
+                    AND p.is_normalized=1
+                    AND confidenceC = 1
+                    AND supportC >= 3
                     """);
             h.execute("""
                     UPDATE patterns AS p
@@ -75,7 +90,7 @@ public class SeparateCommand extends BaseCommand{
                             FROM candidate_children
                         )
                         AND confidenceC = 1
-                        AND supportC >= 2
+                        AND supportC >= 3
                     """);
             h.execute("""
                     UPDATE patterns AS p
